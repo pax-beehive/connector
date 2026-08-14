@@ -21,6 +21,9 @@ func fixtureIR(t *testing.T) *IR {
 func fixtureConfig() *Config {
 	return &Config{
 		Package:          "fixture",
+		Title:            "Fixture API connector",
+		Description:      "Test fixture connector.",
+		AgentNotes:       "Fixture notes.",
 		DateTimeType:     "connector.DateTime",
 		SkipHeaders:      []string{"authorization", "version", "siteId"},
 		QueryPrefixStrip: "request.",

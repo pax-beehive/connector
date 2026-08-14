@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Lint (vet + cyclomatic complexity < 20)
+        run: make lint
+
+      - name: Tests (race detector)
+        run: go test ./... -race
+
+      - name: Coverage gate (>= 80%)
+        run: make cover
+
+      - name: Generated code is up to date
+        run: |
+          make gen
+          git diff --exit-code

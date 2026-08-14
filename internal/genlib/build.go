@@ -138,6 +138,10 @@ func (b *builder) buildOp(raw rawOp) error {
 		return err
 	}
 	op.TestPath = b.testPath(raw)
+	op.DocPath = raw.path
+	for name, value := range b.cfg.PinnedPathParams {
+		op.DocPath = strings.ReplaceAll(op.DocPath, "{"+name+"}", value)
+	}
 	if err := checkFieldNames(op.Request); err != nil {
 		return err
 	}

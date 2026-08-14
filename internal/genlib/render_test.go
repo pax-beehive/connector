@@ -15,7 +15,7 @@ func TestRenderGolden(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{"types_gen.go", "widget_gen.go", "misc_gen.go", "roundtrip_gen_test.go"} {
+	for _, want := range []string{"types_gen.go", "widget_gen.go", "misc_gen.go", "roundtrip_gen_test.go", "AGENTS.md"} {
 		if _, ok := files[want]; !ok {
 			t.Errorf("missing file %s", want)
 		}

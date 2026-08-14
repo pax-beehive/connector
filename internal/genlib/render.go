@@ -30,7 +30,51 @@ func Render(ir *IR, cfg *Config) (map[string][]byte, error) {
 	if err := renderFile(files, "roundtrip_gen_test.go", roundtripTmpl, ir, testImports); err != nil {
 		return nil, err
 	}
+	if err := renderAgents(files, ir, cfg); err != nil {
+		return nil, err
+	}
 	return files, nil
+}
+
+// agentsData feeds the AGENTS.md template.
+type agentsData struct {
+	Title       string
+	Description string
+	Notes       string
+	Package     string
+	Total       int
+	Groups      []agentsGroup
+}
+
+type agentsGroup struct {
+	Tag string
+	Ops []Operation
+}
+
+func renderAgents(files map[string][]byte, ir *IR, cfg *Config) error {
+	data := &agentsData{
+		Title:       cfg.Title,
+		Description: cfg.Description,
+		Notes:       strings.TrimSpace(cfg.AgentNotes),
+		Package:     ir.Package,
+		Total:       len(ir.Ops),
+	}
+	if data.Title == "" {
+		data.Title = ir.Package + " connector"
+	}
+	for _, tag := range ir.Tags {
+		data.Groups = append(data.Groups, agentsGroup{Tag: tag, Ops: opsForTag(ir, tag)})
+	}
+	t, err := template.New("AGENTS.md").Parse(agentsTmpl)
+	if err != nil {
+		return err
+	}
+	var buf bytes.Buffer
+	if err := t.Execute(&buf, data); err != nil {
+		return err
+	}
+	files["AGENTS.md"] = buf.Bytes()
+	return nil
 }
 
 func opsForTag(ir *IR, tag string) []Operation {

@@ -13,9 +13,16 @@ import (
 
 // Config is the per-connector generation config (gen.yaml).
 type Config struct {
-	Package          string            `yaml:"package"`
-	Spec             string            `yaml:"spec"`
-	OutDir           string            `yaml:"out_dir"`
+	Package string `yaml:"package"`
+	Spec    string `yaml:"spec"`
+	OutDir  string `yaml:"out_dir"`
+	// Title, Description and AgentNotes feed the generated AGENTS.md: Title
+	// and Description introduce the connector; AgentNotes is handwritten
+	// markdown (auth model, usage, boundaries) included verbatim before the
+	// generated capability catalog.
+	Title            string            `yaml:"title"`
+	Description      string            `yaml:"description"`
+	AgentNotes       string            `yaml:"agent_notes"`
 	DateTimeType     string            `yaml:"datetime_type"` // e.g. connector.DateTime; empty means time.Time
 	SkipHeaders      []string          `yaml:"skip_headers"`
 	QueryPrefixStrip string            `yaml:"query_prefix_strip"`

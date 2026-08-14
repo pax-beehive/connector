@@ -37,6 +37,9 @@ type Operation struct {
 	// TestPath is the expected expanded path with pinned params applied and
 	// remaining path params replaced by their zero values.
 	TestPath string
+	// DocPath is the path with pinned params substituted but caller-supplied
+	// path params kept as {name} placeholders, for documentation.
+	DocPath string
 }
 
 // IR is everything the renderer needs.

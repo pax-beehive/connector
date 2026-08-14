@@ -1,6 +1,67 @@
 package: mindbody
 spec: spec/swagger.json
 out_dir: .
+title: "Mindbody Public API v6 connector"
+description: >-
+  Go connector for the Mindbody Public API v6 (fitness/wellness studio
+  management: classes, appointments, clients, sales, staff, sites). Full
+  coverage of the public API, generated from the official OpenAPI spec.
+agent_notes: |
+  ## How to use this connector
+
+  One `Client` serves one Mindbody site. Construct it with credentials; all
+  auth headers and the staff user token are handled automatically:
+
+  ```go
+  import (
+      "github.com/pax-beehive/connector"
+      "github.com/pax-beehive/connector/mindbody"
+  )
+
+  c, err := mindbody.NewClient(&mindbody.Config{
+      APIKey:   "...",     // required
+      SiteID:   "-99",     // required ("-99" is the Mindbody sandbox site)
+      Username: "staff",   // optional staff credentials; most write
+      Password: "secret",  // endpoints and some reads require them
+  })
+
+  resp, err := c.GetClasses(ctx, &mindbody.GetClassesRequest{
+      Limit:       connector.Ptr(25),
+      LocationIds: []int{1},
+  })
+  ```
+
+  ## Auth model
+
+  - `Api-Key`, `SiteId`, and `Version` headers are attached to every request.
+  - If `Username`/`Password` are set, a staff user token is issued lazily via
+    `POST /usertoken/issue`, cached in memory, and re-issued automatically
+    once after a 401. Without staff credentials only public read endpoints
+    work; authenticated endpoints return 401.
+
+  ## Errors
+
+  Any non-2xx response is returned as `*connector.APIError` with
+  `StatusCode`, Mindbody's `Code`/`Message`, and the raw `Body`. Check it
+  with `errors.As`.
+
+  ## Data conventions
+
+  - Date-time fields use `connector.DateTime`. The wire format has NO
+    timezone: values are interpreted in the studio site's local time zone.
+    Construct them in site-local time; offsets are dropped on send.
+  - Optional scalars are pointers (`*int`, `*string`, ...); absent means
+    "not sent". Slices encode as repeated query keys.
+  - IDs and paging: list endpoints take `Limit`/`Offset` and return a
+    `PaginationResponse`; there is no automatic pagination helper — loop
+    with `Offset` yourself.
+
+  ## Capability boundaries (what this connector does NOT do)
+
+  - No webhooks (Mindbody's Webhooks API is a separate product/spec).
+  - No rate limiting or retry/backoff beyond the single 401 re-auth retry.
+  - No request validation: required-ness is enforced by the API server, not
+    by these types.
 datetime_type: connector.DateTime
 skip_headers: [authorization, version, siteId]
 query_prefix_strip: "request."

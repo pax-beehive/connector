@@ -1,5 +1,7 @@
 # connector
 
+[![CI](https://github.com/pax-beehive/connector/actions/workflows/ci.yml/badge.svg)](https://github.com/pax-beehive/connector/actions/workflows/ci.yml)
+
 A Go connector SDK library. Each external service gets one connector package;
 a connector instance is constructed with the credentials it needs. Every API
 operation is one method:
@@ -49,6 +51,15 @@ resp, err := c.GetClasses(ctx, &mindbody.GetClassesRequest{
 - Non-2xx responses return a `*connector.APIError` with the Mindbody error
   code and message parsed.
 
+## For AI agents
+
+Each connector ships a generated [`AGENTS.md`](mindbody/AGENTS.md) describing
+its capability boundary: how to construct the client, the auth model, error
+and data conventions, what is out of scope, and a catalog of every operation
+with its HTTP mapping. It is generated from the spec (plus handwritten notes
+in `gen.yaml`), so it never drifts from the code. Point your agent at it
+before using the SDK.
+
 ## Regenerating
 
 Generated files (`*_gen.go`) and the spec snapshot (`mindbody/spec/`) are
@@ -62,8 +73,9 @@ make gen
 
 1. Create a package directory with the service's OpenAPI spec snapshot
    (Swagger 2.0 or OpenAPI 3.x both work).
-2. Write a `gen.yaml` (see `mindbody/gen.yaml`) and a `gen.go` with the
-   `go:generate` line.
+2. Write a `gen.yaml` (see `mindbody/gen.yaml`) — including the
+   `title`/`description`/`agent_notes` that feed the generated `AGENTS.md` —
+   and a `gen.go` with the `go:generate` line.
 3. Write the handwritten layer: a `Config`, a `Client` struct with a
    `core *connector.Core` field, a `NewClient` that wires base URL, static
    headers, an optional `connector.Authorizer`, and an error-body parser.
