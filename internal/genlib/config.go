@@ -22,7 +22,8 @@ type Config struct {
 	QueryPrefixStrip string            `yaml:"query_prefix_strip"`
 	PinnedPathParams map[string]string `yaml:"pinned_path_params"`
 	PreferNamespaces []string          `yaml:"prefer_namespaces"`
-	Rename           map[string]string `yaml:"rename"` // operationId -> method name
+	Rename           map[string]string `yaml:"rename"`       // operationId -> method name
+	RenameTypes      map[string]string `yaml:"rename_types"` // definition full name -> Go type name
 }
 
 // LoadConfig reads a gen.yaml. Spec and OutDir are resolved relative to the

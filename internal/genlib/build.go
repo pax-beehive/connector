@@ -89,7 +89,7 @@ func (b *builder) collectRawOps() ([]rawOp, error) {
 	seen := map[string]string{}
 	for path, item := range b.doc.Paths.Map() {
 		for httpMethod, op := range item.Operations() {
-			name := methodName(op.OperationID, b.cfg)
+			name := methodName(httpMethod, path, op.OperationID, b.cfg)
 			if prev, ok := seen[name]; ok {
 				return nil, fmt.Errorf("genlib: duplicate method name %q (operationIds %q and %q); disambiguate via rename config", name, prev, op.OperationID)
 			}

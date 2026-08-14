@@ -196,3 +196,42 @@ func TestBuildDuplicateMethodNames(t *testing.T) {
 		t.Fatal("expected duplicate method name error")
 	}
 }
+
+func TestRenameByMethodAndPath(t *testing.T) {
+	doc, err := LoadSpec("testdata/fixture-swagger.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg := fixtureConfig()
+	cfg.Rename = map[string]string{"POST /public/v{version}/widget/widgets": "CreateWidget"}
+	ir, err := Build(doc, cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	opByName(t, ir, "CreateWidget")
+}
+
+func TestRenameTypes(t *testing.T) {
+	doc, err := LoadSpec("testdata/fixture-swagger.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg := fixtureConfig()
+	cfg.RenameTypes = map[string]string{"Acme.Api.V1.Widget": "WidgetModel"}
+	ir, err := Build(doc, cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	found := false
+	for _, m := range ir.Models {
+		if m.Name == "WidgetModel" {
+			found = true
+		}
+		if m.Name == "Widget" {
+			t.Error("Widget should have been renamed")
+		}
+	}
+	if !found {
+		t.Error("WidgetModel missing")
+	}
+}

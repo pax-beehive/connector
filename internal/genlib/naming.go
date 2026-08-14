@@ -34,9 +34,13 @@ func camelize(name string) string {
 	return s
 }
 
-// methodName derives a Go method name from an operationId, applying config
-// renames first.
-func methodName(operationID string, cfg *Config) string {
+// methodName derives a Go method name from an operationId. Config renames
+// apply first, keyed either by "METHOD /path" (for specs with duplicate
+// operationIds) or by operationId.
+func methodName(httpMethod, path, operationID string, cfg *Config) string {
+	if n, ok := cfg.Rename[httpMethod+" "+path]; ok {
+		return n
+	}
 	if n, ok := cfg.Rename[operationID]; ok {
 		return n
 	}
@@ -73,12 +77,17 @@ func preferred(full string, cfg *Config) bool {
 // segments right-to-left until unique. forbidden holds names reserved for
 // generated request structs.
 func defGoNames(fullNames []string, cfg *Config, forbidden map[string]bool) (map[string]string, error) {
+	names := map[string]string{}
 	groups := map[string][]string{}
 	for _, full := range fullNames {
+		if renamed, ok := cfg.RenameTypes[full]; ok {
+			names[full] = renamed
+			forbidden[renamed] = true
+			continue
+		}
 		base := camelize(lastSegment(full))
 		groups[base] = append(groups[base], full)
 	}
-	names := map[string]string{}
 	for base, group := range groups {
 		sort.Strings(group)
 		if err := assignGroup(base, group, cfg, forbidden, names); err != nil {

@@ -1,0 +1,16 @@
+package: mindbody
+spec: spec/swagger.json
+out_dir: .
+base_url: https://api.mindbodyonline.com
+datetime_type: connector.DateTime
+skip_headers: [authorization, version, siteId]
+query_prefix_strip: "request."
+pinned_path_params: {version: "6"}
+prefer_namespaces: ["Mindbody.PublicApi.Dto.Models.V6"]
+# The spec uses operationId RemoveFromWaitlist for two different endpoints.
+rename:
+  "DELETE /public/v{version}/appointment/appointmentfromwaitlist": RemoveAppointmentFromWaitlist
+# The Mindbody "Client" model would collide with the connector's Client type.
+rename_types:
+  "Mindbody.PublicApi.Dto.Models.V6.Client": ClientProfile
+
