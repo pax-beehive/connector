@@ -19,6 +19,17 @@ func TestDefGoNamesCrossGroupReservation(t *testing.T) {
 	}
 }
 
+func TestMethodNameStripSuffix(t *testing.T) {
+	cfg := &Config{StripOperationIDSuffix: "Method"}
+	if got := methodName("GET", "/x", "CreateCampaignMethod", cfg); got != "CreateCampaign" {
+		t.Errorf("got %q", got)
+	}
+	cfg.Rename = map[string]string{"CreateCampaignMethod": "MakeCampaign"}
+	if got := methodName("GET", "/x", "CreateCampaignMethod", cfg); got != "MakeCampaign" {
+		t.Errorf("rename must win, got %q", got)
+	}
+}
+
 func TestDefGoNamesForbiddenBase(t *testing.T) {
 	names, err := defGoNames([]string{"Api.V1.Foo"}, &Config{}, map[string]bool{"Foo": true})
 	if err != nil {

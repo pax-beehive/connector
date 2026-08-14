@@ -44,6 +44,9 @@ func methodName(httpMethod, path, operationID string, cfg *Config) string {
 	if n, ok := cfg.Rename[operationID]; ok {
 		return n
 	}
+	if cfg.StripOperationIDSuffix != "" {
+		operationID = strings.TrimSuffix(operationID, cfg.StripOperationIDSuffix)
+	}
 	return camelize(operationID)
 }
 

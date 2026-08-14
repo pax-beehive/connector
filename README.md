@@ -160,6 +160,25 @@ resp, err := c.SearchGoogleAds(ctx, &googleads.SearchGoogleAdsRequest{
 })
 ```
 
+## OpenAI Ads (ChatGPT Ads)
+
+Manage ChatGPT ad campaigns: campaigns / ad groups / ads with dedicated
+activate/pause/archive actions, creative uploads, custom audiences,
+conversion setup, geo lookup, and insights at every level. Generated from
+OpenAI's **official** OpenAPI spec. See
+[`openaiads/AGENTS.md`](openaiads/AGENTS.md).
+
+```go
+import "github.com/pax-beehive/connector/openaiads"
+
+c, err := openaiads.NewClient(&openaiads.Config{APIKey: adsAPIKey})
+camp, err := c.CreateCampaign(ctx, &openaiads.CreateCampaignRequest{
+	Name:   connector.Ptr("Spring launch"),
+	Status: connector.Ptr("active"),
+	Budget: &openaiads.BudgetParams{LifetimeSpendLimitMicros: connector.Ptr(25_000_000)},
+})
+```
+
 ## Client options and error handling
 
 Every connector's `NewClient(cfg, opts...)` accepts shared options:
@@ -196,7 +215,8 @@ Each connector ships a generated `AGENTS.md`
 ([mindbody](mindbody/AGENTS.md), [instagram](instagram/AGENTS.md),
 [threads](threads/AGENTS.md), [facebook](facebook/AGENTS.md),
 [x](x/AGENTS.md), [metaads](metaads/AGENTS.md),
-[googleads](googleads/AGENTS.md)) describing
+[googleads](googleads/AGENTS.md), [openaiads](openaiads/AGENTS.md))
+describing
 its capability boundary: how to construct the client, the auth model, error
 and data conventions, what is out of scope, and a catalog of every operation
 with its HTTP mapping. It is generated from the spec (plus handwritten notes

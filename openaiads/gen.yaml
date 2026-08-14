@@ -1,0 +1,84 @@
+package: openaiads
+spec: spec/openapi.json
+out_dir: .
+title: "OpenAI Ads (ChatGPT Ads) connector"
+description: >-
+  Go connector for the OpenAI Ads API: managing ChatGPT ad campaigns, ad
+  groups, ads, creative uploads, custom audiences, conversion setup, and
+  insights. Generated from OpenAI's OFFICIAL OpenAPI spec
+  (developers.openai.com/ads/openapi.json), snapshotted in spec/.
+agent_notes: |
+  ## How to use this connector
+
+  One `Client` serves one OpenAI ad account, authenticated by an Ads API
+  key issued in the **Settings tab of the Ads Manager** (each key is scoped
+  to exactly one ad account — no separate account ID parameter exists):
+
+  ```go
+  import (
+      "github.com/pax-beehive/connector"
+      "github.com/pax-beehive/connector/openaiads"
+  )
+
+  c, err := openaiads.NewClient(&openaiads.Config{APIKey: "..."})
+
+  // Verify access:
+  acct, err := c.GetAdAccount(ctx, &openaiads.GetAdAccountRequest{})
+  ```
+
+  ## Campaign structure and workflow
+
+  Hierarchy: Campaign → Ad Group (context hints + bidding) → Ad (creative).
+  Typical flow:
+
+  ```go
+  // 1. Upload a creative image (public URL; returns a file_id).
+  up, err := c.UploadImage(ctx, &openaiads.UploadImageRequest{
+      ImageUrl: connector.Ptr("https://example.com/card.png"),
+  })
+
+  // 2. Campaign with a budget (amounts are micros: $25 = 25_000_000).
+  camp, err := c.CreateCampaign(ctx, &openaiads.CreateCampaignRequest{ ... })
+
+  // 3. Ad group: context_hints steer contextual matching (there is no
+  //    keyword targeting), bidding_config sets billing event and max bid.
+  // 4. Ad: chat_card creative referencing the uploaded file_id.
+  ```
+
+  For an ad to serve, the ad AND its parent ad group AND campaign must all
+  be enabled, and the ad must pass review — poll the ad's `review_status`
+  (reviews typically take minutes). Use the dedicated
+  Activate/Pause/Archive methods to change state.
+
+  ## Errors and limits
+
+  - Non-2xx responses become `*connector.APIError` with OpenAI's error
+    code/type and message.
+  - Rate limits: 600 req/min per endpoint, 1200 req/min overall per ad
+    account and per IP. `connector.IsRateLimited(err)` detects 429s;
+    consider `connector.WithRetry`.
+
+  ## Capability boundaries (what this connector does NOT do)
+
+  - No OAuth or key management: issue/rotate API keys in Ads Manager.
+  - Binary multipart uploads are not supported — upload creatives via the
+    JSON `image_url` variant only.
+  - The Bulk API (async batch jobs), product feeds / delta feeds, and the
+    Conversions API event-sending endpoint are not covered (conversion
+    SETUP — pixels, API keys, event settings — is included).
+  - This platform is in active beta; re-snapshot the official spec
+    (developers.openai.com/ads/openapi.json) and `make gen` to pick up
+    changes.
+  - No retries by default; opt in with `connector.WithRetry`.
+datetime_type: connector.DateTime
+strip_operation_id_suffix: "Method"
+path_tags:
+  - {prefix: "/campaigns", tag: "Campaigns"}
+  - {prefix: "/ad_groups", tag: "AdGroups"}
+  - {prefix: "/ads", tag: "Ads"}
+  - {prefix: "/ad_account", tag: "Account"}
+  - {prefix: "/custom_audiences", tag: "Audiences"}
+  - {prefix: "/conversions", tag: "Conversions"}
+  - {prefix: "/geo_lookup", tag: "Geo"}
+  - {prefix: "/upload", tag: "Files"}
+test_new_client: 'NewClient(&Config{APIKey: "t", BaseURL: srv.URL})'

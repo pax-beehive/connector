@@ -129,7 +129,7 @@ func (b *builder) buildOp(raw rawOp) error {
 		MethodName: raw.methodName,
 		HTTPMethod: raw.httpMethod,
 		Path:       raw.path,
-		Tag:        opTag(raw.op),
+		Tag:        b.opTag(raw),
 		Request:    Struct{Name: raw.methodName + "Request"},
 	}
 	if err := b.buildParams(&op, raw.op); err != nil {
@@ -153,9 +153,14 @@ func (b *builder) buildOp(raw rawOp) error {
 	return nil
 }
 
-func opTag(op *openapi3.Operation) string {
-	if len(op.Tags) > 0 {
-		return op.Tags[0]
+func (b *builder) opTag(raw rawOp) string {
+	for _, pt := range b.cfg.PathTags {
+		if strings.HasPrefix(raw.path, pt.Prefix) {
+			return pt.Tag
+		}
+	}
+	if len(raw.op.Tags) > 0 {
+		return raw.op.Tags[0]
 	}
 	return "Default"
 }
@@ -168,6 +173,9 @@ func (b *builder) buildParams(op *Operation, src *openapi3.Operation) error {
 		f, kind, err := b.paramField(p)
 		if err != nil {
 			return fmt.Errorf("genlib: %s param %q: %w", op.MethodName, p.Name, err)
+		}
+		if kind != "" {
+			b.markReachable(p.Schema)
 		}
 		switch kind {
 		case "path":
@@ -345,12 +353,36 @@ func (b *builder) goType(schema *openapi3.SchemaRef) string {
 		return "any"
 	}
 	if schema.Ref != "" {
-		return "*" + b.names[refName(schema.Ref)]
+		full := refName(schema.Ref)
+		if def := b.schemaFor(full); def != nil && def.Value != nil && !isObjectDef(def.Value) {
+			// Non-object definitions (enum strings, arrays, primitives)
+			// inline to their underlying Go type instead of a named struct.
+			return b.inlineGoType(def.Value)
+		}
+		return "*" + b.names[full]
 	}
 	return b.inlineGoType(schema.Value)
 }
 
+// isObjectDef reports whether a definition should be emitted as a struct.
+// Enum strings, primitives, arrays, and pure anyOf wrappers inline instead.
+func isObjectDef(s *openapi3.Schema) bool {
+	switch typeOf(s) {
+	case "object":
+		return true
+	case "":
+		return len(s.AnyOf) == 0
+	default:
+		return false
+	}
+}
+
 func (b *builder) inlineGoType(s *openapi3.Schema) string {
+	if len(s.AnyOf) > 0 {
+		if collapsed := firstNonNull(s.AnyOf); collapsed != nil {
+			return b.goType(collapsed)
+		}
+	}
 	switch typeOf(s) {
 	case "string":
 		return b.stringGoType(s)
@@ -394,6 +426,17 @@ func (b *builder) elemType(schema *openapi3.SchemaRef) string {
 	return strings.TrimPrefix(b.goType(schema), "*")
 }
 
+// firstNonNull collapses a nullable anyOf ({X, null}) to its X branch;
+// optionality is already expressed by pointer field types.
+func firstNonNull(branches openapi3.SchemaRefs) *openapi3.SchemaRef {
+	for _, branch := range branches {
+		if branch.Ref != "" || typeOf(branch.Value) != "null" {
+			return branch
+		}
+	}
+	return nil
+}
+
 func typeOf(s *openapi3.Schema) string {
 	if s == nil || s.Type == nil || len(*s.Type) == 0 {
 		return ""
@@ -432,6 +475,15 @@ func (b *builder) markInline(s *openapi3.Schema) {
 	}
 	b.markReachable(s.Items)
 	b.markReachable(s.AdditionalProperties.Schema)
+	for _, branch := range s.AnyOf {
+		b.markReachable(branch)
+	}
+	for _, branch := range s.OneOf {
+		b.markReachable(branch)
+	}
+	for _, branch := range s.AllOf {
+		b.markReachable(branch)
+	}
 }
 
 // buildModels emits a struct for every reachable definition.
@@ -445,6 +497,9 @@ func (b *builder) buildModels() error {
 		def := b.schemaFor(full)
 		if def == nil || def.Value == nil {
 			return fmt.Errorf("genlib: reachable definition %q not found", full)
+		}
+		if !isObjectDef(def.Value) {
+			continue // inlined at use sites (enum/primitive/array defs)
 		}
 		m := Struct{Name: b.names[full], Doc: full}
 		for _, name := range sortedKeys(def.Value.Properties) {

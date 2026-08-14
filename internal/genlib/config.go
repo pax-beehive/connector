@@ -34,6 +34,18 @@ type Config struct {
 	PreferNamespaces []string          `yaml:"prefer_namespaces"`
 	Rename           map[string]string `yaml:"rename"`       // operationId -> method name
 	RenameTypes      map[string]string `yaml:"rename_types"` // definition full name -> Go type name
+	// StripOperationIDSuffix removes a trailing suffix from every
+	// operationId before deriving the method name (e.g. "Method").
+	StripOperationIDSuffix string `yaml:"strip_operation_id_suffix"`
+	// PathTags assigns operation tags by path prefix (first match wins),
+	// for specs that declare no tags. Falls back to the spec's own tags.
+	PathTags []PathTag `yaml:"path_tags"`
+}
+
+// PathTag maps a path prefix to a tag used for file grouping and docs.
+type PathTag struct {
+	Prefix string `yaml:"prefix"`
+	Tag    string `yaml:"tag"`
 }
 
 // LoadConfig reads a gen.yaml. Spec and OutDir are resolved relative to the
