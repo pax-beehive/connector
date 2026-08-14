@@ -1,0 +1,370 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Facebook Pages API (business posting, curated)",
+    "version": "v23.0",
+    "description": "Curated OpenAPI description of the Meta Graph API endpoints used to publish and manage content on a Facebook Page. Authored by hand from the official Meta documentation (Meta publishes no OpenAPI spec)."
+  },
+  "paths": {
+    "/{version}/me/accounts": {
+      "get": {
+        "operationId": "ListManagedPages",
+        "tags": ["Pages"],
+        "description": "Pages the token's user manages, including each Page's access token. Call with a USER access token; use the returned page access_token for the other operations.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "limit", "in": "query", "schema": {"type": "integer"}},
+          {"name": "after", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Managed pages", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ListManagedPagesResponse"}}}}}
+      }
+    },
+    "/{version}/{fbPageId}": {
+      "get": {
+        "operationId": "GetPage",
+        "tags": ["Pages"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fbPageId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}, "description": "e.g. id,name,about,fan_count,followers_count,link."}
+        ],
+        "responses": {"200": {"description": "Page", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Page"}}}}}
+      }
+    },
+    "/{version}/{pageId}/feed": {
+      "post": {
+        "operationId": "CreatePagePost",
+        "tags": ["Publishing"],
+        "description": "Publish a text/link post to the Page's feed.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "pageId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "message", "in": "query", "schema": {"type": "string"}, "description": "Post text. Required unless link is set."},
+          {"name": "link", "in": "query", "schema": {"type": "string"}},
+          {"name": "published", "in": "query", "schema": {"type": "boolean"}, "description": "false + scheduled_publish_time schedules the post."},
+          {"name": "scheduled_publish_time", "in": "query", "schema": {"type": "integer", "format": "int64"}, "description": "Unix timestamp, 10 min - 30 days ahead."}
+        ],
+        "responses": {"200": {"description": "Created post", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreatePagePostResponse"}}}}}
+      },
+      "get": {
+        "operationId": "ListPagePosts",
+        "tags": ["Publishing"],
+        "description": "Posts on the Page's feed.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "pageId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}, "description": "e.g. id,message,created_time,permalink_url,shares."},
+          {"name": "limit", "in": "query", "schema": {"type": "integer"}},
+          {"name": "after", "in": "query", "schema": {"type": "string"}},
+          {"name": "before", "in": "query", "schema": {"type": "string"}},
+          {"name": "since", "in": "query", "schema": {"type": "integer", "format": "int64"}, "description": "Unix timestamp."},
+          {"name": "until", "in": "query", "schema": {"type": "integer", "format": "int64"}, "description": "Unix timestamp."}
+        ],
+        "responses": {"200": {"description": "Posts", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PostList"}}}}}
+      }
+    },
+    "/{version}/{pageId}/photos": {
+      "post": {
+        "operationId": "CreatePagePhoto",
+        "tags": ["Publishing"],
+        "description": "Publish a photo to the Page from a public URL.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "pageId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "url", "in": "query", "schema": {"type": "string"}, "description": "Public image URL. Required."},
+          {"name": "message", "in": "query", "schema": {"type": "string"}, "description": "Caption."},
+          {"name": "published", "in": "query", "schema": {"type": "boolean"}},
+          {"name": "scheduled_publish_time", "in": "query", "schema": {"type": "integer", "format": "int64"}},
+          {"name": "temporary", "in": "query", "schema": {"type": "boolean"}, "description": "true for unpublished photos meant to be attached to a post."}
+        ],
+        "responses": {"200": {"description": "Created photo", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreatePagePhotoResponse"}}}}}
+      }
+    },
+    "/{version}/{pageId}/videos": {
+      "post": {
+        "operationId": "CreatePageVideo",
+        "tags": ["Publishing"],
+        "description": "Publish a video to the Page from a public URL.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "pageId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "file_url", "in": "query", "schema": {"type": "string"}, "description": "Public video URL. Required."},
+          {"name": "title", "in": "query", "schema": {"type": "string"}},
+          {"name": "description", "in": "query", "schema": {"type": "string"}},
+          {"name": "published", "in": "query", "schema": {"type": "boolean"}},
+          {"name": "scheduled_publish_time", "in": "query", "schema": {"type": "integer", "format": "int64"}}
+        ],
+        "responses": {"200": {"description": "Created video", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreatePageVideoResponse"}}}}}
+      }
+    },
+    "/{version}/{fbPostId}": {
+      "get": {
+        "operationId": "GetPost",
+        "tags": ["Publishing"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fbPostId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Post", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Post"}}}}}
+      },
+      "post": {
+        "operationId": "UpdatePost",
+        "tags": ["Publishing"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fbPostId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "message", "in": "query", "schema": {"type": "string"}},
+          {"name": "is_hidden", "in": "query", "schema": {"type": "boolean"}}
+        ],
+        "responses": {"200": {"description": "Result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UpdatePostResponse"}}}}}
+      },
+      "delete": {
+        "operationId": "DeletePost",
+        "tags": ["Publishing"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fbPostId", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DeletePostResponse"}}}}}
+      }
+    },
+    "/{version}/{fbObjectId}/comments": {
+      "get": {
+        "operationId": "ListComments",
+        "tags": ["Comments"],
+        "description": "Comments on a post, photo, or another comment.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fbObjectId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "limit", "in": "query", "schema": {"type": "integer"}},
+          {"name": "after", "in": "query", "schema": {"type": "string"}},
+          {"name": "filter", "in": "query", "schema": {"type": "string"}, "description": "toplevel or stream."},
+          {"name": "order", "in": "query", "schema": {"type": "string"}, "description": "chronological or reverse_chronological."}
+        ],
+        "responses": {"200": {"description": "Comments", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CommentList"}}}}}
+      },
+      "post": {
+        "operationId": "CreateComment",
+        "tags": ["Comments"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fbObjectId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "message", "in": "query", "schema": {"type": "string"}, "description": "Comment text. Required unless attachment_url is set."},
+          {"name": "attachment_url", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Created comment", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateCommentResponse"}}}}}
+      }
+    },
+    "/{version}/{fbCommentId}": {
+      "post": {
+        "operationId": "HideComment",
+        "tags": ["Comments"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fbCommentId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "is_hidden", "in": "query", "schema": {"type": "boolean"}, "description": "true hides, false unhides. Required."}
+        ],
+        "responses": {"200": {"description": "Result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HideCommentResponse"}}}}}
+      },
+      "delete": {
+        "operationId": "DeleteComment",
+        "tags": ["Comments"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fbCommentId", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DeleteCommentResponse"}}}}}
+      }
+    },
+    "/{version}/{pageId}/insights": {
+      "get": {
+        "operationId": "GetPageInsights",
+        "tags": ["Insights"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "pageId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "metric", "in": "query", "schema": {"type": "string"}, "description": "Comma-separated metrics, e.g. page_impressions,page_post_engagements. Required."},
+          {"name": "period", "in": "query", "schema": {"type": "string"}, "description": "day, week, days_28, or lifetime."},
+          {"name": "date_preset", "in": "query", "schema": {"type": "string"}},
+          {"name": "since", "in": "query", "schema": {"type": "integer", "format": "int64"}, "description": "Unix timestamp."},
+          {"name": "until", "in": "query", "schema": {"type": "integer", "format": "int64"}, "description": "Unix timestamp."}
+        ],
+        "responses": {"200": {"description": "Insights", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InsightList"}}}}}
+      }
+    },
+    "/{version}/{fbPostId}/insights": {
+      "get": {
+        "operationId": "GetPostInsights",
+        "tags": ["Insights"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fbPostId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "metric", "in": "query", "schema": {"type": "string"}, "description": "e.g. post_impressions,post_clicks. Required."},
+          {"name": "period", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Insights", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InsightList"}}}}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ListManagedPagesResponse": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/PageAccount"}},
+          "paging": {"$ref": "#/components/schemas/Paging"}
+        }
+      },
+      "PageAccount": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "access_token": {"type": "string", "description": "Page access token; use it as Config.AccessToken for page operations."},
+          "category": {"type": "string"},
+          "tasks": {"type": "array", "items": {"type": "string"}}
+        }
+      },
+      "Page": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "about": {"type": "string"},
+          "category": {"type": "string"},
+          "fan_count": {"type": "integer"},
+          "followers_count": {"type": "integer"},
+          "link": {"type": "string"},
+          "username": {"type": "string"},
+          "website": {"type": "string"}
+        }
+      },
+      "CreatePagePostResponse": {
+        "type": "object",
+        "properties": {"id": {"type": "string", "description": "Post ID (pageid_postid)."}}
+      },
+      "CreatePagePhotoResponse": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "description": "Photo ID."},
+          "post_id": {"type": "string", "description": "ID of the feed post wrapping the photo."}
+        }
+      },
+      "CreatePageVideoResponse": {
+        "type": "object",
+        "properties": {"id": {"type": "string"}}
+      },
+      "UpdatePostResponse": {
+        "type": "object",
+        "properties": {"success": {"type": "boolean"}}
+      },
+      "DeletePostResponse": {
+        "type": "object",
+        "properties": {"success": {"type": "boolean"}}
+      },
+      "Post": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "message": {"type": "string"},
+          "story": {"type": "string"},
+          "created_time": {"type": "string", "format": "date-time"},
+          "updated_time": {"type": "string", "format": "date-time"},
+          "permalink_url": {"type": "string"},
+          "full_picture": {"type": "string"},
+          "status_type": {"type": "string"},
+          "is_published": {"type": "boolean"},
+          "is_hidden": {"type": "boolean"},
+          "shares": {"$ref": "#/components/schemas/ShareCount"}
+        }
+      },
+      "ShareCount": {
+        "type": "object",
+        "properties": {"count": {"type": "integer"}}
+      },
+      "PostList": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/Post"}},
+          "paging": {"$ref": "#/components/schemas/Paging"}
+        }
+      },
+      "Paging": {
+        "type": "object",
+        "properties": {
+          "cursors": {"$ref": "#/components/schemas/PagingCursors"},
+          "next": {"type": "string"},
+          "previous": {"type": "string"}
+        }
+      },
+      "PagingCursors": {
+        "type": "object",
+        "properties": {"before": {"type": "string"}, "after": {"type": "string"}}
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "message": {"type": "string"},
+          "created_time": {"type": "string", "format": "date-time"},
+          "like_count": {"type": "integer"},
+          "comment_count": {"type": "integer"},
+          "is_hidden": {"type": "boolean"},
+          "permalink_url": {"type": "string"},
+          "from": {"$ref": "#/components/schemas/CommentFrom"}
+        }
+      },
+      "CommentFrom": {
+        "type": "object",
+        "properties": {"id": {"type": "string"}, "name": {"type": "string"}}
+      },
+      "CommentList": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/Comment"}},
+          "paging": {"$ref": "#/components/schemas/Paging"}
+        }
+      },
+      "CreateCommentResponse": {
+        "type": "object",
+        "properties": {"id": {"type": "string"}}
+      },
+      "HideCommentResponse": {
+        "type": "object",
+        "properties": {"success": {"type": "boolean"}}
+      },
+      "DeleteCommentResponse": {
+        "type": "object",
+        "properties": {"success": {"type": "boolean"}}
+      },
+      "InsightList": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/Insight"}},
+          "paging": {"$ref": "#/components/schemas/Paging"}
+        }
+      },
+      "Insight": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "period": {"type": "string"},
+          "title": {"type": "string"},
+          "description": {"type": "string"},
+          "values": {"type": "array", "items": {"$ref": "#/components/schemas/InsightValue"}}
+        }
+      },
+      "InsightValue": {
+        "type": "object",
+        "properties": {
+          "value": {"description": "Metric value; a number, or an object for breakdowns."},
+          "end_time": {"type": "string", "format": "date-time"}
+        }
+      }
+    }
+  }
+}

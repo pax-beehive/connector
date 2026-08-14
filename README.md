@@ -74,10 +74,39 @@ pub, err := c.PublishMedia(ctx, &instagram.PublishMediaRequest{
 })
 ```
 
+## Facebook (Pages)
+
+Publish and manage content on a Facebook Page: feed posts, photos, videos,
+scheduling, comments, insights. See [`facebook/AGENTS.md`](facebook/AGENTS.md).
+
+```go
+import "github.com/pax-beehive/connector/facebook"
+
+c, err := facebook.NewClient(&facebook.Config{AccessToken: pageToken})
+post, err := c.CreatePagePost(ctx, &facebook.CreatePagePostRequest{
+	PageId: pageID, Message: connector.Ptr("Hello from the API"),
+})
+```
+
+## X (Twitter)
+
+Post and manage tweets: create/delete, timelines, mentions, recent search,
+likes, reposts. See [`x/AGENTS.md`](x/AGENTS.md).
+
+```go
+import "github.com/pax-beehive/connector/x"
+
+c, err := x.NewClient(&x.Config{AccessToken: userContextToken})
+tweet, err := c.CreateTweet(ctx, &x.CreateTweetRequest{
+	Text: connector.Ptr("Hello world"),
+})
+```
+
 ## For AI agents
 
 Each connector ships a generated `AGENTS.md`
-([mindbody](mindbody/AGENTS.md), [instagram](instagram/AGENTS.md)) describing
+([mindbody](mindbody/AGENTS.md), [instagram](instagram/AGENTS.md),
+[facebook](facebook/AGENTS.md), [x](x/AGENTS.md)) describing
 its capability boundary: how to construct the client, the auth model, error
 and data conventions, what is out of scope, and a catalog of every operation
 with its HTTP mapping. It is generated from the spec (plus handwritten notes

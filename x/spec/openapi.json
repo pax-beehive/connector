@@ -1,0 +1,399 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "X API v2 (posting-focused, curated)",
+    "version": "2",
+    "description": "Curated OpenAPI description of the X (Twitter) API v2 endpoints used to post and manage tweets for a business account. Authored by hand from the official X documentation."
+  },
+  "paths": {
+    "/2/tweets": {
+      "post": {
+        "operationId": "CreateTweet",
+        "tags": ["Tweets"],
+        "description": "Create a tweet (post). Requires an OAuth 2.0 user-context token.",
+        "requestBody": {
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateTweetBody"}}}
+        },
+        "parameters": [],
+        "responses": {"201": {"description": "Created tweet", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateTweetResponse"}}}}}
+      },
+      "get": {
+        "operationId": "GetTweets",
+        "tags": ["Tweets"],
+        "description": "Look up multiple tweets by ID.",
+        "parameters": [
+          {"name": "ids", "in": "query", "schema": {"type": "string"}, "description": "Comma-separated tweet IDs (max 100). Required."},
+          {"name": "tweet.fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "expansions", "in": "query", "schema": {"type": "string"}},
+          {"name": "user.fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "media.fields", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Tweets", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/GetTweetsResponse"}}}}}
+      }
+    },
+    "/2/tweets/{id}": {
+      "get": {
+        "operationId": "GetTweet",
+        "tags": ["Tweets"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "tweet.fields", "in": "query", "schema": {"type": "string"}, "description": "e.g. created_at,public_metrics,author_id."},
+          {"name": "expansions", "in": "query", "schema": {"type": "string"}},
+          {"name": "user.fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "media.fields", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Tweet", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/GetTweetResponse"}}}}}
+      },
+      "delete": {
+        "operationId": "DeleteTweet",
+        "tags": ["Tweets"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Deletion result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DeleteTweetResponse"}}}}}
+      }
+    },
+    "/2/users/me": {
+      "get": {
+        "operationId": "GetMe",
+        "tags": ["Users"],
+        "description": "The authenticated user.",
+        "parameters": [
+          {"name": "user.fields", "in": "query", "schema": {"type": "string"}, "description": "e.g. public_metrics,description,profile_image_url."}
+        ],
+        "responses": {"200": {"description": "User", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/GetMeResponse"}}}}}
+      }
+    },
+    "/2/users/by/username/{username}": {
+      "get": {
+        "operationId": "GetUserByUsername",
+        "tags": ["Users"],
+        "parameters": [
+          {"name": "username", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "user.fields", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "User", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/GetUserByUsernameResponse"}}}}}
+      }
+    },
+    "/2/users/{id}/tweets": {
+      "get": {
+        "operationId": "ListUserTweets",
+        "tags": ["Users"],
+        "description": "Tweets composed by a user (timeline).",
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "max_results", "in": "query", "schema": {"type": "integer"}, "description": "5-100."},
+          {"name": "pagination_token", "in": "query", "schema": {"type": "string"}},
+          {"name": "since_id", "in": "query", "schema": {"type": "string"}},
+          {"name": "until_id", "in": "query", "schema": {"type": "string"}},
+          {"name": "exclude", "in": "query", "schema": {"type": "string"}, "description": "retweets and/or replies (comma-separated)."},
+          {"name": "start_time", "in": "query", "schema": {"type": "string"}, "description": "RFC3339 UTC, e.g. 2026-01-01T00:00:00Z."},
+          {"name": "end_time", "in": "query", "schema": {"type": "string"}, "description": "RFC3339 UTC."},
+          {"name": "tweet.fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "expansions", "in": "query", "schema": {"type": "string"}},
+          {"name": "user.fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "media.fields", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Tweet list", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/TweetList"}}}}}
+      }
+    },
+    "/2/users/{id}/mentions": {
+      "get": {
+        "operationId": "ListUserMentions",
+        "tags": ["Users"],
+        "description": "Tweets mentioning a user.",
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "max_results", "in": "query", "schema": {"type": "integer"}},
+          {"name": "pagination_token", "in": "query", "schema": {"type": "string"}},
+          {"name": "since_id", "in": "query", "schema": {"type": "string"}},
+          {"name": "until_id", "in": "query", "schema": {"type": "string"}},
+          {"name": "start_time", "in": "query", "schema": {"type": "string"}, "description": "RFC3339 UTC."},
+          {"name": "end_time", "in": "query", "schema": {"type": "string"}, "description": "RFC3339 UTC."},
+          {"name": "tweet.fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "expansions", "in": "query", "schema": {"type": "string"}},
+          {"name": "user.fields", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Tweet list", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/TweetList"}}}}}
+      }
+    },
+    "/2/tweets/search/recent": {
+      "get": {
+        "operationId": "SearchRecentTweets",
+        "tags": ["Search"],
+        "description": "Search tweets from the last 7 days.",
+        "parameters": [
+          {"name": "query", "in": "query", "schema": {"type": "string"}, "description": "Search query, e.g. \"from:handle -is:retweet\". Required."},
+          {"name": "max_results", "in": "query", "schema": {"type": "integer"}, "description": "10-100."},
+          {"name": "next_token", "in": "query", "schema": {"type": "string"}},
+          {"name": "since_id", "in": "query", "schema": {"type": "string"}},
+          {"name": "until_id", "in": "query", "schema": {"type": "string"}},
+          {"name": "start_time", "in": "query", "schema": {"type": "string"}, "description": "RFC3339 UTC."},
+          {"name": "end_time", "in": "query", "schema": {"type": "string"}, "description": "RFC3339 UTC."},
+          {"name": "sort_order", "in": "query", "schema": {"type": "string"}, "description": "recency or relevancy."},
+          {"name": "tweet.fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "expansions", "in": "query", "schema": {"type": "string"}},
+          {"name": "user.fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "media.fields", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Tweet list", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/TweetList"}}}}}
+      }
+    },
+    "/2/users/{id}/likes": {
+      "post": {
+        "operationId": "LikeTweet",
+        "tags": ["Engagement"],
+        "description": "Like a tweet on behalf of the authenticated user ({id} must be the authenticated user's ID).",
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LikeTweetBody"}}}
+        },
+        "responses": {"200": {"description": "Like result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LikeTweetResponse"}}}}}
+      }
+    },
+    "/2/users/{id}/likes/{tweet_id}": {
+      "delete": {
+        "operationId": "UnlikeTweet",
+        "tags": ["Engagement"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "tweet_id", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Unlike result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LikeTweetResponse"}}}}}
+      }
+    },
+    "/2/users/{id}/retweets": {
+      "post": {
+        "operationId": "Retweet",
+        "tags": ["Engagement"],
+        "description": "Repost a tweet on behalf of the authenticated user.",
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RetweetBody"}}}
+        },
+        "responses": {"200": {"description": "Retweet result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RetweetResponse"}}}}}
+      }
+    },
+    "/2/users/{id}/retweets/{source_tweet_id}": {
+      "delete": {
+        "operationId": "Unretweet",
+        "tags": ["Engagement"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "source_tweet_id", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Unretweet result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RetweetResponse"}}}}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateTweetBody": {
+        "type": "object",
+        "properties": {
+          "text": {"type": "string", "description": "Tweet text (required unless media or poll is set)."},
+          "quote_tweet_id": {"type": "string"},
+          "reply_settings": {"type": "string", "description": "everyone, mentionedUsers, or following."},
+          "for_super_followers_only": {"type": "boolean"},
+          "reply": {"$ref": "#/components/schemas/TweetReply"},
+          "media": {"$ref": "#/components/schemas/TweetMedia"},
+          "poll": {"$ref": "#/components/schemas/TweetPoll"},
+          "geo": {"$ref": "#/components/schemas/TweetGeo"}
+        }
+      },
+      "TweetReply": {
+        "type": "object",
+        "properties": {
+          "in_reply_to_tweet_id": {"type": "string"},
+          "exclude_reply_user_ids": {"type": "array", "items": {"type": "string"}}
+        }
+      },
+      "TweetMedia": {
+        "type": "object",
+        "properties": {
+          "media_ids": {"type": "array", "items": {"type": "string"}, "description": "IDs from a prior media upload (upload itself is out of scope)."},
+          "tagged_user_ids": {"type": "array", "items": {"type": "string"}}
+        }
+      },
+      "TweetPoll": {
+        "type": "object",
+        "properties": {
+          "options": {"type": "array", "items": {"type": "string"}},
+          "duration_minutes": {"type": "integer"}
+        }
+      },
+      "TweetGeo": {
+        "type": "object",
+        "properties": {"place_id": {"type": "string"}}
+      },
+      "CreateTweetResponse": {
+        "type": "object",
+        "properties": {"data": {"$ref": "#/components/schemas/CreatedTweet"}}
+      },
+      "CreatedTweet": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "text": {"type": "string"},
+          "edit_history_tweet_ids": {"type": "array", "items": {"type": "string"}}
+        }
+      },
+      "DeleteTweetResponse": {
+        "type": "object",
+        "properties": {"data": {"$ref": "#/components/schemas/DeletedTweet"}}
+      },
+      "DeletedTweet": {
+        "type": "object",
+        "properties": {"deleted": {"type": "boolean"}}
+      },
+      "GetTweetResponse": {
+        "type": "object",
+        "properties": {
+          "data": {"$ref": "#/components/schemas/Tweet"},
+          "includes": {"$ref": "#/components/schemas/Includes"},
+          "errors": {"type": "array", "items": {"$ref": "#/components/schemas/Problem"}}
+        }
+      },
+      "GetTweetsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/Tweet"}},
+          "includes": {"$ref": "#/components/schemas/Includes"},
+          "errors": {"type": "array", "items": {"$ref": "#/components/schemas/Problem"}}
+        }
+      },
+      "TweetList": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/Tweet"}},
+          "includes": {"$ref": "#/components/schemas/Includes"},
+          "meta": {"$ref": "#/components/schemas/ListMeta"},
+          "errors": {"type": "array", "items": {"$ref": "#/components/schemas/Problem"}}
+        }
+      },
+      "Tweet": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "text": {"type": "string"},
+          "author_id": {"type": "string"},
+          "conversation_id": {"type": "string"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "in_reply_to_user_id": {"type": "string"},
+          "lang": {"type": "string"},
+          "possibly_sensitive": {"type": "boolean"},
+          "reply_settings": {"type": "string"},
+          "edit_history_tweet_ids": {"type": "array", "items": {"type": "string"}},
+          "public_metrics": {"$ref": "#/components/schemas/TweetPublicMetrics"}
+        }
+      },
+      "TweetPublicMetrics": {
+        "type": "object",
+        "properties": {
+          "retweet_count": {"type": "integer"},
+          "reply_count": {"type": "integer"},
+          "like_count": {"type": "integer"},
+          "quote_count": {"type": "integer"},
+          "bookmark_count": {"type": "integer"},
+          "impression_count": {"type": "integer"}
+        }
+      },
+      "Includes": {
+        "type": "object",
+        "properties": {
+          "users": {"type": "array", "items": {"$ref": "#/components/schemas/User"}},
+          "tweets": {"type": "array", "items": {"$ref": "#/components/schemas/Tweet"}},
+          "media": {"type": "array", "items": {"$ref": "#/components/schemas/Media"}}
+        }
+      },
+      "Media": {
+        "type": "object",
+        "properties": {
+          "media_key": {"type": "string"},
+          "type": {"type": "string"},
+          "url": {"type": "string"},
+          "preview_image_url": {"type": "string"},
+          "width": {"type": "integer"},
+          "height": {"type": "integer"}
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "username": {"type": "string"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "description": {"type": "string"},
+          "profile_image_url": {"type": "string"},
+          "verified": {"type": "boolean"},
+          "public_metrics": {"$ref": "#/components/schemas/UserPublicMetrics"}
+        }
+      },
+      "UserPublicMetrics": {
+        "type": "object",
+        "properties": {
+          "followers_count": {"type": "integer"},
+          "following_count": {"type": "integer"},
+          "tweet_count": {"type": "integer"},
+          "listed_count": {"type": "integer"}
+        }
+      },
+      "GetMeResponse": {
+        "type": "object",
+        "properties": {"data": {"$ref": "#/components/schemas/User"}}
+      },
+      "GetUserByUsernameResponse": {
+        "type": "object",
+        "properties": {"data": {"$ref": "#/components/schemas/User"}}
+      },
+      "ListMeta": {
+        "type": "object",
+        "properties": {
+          "result_count": {"type": "integer"},
+          "newest_id": {"type": "string"},
+          "oldest_id": {"type": "string"},
+          "next_token": {"type": "string"},
+          "previous_token": {"type": "string"}
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "properties": {
+          "title": {"type": "string"},
+          "detail": {"type": "string"},
+          "type": {"type": "string"},
+          "status": {"type": "integer"}
+        }
+      },
+      "LikeTweetBody": {
+        "type": "object",
+        "properties": {"tweet_id": {"type": "string"}}
+      },
+      "LikeTweetResponse": {
+        "type": "object",
+        "properties": {"data": {"$ref": "#/components/schemas/LikeResult"}}
+      },
+      "LikeResult": {
+        "type": "object",
+        "properties": {"liked": {"type": "boolean"}}
+      },
+      "RetweetBody": {
+        "type": "object",
+        "properties": {"tweet_id": {"type": "string"}}
+      },
+      "RetweetResponse": {
+        "type": "object",
+        "properties": {"data": {"$ref": "#/components/schemas/RetweetResult"}}
+      },
+      "RetweetResult": {
+        "type": "object",
+        "properties": {"retweeted": {"type": "boolean"}}
+      }
+    }
+  }
+}

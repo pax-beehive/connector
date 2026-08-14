@@ -1,0 +1,71 @@
+package: x
+spec: spec/openapi.json
+out_dir: .
+title: "X (Twitter) connector"
+description: >-
+  Go connector for the X API v2, focused on posting and managing tweets for
+  a business account: create/delete tweets, timelines, mentions, recent
+  search, likes and reposts. Generated from a curated OpenAPI spec authored
+  from the official X documentation.
+agent_notes: |
+  ## How to use this connector
+
+  One `Client` serves one X account. It needs an OAuth 2.0 **user-context**
+  access token (authorization-code + PKCE flow, scopes `tweet.read
+  tweet.write users.read`, plus `like.write` for likes) for posting; an
+  app-only bearer token works for reads only:
+
+  ```go
+  import (
+      "github.com/pax-beehive/connector"
+      "github.com/pax-beehive/connector/x"
+  )
+
+  c, err := x.NewClient(&x.Config{AccessToken: "..."})
+
+  // Post a tweet.
+  resp, err := c.CreateTweet(ctx, &x.CreateTweetRequest{
+      Text: connector.Ptr("Hello world"),
+  })
+  // Reply / quote / poll:
+  //   Reply: &x.TweetReply{InReplyToTweetId: connector.Ptr("...")}
+  //   QuoteTweetId: connector.Ptr("...")
+  //   Poll: &x.TweetPoll{Options: []string{"a","b"}, DurationMinutes: connector.Ptr(60)}
+
+  me, err := c.GetMe(ctx, &x.GetMeRequest{UserFields: connector.Ptr("public_metrics")})
+  ```
+
+  `LikeTweet`/`Retweet` operate on behalf of the authenticated user: the
+  `Id` path param must be the authenticated user's own ID (from `GetMe`).
+
+  ## Auth model
+
+  - Every request sends `Authorization: Bearer <AccessToken>`.
+  - Tokens are NOT auto-refreshed; run the OAuth refresh-token flow
+    (`offline.access` scope) outside this SDK.
+
+  ## Errors
+
+  Non-2xx responses become `*connector.APIError`. `Code`/`Message` carry
+  the v2 problem `title`/`detail` (or the legacy numeric `code`/`message`,
+  e.g. 89 = invalid token). Rate limiting surfaces as HTTP 429.
+
+  ## Data conventions
+
+  - GET endpoints return minimal objects unless you list extra fields in
+    `TweetFields`/`UserFields`/`MediaFields` (comma-separated) and request
+    related objects via `Expansions`.
+  - `StartTime`/`EndTime` are RFC3339 UTC strings, e.g.
+    `2026-01-01T00:00:00Z`.
+  - Pagination: pass `Meta.NextToken` back as `PaginationToken`
+    (`NextToken` for search).
+
+  ## Capability boundaries (what this connector does NOT do)
+
+  - No OAuth flow: obtaining/refreshing tokens happens outside this SDK.
+  - No media upload: `TweetMedia.MediaIds` must come from an upload done
+    elsewhere (the chunked upload endpoint is not covered).
+  - No DMs, Spaces, Lists, streaming, or full-archive search.
+  - No rate limiting or automatic retries.
+datetime_type: connector.DateTime
+test_new_client: 'NewClient(&Config{AccessToken: "t", BaseURL: srv.URL})'
