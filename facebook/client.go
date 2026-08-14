@@ -38,8 +38,10 @@ type Client struct {
 	core *connector.Core
 }
 
-// NewClient creates a connector instance for one Facebook Page.
-func NewClient(cfg *Config) (*Client, error) {
+// NewClient creates a connector instance for one Facebook Page. Options
+// (connector.WithTimeout, connector.WithRetry, connector.WithHTTPClient)
+// apply to all calls.
+func NewClient(cfg *Config, opts ...connector.Option) (*Client, error) {
 	if cfg == nil || cfg.AccessToken == "" {
 		return nil, errors.New("facebook: AccessToken is required")
 	}
@@ -58,6 +60,7 @@ func NewClient(cfg *Config) (*Client, error) {
 		Auth:       &tokenAuth{token: cfg.AccessToken},
 		ParseError: parseError,
 	}
+	core.Apply(opts...)
 	return &Client{core: core}, nil
 }
 

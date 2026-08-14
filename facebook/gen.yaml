@@ -74,7 +74,7 @@ agent_notes: |
     (no resumable/chunked upload).
   - No Stories/Reels publishing, Groups, Events, Messenger, ads, or
     webhooks.
-  - No rate limiting or automatic retries.
+  - No retries by default; opt in with `connector.WithRetry`.
 datetime_type: connector.DateTime
 pinned_path_params: {version: "v23.0"}
 test_new_client: 'NewClient(&Config{AccessToken: "t", BaseURL: srv.URL})'

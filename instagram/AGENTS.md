@@ -87,8 +87,9 @@ Non-2xx responses become `*connector.APIError`; `Code` is the Graph error
   resumable video upload, which is not covered).
 - No hashtag search, mentions, product tagging catalog, messaging
   (Messenger/IG DM), or webhooks.
-- No rate limiting or retries; a 401/expired token is returned as an
-  error, never refreshed transparently.
+- No retries by default (opt in with `connector.WithRetry`); a
+  401/expired token is returned as an error, never refreshed
+  transparently.
 
 ## Capability catalog (16 operations)
 
@@ -105,6 +106,27 @@ are pointers (use `connector.Ptr(v)`); slice fields repeat the query key.
 Field-level details for an operation live in the `<tag>_gen.go` file next
 to this document (search for `XxxRequest`); shared model types are in
 `types_gen.go`.
+
+### Client options (all connectors)
+
+`NewClient(cfg, opts...)` accepts shared options from the root
+`connector` package:
+
+- `connector.WithTimeout(d)` — overall per-call deadline (covers retries).
+- `connector.WithRetry(connector.RetryPolicy{})` — opt-in automatic
+  retries with exponential backoff honoring `Retry-After`. Defaults:
+  3 attempts, statuses 429/502/503/504; non-idempotent methods (POST) are
+  retried only on 429 unless `RetryNonIdempotent` is set.
+- `connector.WithHTTPClient(hc)` — custom `*http.Client`.
+
+### Error handling (all connectors)
+
+Every non-2xx response is a `*connector.APIError` (StatusCode, service
+Code/Message, raw Body, and the server's `RetryAfter` hint). Classify
+without unwrapping via `connector.IsRateLimited(err)` (429),
+`IsUnauthorized` (401), `IsForbidden` (403), `IsNotFound` (404),
+`IsServerError` (5xx), `IsRetryable` (429/502/503/504), or use
+`connector.AsAPIError(err)` / `connector.StatusCode(err)`.
 
 Anything not listed here is outside this connector's capability boundary.
 

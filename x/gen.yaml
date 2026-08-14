@@ -66,6 +66,7 @@ agent_notes: |
   - No media upload: `TweetMedia.MediaIds` must come from an upload done
     elsewhere (the chunked upload endpoint is not covered).
   - No DMs, Spaces, Lists, streaming, or full-archive search.
-  - No rate limiting or automatic retries.
+  - No retries by default; opt in with `connector.WithRetry` (HTTP 429
+    honors `Retry-After`).
 datetime_type: connector.DateTime
 test_new_client: 'NewClient(&Config{AccessToken: "t", BaseURL: srv.URL})'

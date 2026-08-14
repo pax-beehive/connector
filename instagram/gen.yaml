@@ -91,8 +91,9 @@ agent_notes: |
     resumable video upload, which is not covered).
   - No hashtag search, mentions, product tagging catalog, messaging
     (Messenger/IG DM), or webhooks.
-  - No rate limiting or retries; a 401/expired token is returned as an
-    error, never refreshed transparently.
+  - No retries by default (opt in with `connector.WithRetry`); a
+    401/expired token is returned as an error, never refreshed
+    transparently.
 datetime_type: connector.DateTime
 pinned_path_params: {version: "v23.0"}
 test_new_client: 'NewClient(&Config{AccessToken: "t", BaseURL: srv.URL})'

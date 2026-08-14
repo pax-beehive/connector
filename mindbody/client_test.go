@@ -177,6 +177,36 @@ func TestStaffTokenIssue401FailsFast(t *testing.T) {
 	}
 }
 
+// Options passed to NewClient must reach the underlying core: a client with
+// WithRetry recovers from a 429, and the classifier helpers recognize the
+// terminal error.
+func TestOptionsPassThrough(t *testing.T) {
+	var calls atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if calls.Add(1) == 1 {
+			w.Header().Set("Retry-After", "1")
+			w.WriteHeader(429)
+			return
+		}
+		_, _ = w.Write([]byte(`{}`))
+	}))
+	t.Cleanup(srv.Close)
+	c, err := NewClient(
+		&Config{APIKey: "k", SiteID: "-99", BaseURL: srv.URL},
+		connector.WithRetry(connector.RetryPolicy{MaxAttempts: 2, MinBackoff: time.Millisecond, MaxBackoff: 2 * time.Millisecond}),
+		connector.WithTimeout(5*time.Second),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := c.core.Do(context.Background(), &connector.Call{Method: "GET", Path: "/public/v{version}/site/sites"}); err != nil {
+		t.Fatal(err)
+	}
+	if calls.Load() != 2 {
+		t.Errorf("calls = %d, want 2 (one retry)", calls.Load())
+	}
+}
+
 func TestParseError(t *testing.T) {
 	c := newTestClient(t, Config{}, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)

@@ -45,8 +45,9 @@ type Client struct {
 }
 
 // NewClient creates a connector instance for one Instagram professional
-// account.
-func NewClient(cfg *Config) (*Client, error) {
+// account. Options (connector.WithTimeout, connector.WithRetry,
+// connector.WithHTTPClient) apply to all calls.
+func NewClient(cfg *Config, opts ...connector.Option) (*Client, error) {
 	if cfg == nil || cfg.AccessToken == "" {
 		return nil, errors.New("instagram: AccessToken is required")
 	}
@@ -65,6 +66,7 @@ func NewClient(cfg *Config) (*Client, error) {
 		Auth:       &tokenAuth{token: cfg.AccessToken},
 		ParseError: parseError,
 	}
+	core.Apply(opts...)
 	return &Client{core: core}, nil
 }
 

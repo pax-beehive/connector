@@ -102,6 +102,36 @@ tweet, err := c.CreateTweet(ctx, &x.CreateTweetRequest{
 })
 ```
 
+## Client options and error handling
+
+Every connector's `NewClient(cfg, opts...)` accepts shared options:
+
+```go
+c, err := mindbody.NewClient(cfg,
+	connector.WithTimeout(15*time.Second),           // per-call deadline (covers retries)
+	connector.WithRetry(connector.RetryPolicy{}),    // opt-in retries: 3 attempts,
+	                                                 // 429/502/503/504, honors Retry-After
+	connector.WithHTTPClient(customClient),
+)
+```
+
+Non-idempotent methods (POST) are only retried on 429 unless
+`RetryPolicy.RetryNonIdempotent` is set.
+
+Errors are standardized across connectors: any non-2xx response is a
+`*connector.APIError` (status, service code/message, raw body, `RetryAfter`
+hint), with classifier helpers:
+
+```go
+resp, err := c.GetClasses(ctx, req)
+switch {
+case connector.IsRateLimited(err):  // 429 — back off (see AsAPIError(err).RetryAfter)
+case connector.IsUnauthorized(err): // 401 — credential/token problem
+case connector.IsNotFound(err):     // 404
+case connector.IsRetryable(err):    // 429/502/503/504
+}
+```
+
 ## For AI agents
 
 Each connector ships a generated `AGENTS.md`

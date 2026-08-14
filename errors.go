@@ -1,13 +1,21 @@
 package connector
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
-// APIError is returned for any non-2xx response.
+// APIError is returned for any non-2xx response. Use the package-level
+// classifiers (IsRateLimited, IsUnauthorized, IsNotFound, IsRetryable, ...)
+// to branch on it without unwrapping.
 type APIError struct {
 	StatusCode int
 	Code       string // service-specific error code, if parseable
 	Message    string // service-specific error message, if parseable
 	Body       []byte // raw response body
+	// RetryAfter is the server's Retry-After hint (0 when absent), typical
+	// on 429 responses.
+	RetryAfter time.Duration
 }
 
 func (e *APIError) Error() string {

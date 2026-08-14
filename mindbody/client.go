@@ -37,8 +37,10 @@ type Client struct {
 	core *connector.Core
 }
 
-// NewClient creates a connector instance for one Mindbody site.
-func NewClient(cfg *Config) (*Client, error) {
+// NewClient creates a connector instance for one Mindbody site. Options
+// (connector.WithTimeout, connector.WithRetry, connector.WithHTTPClient)
+// apply to all calls, including the internal token issue.
+func NewClient(cfg *Config, opts ...connector.Option) (*Client, error) {
 	if cfg == nil || cfg.APIKey == "" || cfg.SiteID == "" {
 		return nil, errors.New("mindbody: APIKey and SiteID are required")
 	}
@@ -69,6 +71,8 @@ func NewClient(cfg *Config) (*Client, error) {
 		Auth:       auth,
 		ParseError: parseError,
 	}
+	issueCore.Apply(opts...)
+	core.Apply(opts...)
 	return &Client{core: core}, nil
 }
 

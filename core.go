@@ -29,6 +29,12 @@ type Core struct {
 	PathParams map[string]string
 	Auth       Authorizer
 	ParseError ErrorParser
+	// Timeout is an overall per-call deadline covering all retry attempts.
+	// Zero means no core-level deadline. Set via WithTimeout.
+	Timeout time.Duration
+	// Retry enables automatic retries. Nil means a single attempt. Set via
+	// WithRetry.
+	Retry *RetryPolicy
 }
 
 // Call describes one HTTP operation.
@@ -49,17 +55,56 @@ func (c *Core) Do(ctx context.Context, call *Call) error {
 	if err != nil {
 		return err
 	}
-	resp, err := c.send(ctx, call, params, body)
-	if err != nil {
-		return err
+	if c.Timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, c.Timeout)
+		defer cancel()
 	}
-	if resp.StatusCode == http.StatusUnauthorized && c.Auth != nil && c.Auth.InvalidateAuth(ctx) {
-		drain(resp)
-		if resp, err = c.send(ctx, call, params, body); err != nil {
+	for attempt := 0; ; attempt++ {
+		resp, err := c.attempt(ctx, call, params, body)
+		retry, wait := c.retryDecision(call.Method, resp, err, attempt)
+		if !retry {
+			if err != nil {
+				return err
+			}
+			return c.handleResponse(resp, call.Out)
+		}
+		if resp != nil {
+			drain(resp)
+		}
+		if err := sleepCtx(ctx, wait); err != nil {
 			return err
 		}
 	}
-	return c.handleResponse(resp, call.Out)
+}
+
+// attempt sends the request once, with the single transparent re-auth on a
+// 401 when the Authorizer supports it.
+func (c *Core) attempt(ctx context.Context, call *Call, params *RequestParams, body []byte) (*http.Response, error) {
+	resp, err := c.send(ctx, call, params, body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode == http.StatusUnauthorized && c.Auth != nil && c.Auth.InvalidateAuth(ctx) {
+		drain(resp)
+		return c.send(ctx, call, params, body)
+	}
+	return resp, nil
+}
+
+// retryDecision reports whether another attempt should be made and how long
+// to wait first. Transport errors are always retried under an active policy.
+func (c *Core) retryDecision(method string, resp *http.Response, err error, attempt int) (bool, time.Duration) {
+	if c.Retry == nil || attempt+1 >= c.Retry.MaxAttempts {
+		return false, 0
+	}
+	if err != nil {
+		return true, c.Retry.backoff(attempt, nil)
+	}
+	if !c.Retry.shouldRetry(method, resp.StatusCode) {
+		return false, 0
+	}
+	return true, c.Retry.backoff(attempt, resp.Header)
 }
 
 func marshalBody(body any) ([]byte, error) {
@@ -140,7 +185,7 @@ func (c *Core) handleResponse(resp *http.Response, out any) error {
 		return err
 	}
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return c.apiError(resp.StatusCode, data)
+		return c.apiError(resp.StatusCode, data, resp.Header)
 	}
 	if out == nil || len(bytes.TrimSpace(data)) == 0 {
 		return nil
@@ -148,8 +193,8 @@ func (c *Core) handleResponse(resp *http.Response, out any) error {
 	return json.Unmarshal(data, out)
 }
 
-func (c *Core) apiError(status int, body []byte) error {
-	e := &APIError{StatusCode: status, Body: body}
+func (c *Core) apiError(status int, body []byte, header http.Header) error {
+	e := &APIError{StatusCode: status, Body: body, RetryAfter: parseRetryAfter(header)}
 	if c.ParseError != nil {
 		e.Code, e.Message = c.ParseError(body)
 	}
