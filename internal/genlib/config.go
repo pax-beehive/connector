@@ -23,6 +23,10 @@ type Config struct {
 	Title            string            `yaml:"title"`
 	Description      string            `yaml:"description"`
 	AgentNotes       string            `yaml:"agent_notes"`
+	// TestNewClient is the Go expression the generated round-trip test uses
+	// to build the client; `srv` (an *httptest.Server) is in scope. Defaults
+	// to `NewClient(&Config{BaseURL: srv.URL})`.
+	TestNewClient    string            `yaml:"test_new_client"`
 	DateTimeType     string            `yaml:"datetime_type"` // e.g. connector.DateTime; empty means time.Time
 	SkipHeaders      []string          `yaml:"skip_headers"`
 	QueryPrefixStrip string            `yaml:"query_prefix_strip"`

@@ -63,6 +63,7 @@ agent_notes: |
   - No request validation: required-ness is enforced by the API server, not
     by these types.
 datetime_type: connector.DateTime
+test_new_client: 'NewClient(&Config{APIKey: "k", SiteID: "-99", BaseURL: srv.URL})'
 skip_headers: [authorization, version, siteId]
 query_prefix_strip: "request."
 pinned_path_params: {version: "6"}

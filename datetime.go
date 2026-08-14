@@ -22,6 +22,7 @@ const dateTimeLayout = "2006-01-02T15:04:05"
 var dateTimeLayouts = []string{
 	time.RFC3339Nano,
 	"2006-01-02T15:04:05.999999999",
+	"2006-01-02T15:04:05-0700", // offset without colon (Meta Graph API)
 	dateTimeLayout,
 	"2006-01-02",
 }

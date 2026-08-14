@@ -23,6 +23,10 @@ type builder struct {
 // Build translates a loaded OpenAPI 3 document into the renderer IR.
 func Build(doc *openapi3.T, cfg *Config) (*IR, error) {
 	b := &builder{doc: doc, cfg: cfg, ir: &IR{Package: cfg.Package}, reach: map[string]bool{}, typeSeen: map[string]string{}}
+	b.ir.TestNewClient = cfg.TestNewClient
+	if b.ir.TestNewClient == "" {
+		b.ir.TestNewClient = "NewClient(&Config{BaseURL: srv.URL})"
+	}
 	ops, err := b.collectRawOps()
 	if err != nil {
 		return nil, err

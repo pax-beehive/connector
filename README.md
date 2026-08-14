@@ -51,9 +51,33 @@ resp, err := c.GetClasses(ctx, &mindbody.GetClassesRequest{
 - Non-2xx responses return a `*connector.APIError` with the Mindbody error
   code and message parsed.
 
+## Instagram (business accounts)
+
+Connector for operating an Instagram professional account via the Meta Graph
+API: publish posts/reels/stories/carousels, read media, manage comments,
+fetch insights. Generated from a curated spec (Meta publishes no OpenAPI
+spec); see [`instagram/AGENTS.md`](instagram/AGENTS.md) for the full
+catalog and the three-step publishing flow.
+
+```go
+import "github.com/pax-beehive/connector/instagram"
+
+c, err := instagram.NewClient(&instagram.Config{AccessToken: "EAAG..."})
+
+cont, err := c.CreateMediaContainer(ctx, &instagram.CreateMediaContainerRequest{
+	IgUserId: igUserID,
+	ImageUrl: connector.Ptr("https://example.com/photo.jpg"),
+	Caption:  connector.Ptr("Hello #world"),
+})
+pub, err := c.PublishMedia(ctx, &instagram.PublishMediaRequest{
+	IgUserId: igUserID, CreationId: cont.Id,
+})
+```
+
 ## For AI agents
 
-Each connector ships a generated [`AGENTS.md`](mindbody/AGENTS.md) describing
+Each connector ships a generated `AGENTS.md`
+([mindbody](mindbody/AGENTS.md), [instagram](instagram/AGENTS.md)) describing
 its capability boundary: how to construct the client, the auth model, error
 and data conventions, what is out of scope, and a catalog of every operation
 with its HTTP mapping. It is generated from the spec (plus handwritten notes

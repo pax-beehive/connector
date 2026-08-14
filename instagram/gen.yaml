@@ -1,0 +1,98 @@
+package: instagram
+spec: spec/openapi.json
+out_dir: .
+title: "Instagram (business account) connector"
+description: >-
+  Go connector for operating an Instagram professional (business/creator)
+  account through the Meta Graph API: publishing posts/reels/stories/
+  carousels, reading media, managing comments, and fetching insights.
+  Generated from a curated OpenAPI spec authored from the official Meta
+  documentation (Meta publishes no OpenAPI spec).
+agent_notes: |
+  ## How to use this connector
+
+  One `Client` serves one Instagram professional account. It needs a
+  long-lived access token with the content-publishing permissions
+  (e.g. `instagram_business_basic` + `instagram_business_content_publish`,
+  or `instagram_basic` + `instagram_content_publish` + `pages_show_list`
+  for the Facebook-Login flow):
+
+  ```go
+  import (
+      "github.com/pax-beehive/connector"
+      "github.com/pax-beehive/connector/instagram"
+  )
+
+  c, err := instagram.NewClient(&instagram.Config{
+      AccessToken: "EAAG...",                       // required
+      // BaseURL: instagram.InstagramLoginBaseURL,  // for Instagram-Login tokens
+      // Version: "v23.0",                          // Graph API version override
+  })
+  ```
+
+  ## Publishing a post (three steps)
+
+  ```go
+  // 1. Create a media container.
+  cont, err := c.CreateMediaContainer(ctx, &instagram.CreateMediaContainerRequest{
+      IgUserId: igUserID,
+      ImageUrl: connector.Ptr("https://example.com/photo.jpg"),
+      Caption:  connector.Ptr("Hello #world"),
+  })
+
+  // 2. Poll until the container is FINISHED (videos/reels take time).
+  st, err := c.GetContainerStatus(ctx, &instagram.GetContainerStatusRequest{
+      IgContainerId: *cont.Id,
+      Fields:        connector.Ptr("status_code,status"),
+  })
+
+  // 3. Publish it.
+  pub, err := c.PublishMedia(ctx, &instagram.PublishMediaRequest{
+      IgUserId:   igUserID,
+      CreationId: cont.Id,
+  })
+  ```
+
+  Reels: `MediaType: connector.Ptr("REELS")` + `VideoUrl`. Stories:
+  `MediaType: "STORIES"`. Carousels: create child containers with
+  `IsCarouselItem: true`, then a `MediaType: "CAROUSEL"` container whose
+  `Children` is the comma-separated child IDs. Media URLs must be publicly
+  reachable; Meta downloads them server-side. Accounts can publish at most
+  50 API posts per rolling 24h — check `GetPublishingLimit`.
+
+  ## Auth model
+
+  - Every request sends `Authorization: Bearer <AccessToken>`.
+  - Tokens are NOT auto-refreshed. Long-lived Instagram-Login tokens can be
+    refreshed with `RefreshAccessToken` (graph.instagram.com only);
+    Facebook-Login tokens are re-issued through the OAuth flow.
+
+  ## Errors
+
+  Non-2xx responses become `*connector.APIError`; `Code` is the Graph error
+  `code` (plus `/subcode` when present, e.g. `190` = invalid/expired token,
+  `100` = unsupported request), `Message` is Meta's message.
+
+  ## Data conventions
+
+  - GET endpoints return only the fields you list in `Fields`
+    (comma-separated); omit it and Meta returns a minimal default set.
+  - `UserTags`, `ProductTags`, `Collaborators` are raw JSON array strings;
+    `Children` is a comma-separated ID list.
+  - `Since`/`Until` are Unix timestamps (int64). Response timestamps parse
+    Meta's `+0000`-style offsets into `connector.DateTime`.
+  - Pagination: pass `After`/`Before` cursors from `Paging.Cursors`.
+
+  ## Capability boundaries (what this connector does NOT do)
+
+  - No OAuth flow: obtaining/exchanging the access token happens outside
+    this SDK.
+  - No media file uploads: publishing works from public URLs only (except
+    resumable video upload, which is not covered).
+  - No hashtag search, mentions, product tagging catalog, messaging
+    (Messenger/IG DM), or webhooks.
+  - No rate limiting or retries; a 401/expired token is returned as an
+    error, never refreshed transparently.
+datetime_type: connector.DateTime
+pinned_path_params: {version: "v23.0"}
+test_new_client: 'NewClient(&Config{AccessToken: "t", BaseURL: srv.URL})'

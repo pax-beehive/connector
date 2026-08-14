@@ -21,6 +21,8 @@ func TestDateTimeUnmarshal(t *testing.T) {
 		{`"2020-01-02T15:04:05"`, time.Date(2020, 1, 2, 15, 4, 5, 0, time.UTC)},
 		{`"2020-01-02T15:04:05.123"`, time.Date(2020, 1, 2, 15, 4, 5, 123000000, time.UTC)},
 		{`"2020-01-02"`, time.Date(2020, 1, 2, 0, 0, 0, 0, time.UTC)},
+		// Meta Graph API style: offset without colon.
+		{`"2020-01-02T15:04:05+0000"`, time.Date(2020, 1, 2, 15, 4, 5, 0, time.UTC)},
 	}
 	for _, c := range cases {
 		var dt DateTime

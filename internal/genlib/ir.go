@@ -49,4 +49,7 @@ type IR struct {
 	Aliases []Alias     // response aliases, sorted by name
 	Ops     []Operation // sorted by (Tag, MethodName)
 	Tags    []string    // sorted unique tags
+	// TestNewClient is the client-construction expression used by the
+	// generated round-trip test (see Config.TestNewClient).
+	TestNewClient string
 }

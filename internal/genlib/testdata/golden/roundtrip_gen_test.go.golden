@@ -96,7 +96,7 @@ func TestGeneratedRoundtrips(t *testing.T) {
 		_, _ = w.Write([]byte(nextResp))
 	}))
 	defer srv.Close()
-	c, err := NewClient(&Config{APIKey: "k", SiteID: "-99", BaseURL: srv.URL})
+	c, err := NewClient(&Config{BaseURL: srv.URL})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -139,7 +139,7 @@ func TestGeneratedNilRequests(t *testing.T) {
 		_, _ = w.Write([]byte(nextResp))
 	}))
 	defer srv.Close()
-	c, err := NewClient(&Config{APIKey: "k", SiteID: "-99", BaseURL: srv.URL})
+	c, err := NewClient(&Config{BaseURL: srv.URL})
 	if err != nil {
 		t.Fatal(err)
 	}

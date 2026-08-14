@@ -1,0 +1,399 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Instagram Platform API (business accounts, curated)",
+    "version": "v23.0",
+    "description": "Curated OpenAPI description of the Meta Graph API endpoints used to operate an Instagram professional (business/creator) account: content publishing, media, comments, insights, and profile. Authored by hand from the official Meta documentation (Meta publishes no OpenAPI spec)."
+  },
+  "paths": {
+    "/{version}/{igUserId}/media": {
+      "post": {
+        "operationId": "CreateMediaContainer",
+        "tags": ["Publishing"],
+        "description": "Step 1 of publishing: create a media container for an image, video, reel, story, or carousel.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "igUserId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "image_url", "in": "query", "schema": {"type": "string"}, "description": "Public URL of the image (IMAGE/CAROUSEL children/STORIES)."},
+          {"name": "video_url", "in": "query", "schema": {"type": "string"}, "description": "Public URL of the video (REELS/VIDEO/STORIES)."},
+          {"name": "media_type", "in": "query", "schema": {"type": "string"}, "description": "IMAGE (default), REELS, STORIES, or CAROUSEL."},
+          {"name": "caption", "in": "query", "schema": {"type": "string"}},
+          {"name": "is_carousel_item", "in": "query", "schema": {"type": "boolean"}},
+          {"name": "children", "in": "query", "schema": {"type": "string"}, "description": "Comma-separated container IDs for a CAROUSEL."},
+          {"name": "cover_url", "in": "query", "schema": {"type": "string"}},
+          {"name": "thumb_offset", "in": "query", "schema": {"type": "integer", "format": "int64"}, "description": "Video thumbnail frame offset in milliseconds."},
+          {"name": "share_to_feed", "in": "query", "schema": {"type": "boolean"}, "description": "REELS: also show in the Feed tab."},
+          {"name": "location_id", "in": "query", "schema": {"type": "string"}},
+          {"name": "user_tags", "in": "query", "schema": {"type": "string"}, "description": "JSON array string, e.g. [{\"username\":\"x\",\"x\":0.5,\"y\":0.5}]."},
+          {"name": "product_tags", "in": "query", "schema": {"type": "string"}, "description": "JSON array string of product tags."},
+          {"name": "collaborators", "in": "query", "schema": {"type": "string"}, "description": "JSON array string of collaborator usernames."},
+          {"name": "alt_text", "in": "query", "schema": {"type": "string"}},
+          {"name": "audio_name", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Container created", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateMediaContainerResponse"}}}}}
+      },
+      "get": {
+        "operationId": "ListMedia",
+        "tags": ["Media"],
+        "description": "List media objects on the account.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "igUserId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}, "description": "Comma-separated field list, e.g. id,caption,media_type,media_url,permalink,timestamp."},
+          {"name": "limit", "in": "query", "schema": {"type": "integer"}},
+          {"name": "after", "in": "query", "schema": {"type": "string"}},
+          {"name": "before", "in": "query", "schema": {"type": "string"}},
+          {"name": "since", "in": "query", "schema": {"type": "integer", "format": "int64"}, "description": "Unix timestamp."},
+          {"name": "until", "in": "query", "schema": {"type": "integer", "format": "int64"}, "description": "Unix timestamp."}
+        ],
+        "responses": {"200": {"description": "Media list", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MediaList"}}}}}
+      }
+    },
+    "/{version}/{igUserId}/media_publish": {
+      "post": {
+        "operationId": "PublishMedia",
+        "tags": ["Publishing"],
+        "description": "Step 3 of publishing: publish a FINISHED container.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "igUserId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "creation_id", "in": "query", "schema": {"type": "string"}, "description": "Container ID from CreateMediaContainer. Required."}
+        ],
+        "responses": {"200": {"description": "Published media", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PublishMediaResponse"}}}}}
+      }
+    },
+    "/{version}/{igContainerId}": {
+      "get": {
+        "operationId": "GetContainerStatus",
+        "tags": ["Publishing"],
+        "description": "Step 2 of publishing: poll container status until FINISHED (or ERROR/EXPIRED).",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "igContainerId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}, "description": "e.g. status_code,status,id."}
+        ],
+        "responses": {"200": {"description": "Container status", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/GetContainerStatusResponse"}}}}}
+      }
+    },
+    "/{version}/{igUserId}/content_publishing_limit": {
+      "get": {
+        "operationId": "GetPublishingLimit",
+        "tags": ["Publishing"],
+        "description": "Current publishing quota usage (accounts may publish up to 50 posts per 24h via the API).",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "igUserId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}, "description": "quota_usage and/or config."},
+          {"name": "since", "in": "query", "schema": {"type": "integer", "format": "int64"}, "description": "Unix timestamp within the last 24h."}
+        ],
+        "responses": {"200": {"description": "Quota", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/GetPublishingLimitResponse"}}}}}
+      }
+    },
+    "/{version}/{igMediaId}": {
+      "get": {
+        "operationId": "GetMedia",
+        "tags": ["Media"],
+        "description": "Fetch a single media object.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "igMediaId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Media", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Media"}}}}}
+      }
+    },
+    "/{version}/{igUserId}/stories": {
+      "get": {
+        "operationId": "ListStories",
+        "tags": ["Media"],
+        "description": "List currently-live story media objects.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "igUserId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Stories", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MediaList"}}}}}
+      }
+    },
+    "/{version}/{igProfileUserId}": {
+      "get": {
+        "operationId": "GetProfile",
+        "tags": ["Profile"],
+        "description": "Fetch the professional account's profile fields.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "igProfileUserId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}, "description": "e.g. id,username,name,biography,followers_count,media_count,profile_picture_url."}
+        ],
+        "responses": {"200": {"description": "Profile", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/IGUser"}}}}}
+      }
+    },
+    "/{version}/{igMediaId}/comments": {
+      "get": {
+        "operationId": "ListComments",
+        "tags": ["Comments"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "igMediaId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "limit", "in": "query", "schema": {"type": "integer"}},
+          {"name": "after", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Comments", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CommentList"}}}}}
+      },
+      "post": {
+        "operationId": "CreateComment",
+        "tags": ["Comments"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "igMediaId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "message", "in": "query", "schema": {"type": "string"}, "description": "Comment text. Required."}
+        ],
+        "responses": {"200": {"description": "Created comment", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateCommentResponse"}}}}}
+      }
+    },
+    "/{version}/{igCommentId}/replies": {
+      "post": {
+        "operationId": "ReplyToComment",
+        "tags": ["Comments"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "igCommentId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "message", "in": "query", "schema": {"type": "string"}, "description": "Reply text. Required."}
+        ],
+        "responses": {"200": {"description": "Created reply", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ReplyToCommentResponse"}}}}}
+      }
+    },
+    "/{version}/{igCommentId}": {
+      "post": {
+        "operationId": "HideComment",
+        "tags": ["Comments"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "igCommentId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "hide", "in": "query", "schema": {"type": "boolean"}, "description": "true hides, false unhides. Required."}
+        ],
+        "responses": {"200": {"description": "Result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HideCommentResponse"}}}}}
+      },
+      "delete": {
+        "operationId": "DeleteComment",
+        "tags": ["Comments"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "igCommentId", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DeleteCommentResponse"}}}}}
+      }
+    },
+    "/{version}/{igUserId}/insights": {
+      "get": {
+        "operationId": "GetUserInsights",
+        "tags": ["Insights"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "igUserId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "metric", "in": "query", "schema": {"type": "string"}, "description": "Comma-separated metrics, e.g. reach,profile_views,accounts_engaged. Required."},
+          {"name": "period", "in": "query", "schema": {"type": "string"}, "description": "day, week, days_28, or lifetime."},
+          {"name": "metric_type", "in": "query", "schema": {"type": "string"}, "description": "time_series or total_value."},
+          {"name": "breakdown", "in": "query", "schema": {"type": "string"}},
+          {"name": "timeframe", "in": "query", "schema": {"type": "string"}, "description": "Demographics: last_14_days, last_30_days, last_90_days, prev_month, this_month, this_week."},
+          {"name": "since", "in": "query", "schema": {"type": "integer", "format": "int64"}, "description": "Unix timestamp."},
+          {"name": "until", "in": "query", "schema": {"type": "integer", "format": "int64"}, "description": "Unix timestamp."}
+        ],
+        "responses": {"200": {"description": "Insights", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InsightList"}}}}}
+      }
+    },
+    "/{version}/{igMediaId}/insights": {
+      "get": {
+        "operationId": "GetMediaInsights",
+        "tags": ["Insights"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "igMediaId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "metric", "in": "query", "schema": {"type": "string"}, "description": "Comma-separated metrics, e.g. reach,likes,comments,saved,shares,views. Required."},
+          {"name": "breakdown", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Insights", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InsightList"}}}}}
+      }
+    },
+    "/{version}/refresh_access_token": {
+      "get": {
+        "operationId": "RefreshAccessToken",
+        "tags": ["Auth"],
+        "description": "Refresh a long-lived Instagram (Instagram-Login) access token. Only available on graph.instagram.com.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "grant_type", "in": "query", "schema": {"type": "string"}, "description": "Must be ig_refresh_token. Required."}
+        ],
+        "responses": {"200": {"description": "Refreshed token", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RefreshAccessTokenResponse"}}}}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateMediaContainerResponse": {
+        "type": "object",
+        "properties": {"id": {"type": "string", "description": "Container ID; pass to PublishMedia as creation_id."}}
+      },
+      "PublishMediaResponse": {
+        "type": "object",
+        "properties": {"id": {"type": "string", "description": "Published media ID."}}
+      },
+      "GetContainerStatusResponse": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "status": {"type": "string"},
+          "status_code": {"type": "string", "description": "EXPIRED, ERROR, FINISHED, IN_PROGRESS, or PUBLISHED."}
+        }
+      },
+      "GetPublishingLimitResponse": {
+        "type": "object",
+        "properties": {"data": {"type": "array", "items": {"$ref": "#/components/schemas/PublishingLimit"}}}
+      },
+      "PublishingLimit": {
+        "type": "object",
+        "properties": {
+          "quota_usage": {"type": "integer"},
+          "config": {"$ref": "#/components/schemas/PublishingLimitConfig"}
+        }
+      },
+      "PublishingLimitConfig": {
+        "type": "object",
+        "properties": {"quota_total": {"type": "integer"}, "quota_duration": {"type": "integer"}}
+      },
+      "Media": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "caption": {"type": "string"},
+          "media_type": {"type": "string"},
+          "media_product_type": {"type": "string"},
+          "media_url": {"type": "string"},
+          "permalink": {"type": "string"},
+          "thumbnail_url": {"type": "string"},
+          "shortcode": {"type": "string"},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "username": {"type": "string"},
+          "like_count": {"type": "integer"},
+          "comments_count": {"type": "integer"},
+          "is_comment_enabled": {"type": "boolean"},
+          "is_shared_to_feed": {"type": "boolean"},
+          "alt_text": {"type": "string"},
+          "children": {"$ref": "#/components/schemas/MediaList"}
+        }
+      },
+      "MediaList": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/Media"}},
+          "paging": {"$ref": "#/components/schemas/Paging"}
+        }
+      },
+      "Paging": {
+        "type": "object",
+        "properties": {
+          "cursors": {"$ref": "#/components/schemas/PagingCursors"},
+          "next": {"type": "string"},
+          "previous": {"type": "string"}
+        }
+      },
+      "PagingCursors": {
+        "type": "object",
+        "properties": {"before": {"type": "string"}, "after": {"type": "string"}}
+      },
+      "IGUser": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "username": {"type": "string"},
+          "name": {"type": "string"},
+          "biography": {"type": "string"},
+          "website": {"type": "string"},
+          "followers_count": {"type": "integer"},
+          "follows_count": {"type": "integer"},
+          "media_count": {"type": "integer"},
+          "profile_picture_url": {"type": "string"}
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "text": {"type": "string"},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "username": {"type": "string"},
+          "like_count": {"type": "integer"},
+          "hidden": {"type": "boolean"},
+          "from": {"$ref": "#/components/schemas/CommentFrom"},
+          "replies": {"$ref": "#/components/schemas/CommentList"}
+        }
+      },
+      "CommentFrom": {
+        "type": "object",
+        "properties": {"id": {"type": "string"}, "username": {"type": "string"}}
+      },
+      "CommentList": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/Comment"}},
+          "paging": {"$ref": "#/components/schemas/Paging"}
+        }
+      },
+      "CreateCommentResponse": {
+        "type": "object",
+        "properties": {"id": {"type": "string"}}
+      },
+      "ReplyToCommentResponse": {
+        "type": "object",
+        "properties": {"id": {"type": "string"}}
+      },
+      "HideCommentResponse": {
+        "type": "object",
+        "properties": {"success": {"type": "boolean"}}
+      },
+      "DeleteCommentResponse": {
+        "type": "object",
+        "properties": {"success": {"type": "boolean"}}
+      },
+      "InsightList": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/Insight"}},
+          "paging": {"$ref": "#/components/schemas/Paging"}
+        }
+      },
+      "Insight": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "period": {"type": "string"},
+          "title": {"type": "string"},
+          "description": {"type": "string"},
+          "values": {"type": "array", "items": {"$ref": "#/components/schemas/InsightValue"}},
+          "total_value": {"$ref": "#/components/schemas/InsightTotalValue"}
+        }
+      },
+      "InsightValue": {
+        "type": "object",
+        "properties": {
+          "value": {"description": "Metric value; a number, or an object for breakdowns."},
+          "end_time": {"type": "string", "format": "date-time"}
+        }
+      },
+      "InsightTotalValue": {
+        "type": "object",
+        "properties": {"value": {"type": "integer", "format": "int64"}}
+      },
+      "RefreshAccessTokenResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {"type": "string"},
+          "token_type": {"type": "string"},
+          "expires_in": {"type": "integer", "format": "int64", "description": "Seconds until expiry."}
+        }
+      }
+    }
+  }
+}

@@ -94,10 +94,8 @@ Anything not listed here is outside this connector's capability boundary.
 {{end}}`
 
 // roundtripTmpl generates one table-driven round-trip test per operation
-// against an httptest stub. It assumes the handwritten layer provides
-// NewClient(&Config{APIKey, SiteID, BaseURL}) (*Client, error); a connector
-// with a different constructor would need a config override for this
-// template.
+// against an httptest stub. The client-construction expression comes from
+// gen.yaml's test_new_client (default: NewClient(&Config{BaseURL: srv.URL})).
 const roundtripTmpl = `
 type roundtripCase struct {
 	name      string
@@ -139,7 +137,7 @@ func TestGeneratedRoundtrips(t *testing.T) {
 		_, _ = w.Write([]byte(nextResp))
 	}))
 	defer srv.Close()
-	c, err := NewClient(&Config{APIKey: "k", SiteID: "-99", BaseURL: srv.URL})
+	c, err := {{.TestNewClient}}
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -182,7 +180,7 @@ func TestGeneratedNilRequests(t *testing.T) {
 		_, _ = w.Write([]byte(nextResp))
 	}))
 	defer srv.Close()
-	c, err := NewClient(&Config{APIKey: "k", SiteID: "-99", BaseURL: srv.URL})
+	c, err := {{.TestNewClient}}
 	if err != nil {
 		t.Fatal(err)
 	}
