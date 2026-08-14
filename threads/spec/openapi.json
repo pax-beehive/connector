@@ -1,0 +1,359 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Threads API (curated)",
+    "version": "v1.0",
+    "description": "Curated OpenAPI description of the Meta Threads API for professional/business use: content publishing, media, replies management, insights, profile, and token maintenance. Authored by hand from the official Meta documentation (Meta publishes no OpenAPI spec)."
+  },
+  "paths": {
+    "/{version}/{threadsUserId}/threads": {
+      "post": {
+        "operationId": "CreateThreadsContainer",
+        "tags": ["Publishing"],
+        "description": "Step 1 of publishing: create a media container for a text post, image, video, or carousel.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "threadsUserId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "media_type", "in": "query", "schema": {"type": "string"}, "description": "TEXT, IMAGE, VIDEO, or CAROUSEL. Required."},
+          {"name": "text", "in": "query", "schema": {"type": "string"}, "description": "Post text (max 500 chars); required for TEXT."},
+          {"name": "image_url", "in": "query", "schema": {"type": "string"}, "description": "Public URL (IMAGE / carousel children)."},
+          {"name": "video_url", "in": "query", "schema": {"type": "string"}, "description": "Public URL (VIDEO / carousel children)."},
+          {"name": "is_carousel_item", "in": "query", "schema": {"type": "boolean"}},
+          {"name": "children", "in": "query", "schema": {"type": "string"}, "description": "Comma-separated child container IDs for CAROUSEL."},
+          {"name": "reply_to_id", "in": "query", "schema": {"type": "string"}, "description": "Publish as a reply to this thread."},
+          {"name": "quote_post_id", "in": "query", "schema": {"type": "string"}, "description": "Quote this thread."},
+          {"name": "reply_control", "in": "query", "schema": {"type": "string"}, "description": "everyone, accounts_you_follow, or mentioned_only."},
+          {"name": "link_attachment", "in": "query", "schema": {"type": "string"}, "description": "URL card to attach (TEXT posts)."},
+          {"name": "alt_text", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Container created", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateThreadsContainerResponse"}}}}}
+      },
+      "get": {
+        "operationId": "ListThreads",
+        "tags": ["Media"],
+        "description": "List the user's threads.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "threadsUserId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}, "description": "e.g. id,text,media_type,media_url,permalink,timestamp."},
+          {"name": "limit", "in": "query", "schema": {"type": "integer"}},
+          {"name": "after", "in": "query", "schema": {"type": "string"}},
+          {"name": "before", "in": "query", "schema": {"type": "string"}},
+          {"name": "since", "in": "query", "schema": {"type": "string"}, "description": "YYYY-MM-DD or Unix timestamp."},
+          {"name": "until", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Threads", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ThreadMediaList"}}}}}
+      }
+    },
+    "/{version}/{threadsUserId}/threads_publish": {
+      "post": {
+        "operationId": "PublishThread",
+        "tags": ["Publishing"],
+        "description": "Step 2 of publishing: publish a FINISHED container. Wait ~30s (or poll GetContainerStatus) for video containers.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "threadsUserId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "creation_id", "in": "query", "schema": {"type": "string"}, "description": "Container ID from CreateThreadsContainer. Required."}
+        ],
+        "responses": {"200": {"description": "Published thread", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PublishThreadResponse"}}}}}
+      }
+    },
+    "/{version}/{containerId}": {
+      "get": {
+        "operationId": "GetContainerStatus",
+        "tags": ["Publishing"],
+        "description": "Poll a container until FINISHED (or ERROR/EXPIRED).",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "containerId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}, "description": "e.g. status,error_message."}
+        ],
+        "responses": {"200": {"description": "Container status", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/GetContainerStatusResponse"}}}}}
+      }
+    },
+    "/{version}/{threadsUserId}/threads_publishing_limit": {
+      "get": {
+        "operationId": "GetPublishingLimit",
+        "tags": ["Publishing"],
+        "description": "Publishing quota usage (250 posts and 1000 replies per 24h).",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "threadsUserId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}, "description": "quota_usage,config,reply_quota_usage,reply_config."}
+        ],
+        "responses": {"200": {"description": "Quota", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/GetPublishingLimitResponse"}}}}}
+      }
+    },
+    "/{version}/{threadsMediaId}": {
+      "get": {
+        "operationId": "GetThread",
+        "tags": ["Media"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "threadsMediaId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Thread", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ThreadMedia"}}}}}
+      }
+    },
+    "/{version}/{profileUserId}": {
+      "get": {
+        "operationId": "GetProfile",
+        "tags": ["Profile"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "profileUserId", "in": "path", "required": true, "schema": {"type": "string"}, "description": "Use me for the authenticated user."},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}, "description": "e.g. id,username,name,threads_profile_picture_url,threads_biography."}
+        ],
+        "responses": {"200": {"description": "Profile", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ThreadsProfile"}}}}}
+      }
+    },
+    "/{version}/{repliesMediaId}/replies": {
+      "get": {
+        "operationId": "ListReplies",
+        "tags": ["Replies"],
+        "description": "Immediate replies to a thread.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "repliesMediaId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "reverse", "in": "query", "schema": {"type": "boolean"}}
+        ],
+        "responses": {"200": {"description": "Replies", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ThreadMediaList"}}}}}
+      }
+    },
+    "/{version}/{conversationMediaId}/conversation": {
+      "get": {
+        "operationId": "ListConversation",
+        "tags": ["Replies"],
+        "description": "Flattened reply tree of a root thread.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "conversationMediaId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "reverse", "in": "query", "schema": {"type": "boolean"}}
+        ],
+        "responses": {"200": {"description": "Conversation", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ThreadMediaList"}}}}}
+      }
+    },
+    "/{version}/{threadsUserId}/replies": {
+      "get": {
+        "operationId": "ListUserReplies",
+        "tags": ["Replies"],
+        "description": "Replies authored by the user.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "threadsUserId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "limit", "in": "query", "schema": {"type": "integer"}},
+          {"name": "after", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Replies", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ThreadMediaList"}}}}}
+      }
+    },
+    "/{version}/{replyId}/manage_reply": {
+      "post": {
+        "operationId": "HideReply",
+        "tags": ["Replies"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "replyId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "hide", "in": "query", "schema": {"type": "boolean"}, "description": "true hides, false unhides. Required."}
+        ],
+        "responses": {"200": {"description": "Result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HideReplyResponse"}}}}}
+      }
+    },
+    "/{version}/{insightsMediaId}/insights": {
+      "get": {
+        "operationId": "GetMediaInsights",
+        "tags": ["Insights"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "insightsMediaId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "metric", "in": "query", "schema": {"type": "string"}, "description": "Comma-separated: views,likes,replies,reposts,quotes,shares. Required."}
+        ],
+        "responses": {"200": {"description": "Insights", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InsightList"}}}}}
+      }
+    },
+    "/{version}/{insightsUserId}/threads_insights": {
+      "get": {
+        "operationId": "GetUserInsights",
+        "tags": ["Insights"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "insightsUserId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "metric", "in": "query", "schema": {"type": "string"}, "description": "e.g. views,likes,replies,reposts,quotes,followers_count,follower_demographics. Required."},
+          {"name": "since", "in": "query", "schema": {"type": "integer", "format": "int64"}, "description": "Unix timestamp."},
+          {"name": "until", "in": "query", "schema": {"type": "integer", "format": "int64"}}
+        ],
+        "responses": {"200": {"description": "Insights", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/InsightList"}}}}}
+      }
+    },
+    "/access_token": {
+      "get": {
+        "operationId": "ExchangeAccessToken",
+        "tags": ["Auth"],
+        "description": "Exchange a short-lived token for a long-lived (60-day) token.",
+        "parameters": [
+          {"name": "grant_type", "in": "query", "schema": {"type": "string"}, "description": "Must be th_exchange_token. Required."},
+          {"name": "client_secret", "in": "query", "schema": {"type": "string"}, "description": "Threads app secret. Required."},
+          {"name": "access_token", "in": "query", "schema": {"type": "string"}, "description": "Short-lived token. Required."}
+        ],
+        "responses": {"200": {"description": "Long-lived token", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ExchangeAccessTokenResponse"}}}}}
+      }
+    },
+    "/refresh_access_token": {
+      "get": {
+        "operationId": "RefreshAccessToken",
+        "tags": ["Auth"],
+        "description": "Refresh an unexpired long-lived token (must be at least 24h old). Returns a NEW token; persist it.",
+        "parameters": [
+          {"name": "grant_type", "in": "query", "schema": {"type": "string"}, "description": "Must be th_refresh_token. Required."},
+          {"name": "access_token", "in": "query", "schema": {"type": "string"}, "description": "Current long-lived token. Required."}
+        ],
+        "responses": {"200": {"description": "Refreshed token", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/RefreshAccessTokenResponse"}}}}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateThreadsContainerResponse": {
+        "type": "object",
+        "properties": {"id": {"type": "string", "description": "Container ID; pass to PublishThread as creation_id."}}
+      },
+      "PublishThreadResponse": {
+        "type": "object",
+        "properties": {"id": {"type": "string", "description": "Published thread media ID."}}
+      },
+      "GetContainerStatusResponse": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "status": {"type": "string", "description": "EXPIRED, ERROR, FINISHED, IN_PROGRESS, or PUBLISHED."},
+          "error_message": {"type": "string"}
+        }
+      },
+      "GetPublishingLimitResponse": {
+        "type": "object",
+        "properties": {"data": {"type": "array", "items": {"$ref": "#/components/schemas/PublishingLimitData"}}}
+      },
+      "PublishingLimitData": {
+        "type": "object",
+        "properties": {
+          "quota_usage": {"type": "integer"},
+          "config": {"$ref": "#/components/schemas/QuotaConfig"},
+          "reply_quota_usage": {"type": "integer"},
+          "reply_config": {"$ref": "#/components/schemas/QuotaConfig"}
+        }
+      },
+      "QuotaConfig": {
+        "type": "object",
+        "properties": {"quota_total": {"type": "integer", "format": "int64"}, "quota_duration": {"type": "integer", "format": "int64"}}
+      },
+      "ThreadMedia": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "media_product_type": {"type": "string"},
+          "media_type": {"type": "string"},
+          "media_url": {"type": "string"},
+          "permalink": {"type": "string"},
+          "shortcode": {"type": "string"},
+          "thumbnail_url": {"type": "string"},
+          "text": {"type": "string"},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "username": {"type": "string"},
+          "owner": {"$ref": "#/components/schemas/ThreadsOwner"},
+          "is_quote_post": {"type": "boolean"},
+          "has_replies": {"type": "boolean"},
+          "reply_audience": {"type": "string"},
+          "alt_text": {"type": "string"},
+          "children": {"$ref": "#/components/schemas/ThreadMediaList"}
+        }
+      },
+      "ThreadsOwner": {
+        "type": "object",
+        "properties": {"id": {"type": "string"}}
+      },
+      "ThreadMediaList": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/ThreadMedia"}},
+          "paging": {"$ref": "#/components/schemas/Paging"}
+        }
+      },
+      "Paging": {
+        "type": "object",
+        "properties": {
+          "cursors": {"$ref": "#/components/schemas/PagingCursors"},
+          "next": {"type": "string"},
+          "previous": {"type": "string"}
+        }
+      },
+      "PagingCursors": {
+        "type": "object",
+        "properties": {"before": {"type": "string"}, "after": {"type": "string"}}
+      },
+      "ThreadsProfile": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "username": {"type": "string"},
+          "name": {"type": "string"},
+          "threads_profile_picture_url": {"type": "string"},
+          "threads_biography": {"type": "string"}
+        }
+      },
+      "HideReplyResponse": {
+        "type": "object",
+        "properties": {"success": {"type": "boolean"}}
+      },
+      "InsightList": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/Insight"}},
+          "paging": {"$ref": "#/components/schemas/Paging"}
+        }
+      },
+      "Insight": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "period": {"type": "string"},
+          "title": {"type": "string"},
+          "description": {"type": "string"},
+          "values": {"type": "array", "items": {"$ref": "#/components/schemas/InsightValue"}},
+          "total_value": {"$ref": "#/components/schemas/InsightTotalValue"}
+        }
+      },
+      "InsightValue": {
+        "type": "object",
+        "properties": {
+          "value": {"description": "Metric value; a number, or an object for demographic breakdowns."},
+          "end_time": {"type": "string", "format": "date-time"}
+        }
+      },
+      "InsightTotalValue": {
+        "type": "object",
+        "properties": {"value": {"type": "integer", "format": "int64"}}
+      },
+      "ExchangeAccessTokenResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {"type": "string"},
+          "token_type": {"type": "string"},
+          "expires_in": {"type": "integer", "format": "int64"}
+        }
+      },
+      "RefreshAccessTokenResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {"type": "string"},
+          "token_type": {"type": "string"},
+          "expires_in": {"type": "integer", "format": "int64"}
+        }
+      }
+    }
+  }
+}

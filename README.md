@@ -74,6 +74,26 @@ pub, err := c.PublishMedia(ctx, &instagram.PublishMediaRequest{
 })
 ```
 
+## Threads
+
+Publish text/image/video/carousel posts, manage replies, and fetch insights
+for a Threads professional account. Same two-step container flow as
+Instagram. See [`threads/AGENTS.md`](threads/AGENTS.md).
+
+```go
+import "github.com/pax-beehive/connector/threads"
+
+c, err := threads.NewClient(&threads.Config{AccessToken: token})
+cont, err := c.CreateThreadsContainer(ctx, &threads.CreateThreadsContainerRequest{
+	ThreadsUserId: userID,
+	MediaType:     connector.Ptr("TEXT"),
+	Text:          connector.Ptr("Hello Threads"),
+})
+pub, err := c.PublishThread(ctx, &threads.PublishThreadRequest{
+	ThreadsUserId: userID, CreationId: cont.Id,
+})
+```
+
 ## Facebook (Pages)
 
 Publish and manage content on a Facebook Page: feed posts, photos, videos,
@@ -174,8 +194,9 @@ case connector.IsRetryable(err):    // 429/502/503/504
 
 Each connector ships a generated `AGENTS.md`
 ([mindbody](mindbody/AGENTS.md), [instagram](instagram/AGENTS.md),
-[facebook](facebook/AGENTS.md), [x](x/AGENTS.md),
-[metaads](metaads/AGENTS.md), [googleads](googleads/AGENTS.md)) describing
+[threads](threads/AGENTS.md), [facebook](facebook/AGENTS.md),
+[x](x/AGENTS.md), [metaads](metaads/AGENTS.md),
+[googleads](googleads/AGENTS.md)) describing
 its capability boundary: how to construct the client, the auth model, error
 and data conventions, what is out of scope, and a catalog of every operation
 with its HTTP mapping. It is generated from the spec (plus handwritten notes
