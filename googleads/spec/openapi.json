@@ -1,0 +1,294 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Google Ads API (REST, curated)",
+    "version": "v23",
+    "description": "Curated OpenAPI description of the Google Ads API REST interface: GAQL search/searchStream for reads and reporting, mutate endpoints for the core write path (budgets, campaigns, ad groups, ads, criteria), and accessible-customer listing. Authored by hand from the official Google documentation."
+  },
+  "paths": {
+    "/{version}/customers/{customerId}/googleAds:search": {
+      "post": {
+        "operationId": "SearchGoogleAds",
+        "tags": ["Query"],
+        "description": "Run a GAQL query with paged results. GAQL covers every resource and metric (reporting included).",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "customerId", "in": "path", "required": true, "schema": {"type": "string"}, "description": "Digits only, no dashes."}
+        ],
+        "requestBody": {
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SearchGoogleAdsBody"}}}
+        },
+        "responses": {"200": {"description": "Query results", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SearchGoogleAdsResponse"}}}}}
+      }
+    },
+    "/{version}/customers/{customerId}/googleAds:searchStream": {
+      "post": {
+        "operationId": "SearchGoogleAdsStream",
+        "tags": ["Query"],
+        "description": "Run a GAQL query streaming all results in batches (no paging).",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "customerId", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SearchGoogleAdsStreamBody"}}}
+        },
+        "responses": {"200": {"description": "Result batches", "content": {"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/SearchGoogleAdsStreamBatch"}}}}}}
+      }
+    },
+    "/{version}/customers/{customerId}/campaignBudgets:mutate": {
+      "post": {
+        "operationId": "MutateCampaignBudgets",
+        "tags": ["Mutate"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "customerId", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MutateCampaignBudgetsBody"}}}
+        },
+        "responses": {"200": {"description": "Mutate results", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MutateCampaignBudgetsResponse"}}}}}
+      }
+    },
+    "/{version}/customers/{customerId}/campaigns:mutate": {
+      "post": {
+        "operationId": "MutateCampaigns",
+        "tags": ["Mutate"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "customerId", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MutateCampaignsBody"}}}
+        },
+        "responses": {"200": {"description": "Mutate results", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MutateCampaignsResponse"}}}}}
+      }
+    },
+    "/{version}/customers/{customerId}/adGroups:mutate": {
+      "post": {
+        "operationId": "MutateAdGroups",
+        "tags": ["Mutate"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "customerId", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MutateAdGroupsBody"}}}
+        },
+        "responses": {"200": {"description": "Mutate results", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MutateAdGroupsResponse"}}}}}
+      }
+    },
+    "/{version}/customers/{customerId}/adGroupAds:mutate": {
+      "post": {
+        "operationId": "MutateAdGroupAds",
+        "tags": ["Mutate"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "customerId", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MutateAdGroupAdsBody"}}}
+        },
+        "responses": {"200": {"description": "Mutate results", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MutateAdGroupAdsResponse"}}}}}
+      }
+    },
+    "/{version}/customers/{customerId}/adGroupCriteria:mutate": {
+      "post": {
+        "operationId": "MutateAdGroupCriteria",
+        "tags": ["Mutate"],
+        "description": "Manage ad group criteria such as keywords.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "customerId", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MutateAdGroupCriteriaBody"}}}
+        },
+        "responses": {"200": {"description": "Mutate results", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MutateAdGroupCriteriaResponse"}}}}}
+      }
+    },
+    "/{version}/customers:listAccessibleCustomers": {
+      "get": {
+        "operationId": "ListAccessibleCustomers",
+        "tags": ["Accounts"],
+        "description": "Customer resource names directly accessible by the authenticated user.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Resource names", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ListAccessibleCustomersResponse"}}}}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SearchGoogleAdsBody": {
+        "type": "object",
+        "properties": {
+          "query": {"type": "string", "description": "GAQL, e.g. SELECT campaign.id, metrics.clicks FROM campaign WHERE segments.date DURING LAST_7_DAYS. Required."},
+          "pageToken": {"type": "string"},
+          "pageSize": {"type": "integer"},
+          "validateOnly": {"type": "boolean"}
+        }
+      },
+      "SearchGoogleAdsResponse": {
+        "type": "object",
+        "properties": {
+          "results": {"type": "array", "items": {"type": "object"}, "description": "GoogleAdsRow objects; shape follows the GAQL SELECT clause."},
+          "nextPageToken": {"type": "string"},
+          "totalResultsCount": {"type": "string", "description": "int64 as string."},
+          "fieldMask": {"type": "string"}
+        }
+      },
+      "SearchGoogleAdsStreamBody": {
+        "type": "object",
+        "properties": {
+          "query": {"type": "string", "description": "GAQL. Required."},
+          "summaryRowSetting": {"type": "string"}
+        }
+      },
+      "SearchGoogleAdsStreamBatch": {
+        "type": "object",
+        "properties": {
+          "results": {"type": "array", "items": {"type": "object"}},
+          "fieldMask": {"type": "string"},
+          "requestId": {"type": "string"}
+        }
+      },
+      "CampaignBudgetOperation": {
+        "type": "object",
+        "properties": {
+          "create": {"type": "object", "description": "CampaignBudget fields, e.g. {\"name\":..,\"amountMicros\":\"5000000\",\"deliveryMethod\":\"STANDARD\"}."},
+          "update": {"type": "object"},
+          "updateMask": {"type": "string", "description": "Comma-separated field paths; required with update."},
+          "remove": {"type": "string", "description": "Resource name to remove."}
+        }
+      },
+      "MutateCampaignBudgetsBody": {
+        "type": "object",
+        "properties": {
+          "operations": {"type": "array", "items": {"$ref": "#/components/schemas/CampaignBudgetOperation"}},
+          "partialFailure": {"type": "boolean"},
+          "validateOnly": {"type": "boolean"}
+        }
+      },
+      "MutateCampaignBudgetsResponse": {
+        "type": "object",
+        "properties": {
+          "results": {"type": "array", "items": {"$ref": "#/components/schemas/MutateResult"}},
+          "partialFailureError": {"$ref": "#/components/schemas/GoogleRpcStatus"}
+        }
+      },
+      "CampaignOperation": {
+        "type": "object",
+        "properties": {
+          "create": {"type": "object", "description": "Campaign fields, e.g. {\"name\":..,\"advertisingChannelType\":\"SEARCH\",\"status\":\"PAUSED\",\"campaignBudget\":\"customers/1/campaignBudgets/2\",\"manualCpc\":{}}."},
+          "update": {"type": "object"},
+          "updateMask": {"type": "string"},
+          "remove": {"type": "string"}
+        }
+      },
+      "MutateCampaignsBody": {
+        "type": "object",
+        "properties": {
+          "operations": {"type": "array", "items": {"$ref": "#/components/schemas/CampaignOperation"}},
+          "partialFailure": {"type": "boolean"},
+          "validateOnly": {"type": "boolean"}
+        }
+      },
+      "MutateCampaignsResponse": {
+        "type": "object",
+        "properties": {
+          "results": {"type": "array", "items": {"$ref": "#/components/schemas/MutateResult"}},
+          "partialFailureError": {"$ref": "#/components/schemas/GoogleRpcStatus"}
+        }
+      },
+      "AdGroupOperation": {
+        "type": "object",
+        "properties": {
+          "create": {"type": "object"},
+          "update": {"type": "object"},
+          "updateMask": {"type": "string"},
+          "remove": {"type": "string"}
+        }
+      },
+      "MutateAdGroupsBody": {
+        "type": "object",
+        "properties": {
+          "operations": {"type": "array", "items": {"$ref": "#/components/schemas/AdGroupOperation"}},
+          "partialFailure": {"type": "boolean"},
+          "validateOnly": {"type": "boolean"}
+        }
+      },
+      "MutateAdGroupsResponse": {
+        "type": "object",
+        "properties": {
+          "results": {"type": "array", "items": {"$ref": "#/components/schemas/MutateResult"}},
+          "partialFailureError": {"$ref": "#/components/schemas/GoogleRpcStatus"}
+        }
+      },
+      "AdGroupAdOperation": {
+        "type": "object",
+        "properties": {
+          "create": {"type": "object", "description": "AdGroupAd, e.g. {\"adGroup\":..,\"status\":\"PAUSED\",\"ad\":{\"responsiveSearchAd\":{...},\"finalUrls\":[...]}}."},
+          "update": {"type": "object"},
+          "updateMask": {"type": "string"},
+          "remove": {"type": "string"}
+        }
+      },
+      "MutateAdGroupAdsBody": {
+        "type": "object",
+        "properties": {
+          "operations": {"type": "array", "items": {"$ref": "#/components/schemas/AdGroupAdOperation"}},
+          "partialFailure": {"type": "boolean"},
+          "validateOnly": {"type": "boolean"}
+        }
+      },
+      "MutateAdGroupAdsResponse": {
+        "type": "object",
+        "properties": {
+          "results": {"type": "array", "items": {"$ref": "#/components/schemas/MutateResult"}},
+          "partialFailureError": {"$ref": "#/components/schemas/GoogleRpcStatus"}
+        }
+      },
+      "AdGroupCriterionOperation": {
+        "type": "object",
+        "properties": {
+          "create": {"type": "object", "description": "AdGroupCriterion, e.g. {\"adGroup\":..,\"status\":\"ENABLED\",\"keyword\":{\"text\":\"running shoes\",\"matchType\":\"PHRASE\"}}."},
+          "update": {"type": "object"},
+          "updateMask": {"type": "string"},
+          "remove": {"type": "string"}
+        }
+      },
+      "MutateAdGroupCriteriaBody": {
+        "type": "object",
+        "properties": {
+          "operations": {"type": "array", "items": {"$ref": "#/components/schemas/AdGroupCriterionOperation"}},
+          "partialFailure": {"type": "boolean"},
+          "validateOnly": {"type": "boolean"}
+        }
+      },
+      "MutateAdGroupCriteriaResponse": {
+        "type": "object",
+        "properties": {
+          "results": {"type": "array", "items": {"$ref": "#/components/schemas/MutateResult"}},
+          "partialFailureError": {"$ref": "#/components/schemas/GoogleRpcStatus"}
+        }
+      },
+      "MutateResult": {
+        "type": "object",
+        "properties": {"resourceName": {"type": "string"}}
+      },
+      "GoogleRpcStatus": {
+        "type": "object",
+        "properties": {
+          "code": {"type": "integer"},
+          "message": {"type": "string"}
+        }
+      },
+      "ListAccessibleCustomersResponse": {
+        "type": "object",
+        "properties": {"resourceNames": {"type": "array", "items": {"type": "string"}}}
+      }
+    }
+  }
+}

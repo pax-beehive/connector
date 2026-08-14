@@ -1,0 +1,80 @@
+package: metaads
+spec: spec/openapi.json
+out_dir: .
+title: "Meta Marketing API (ads) connector"
+description: >-
+  Go connector for the Meta Marketing API: managing Facebook AND Instagram
+  ads through one surface — ad accounts, campaigns, ad sets, ads, creatives,
+  and insights. Generated from a curated OpenAPI spec authored from the
+  official Meta documentation (Meta publishes no OpenAPI spec).
+agent_notes: |
+  ## How to use this connector
+
+  One `Client` serves one access token (user or system user) with the
+  `ads_management` permission (`ads_read` suffices for read-only). Instagram
+  ads are NOT a separate API: they are placements inside the same ad
+  account, controlled by `Targeting`/placement fields and the creative's
+  Instagram identity.
+
+  ```go
+  import (
+      "github.com/pax-beehive/connector"
+      "github.com/pax-beehive/connector/metaads"
+  )
+
+  c, err := metaads.NewClient(&metaads.Config{AccessToken: "EAAG..."})
+
+  // The object hierarchy is Campaign -> Ad Set -> Ad (with a Creative).
+  camp, err := c.CreateCampaign(ctx, &metaads.CreateCampaignRequest{
+      AdAccountId:         "act_123",            // always act_-prefixed
+      Name:                connector.Ptr("spring sale"),
+      Objective:           connector.Ptr("OUTCOME_TRAFFIC"),
+      Status:              connector.Ptr("PAUSED"),
+      SpecialAdCategories: connector.Ptr("[]"),  // required, JSON array string
+      DailyBudget:         connector.Ptr(int64(1000)), // minor units (cents)
+  })
+  ```
+
+  Then `CreateAdSet` (targeting/budget/optimization; `Targeting` is a JSON
+  object string), `CreateAdCreative` (`ObjectStorySpec` JSON string, or
+  `ObjectStoryId` to promote an existing page post), and `CreateAd` tying an
+  ad set to a creative (`Creative` = `{"creative_id":"..."}`).
+
+  `GetInsights` works on any level: pass an ad account (`act_...`),
+  campaign, ad set, or ad ID as `ObjectId`; use
+  `Breakdowns: connector.Ptr("publisher_platform")` to split Facebook vs
+  Instagram performance.
+
+  ## Auth model
+
+  - Every request sends `Authorization: Bearer <AccessToken>`.
+  - Tokens are NOT auto-refreshed; use a long-lived or system-user token.
+  - New apps start in the Limited tier of the Marketing API Access Tier
+    with stricter rate limits; limits also scale with ad-account spend.
+
+  ## Errors
+
+  Non-2xx responses become `*connector.APIError`; `Code` is the Graph error
+  `code` (plus `/subcode`, e.g. `190` = invalid token, `100` = invalid
+  parameter, `17`/`80004` = rate limits), `Message` is Meta's message.
+
+  ## Data conventions
+
+  - GET endpoints return only the fields you list in `Fields`.
+  - Budgets and bid amounts are in the account currency's minor units.
+  - Insight metrics come back as strings (Marketing API convention).
+  - Nested structures (`Targeting`, `PromotedObject`, `ObjectStorySpec`,
+    `Filtering`, `TimeRange`, `Creative`) are raw JSON strings on requests.
+  - Pagination: pass `After` cursors from `Paging.Cursors`.
+
+  ## Capability boundaries (what this connector does NOT do)
+
+  - No OAuth flow: obtaining tokens happens outside this SDK.
+  - No image/video uploads (adimages/advideos), custom audiences, pixels,
+    catalogs, lead forms, or async insight jobs.
+  - No budget safety rails: create campaigns PAUSED and verify before
+    activating.
+  - No retries by default; opt in with `connector.WithRetry`.
+datetime_type: connector.DateTime
+pinned_path_params: {version: "v26.0"}
+test_new_client: 'NewClient(&Config{AccessToken: "t", BaseURL: srv.URL})'

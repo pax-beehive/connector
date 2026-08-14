@@ -102,6 +102,44 @@ tweet, err := c.CreateTweet(ctx, &x.CreateTweetRequest{
 })
 ```
 
+## Meta Marketing API (Facebook + Instagram ads)
+
+Manage ads across Facebook and Instagram with one surface: ad accounts,
+campaigns, ad sets, ads, creatives, insights. See
+[`metaads/AGENTS.md`](metaads/AGENTS.md).
+
+```go
+import "github.com/pax-beehive/connector/metaads"
+
+c, err := metaads.NewClient(&metaads.Config{AccessToken: token})
+camp, err := c.CreateCampaign(ctx, &metaads.CreateCampaignRequest{
+	AdAccountId:         "act_123",
+	Name:                connector.Ptr("spring sale"),
+	Objective:           connector.Ptr("OUTCOME_TRAFFIC"),
+	Status:              connector.Ptr("PAUSED"),
+	SpecialAdCategories: connector.Ptr("[]"),
+})
+```
+
+## Google Ads
+
+GAQL queries/reporting plus the core write path (budgets, campaigns, ad
+groups, ads, keywords) over the REST interface, with automatic OAuth
+access-token refresh. See [`googleads/AGENTS.md`](googleads/AGENTS.md).
+
+```go
+import "github.com/pax-beehive/connector/googleads"
+
+c, err := googleads.NewClient(&googleads.Config{
+	DeveloperToken: devToken,
+	ClientID: id, ClientSecret: secret, RefreshToken: refresh,
+})
+resp, err := c.SearchGoogleAds(ctx, &googleads.SearchGoogleAdsRequest{
+	CustomerId: "5551234567",
+	Query:      connector.Ptr("SELECT campaign.id, metrics.clicks FROM campaign"),
+})
+```
+
 ## Client options and error handling
 
 Every connector's `NewClient(cfg, opts...)` accepts shared options:
@@ -136,7 +174,8 @@ case connector.IsRetryable(err):    // 429/502/503/504
 
 Each connector ships a generated `AGENTS.md`
 ([mindbody](mindbody/AGENTS.md), [instagram](instagram/AGENTS.md),
-[facebook](facebook/AGENTS.md), [x](x/AGENTS.md)) describing
+[facebook](facebook/AGENTS.md), [x](x/AGENTS.md),
+[metaads](metaads/AGENTS.md), [googleads](googleads/AGENTS.md)) describing
 its capability boundary: how to construct the client, the auth model, error
 and data conventions, what is out of scope, and a catalog of every operation
 with its HTTP mapping. It is generated from the spec (plus handwritten notes

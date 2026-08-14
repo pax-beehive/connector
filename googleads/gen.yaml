@@ -1,0 +1,107 @@
+package: googleads
+spec: spec/openapi.json
+out_dir: .
+title: "Google Ads connector"
+description: >-
+  Go connector for the Google Ads API (REST interface): GAQL queries and
+  reporting via googleAds:search/searchStream, plus the core write path —
+  campaign budgets, campaigns, ad groups, ads, and keywords — via mutate
+  operations. Generated from a curated OpenAPI spec authored from the
+  official Google documentation.
+agent_notes: |
+  ## How to use this connector
+
+  One `Client` serves one OAuth identity. Credentials are a three-part
+  setup: a **developer token** (from a manager account's API Center), an
+  **OAuth token source** (either a static `AccessToken`, or
+  `ClientID`+`ClientSecret`+`RefreshToken` for automatic refresh — access
+  tokens are minted lazily, cached until expiry, and re-minted after a
+  401), and optionally `LoginCustomerID` (the manager/MCC customer ID,
+  digits only, required when operating client accounts through a manager).
+
+  ```go
+  import (
+      "github.com/pax-beehive/connector"
+      "github.com/pax-beehive/connector/googleads"
+  )
+
+  c, err := googleads.NewClient(&googleads.Config{
+      DeveloperToken:  "...",
+      ClientID:        "....apps.googleusercontent.com",
+      ClientSecret:    "...",
+      RefreshToken:    "...",
+      LoginCustomerID: "1234567890",
+  })
+  ```
+
+  ## Reading anything: GAQL
+
+  There are no per-resource GET endpoints — every read (including reports)
+  is a GAQL query:
+
+  ```go
+  resp, err := c.SearchGoogleAds(ctx, &googleads.SearchGoogleAdsRequest{
+      CustomerId: "5551234567",
+      Query: connector.Ptr(`SELECT campaign.id, campaign.name, metrics.clicks,
+          metrics.cost_micros FROM campaign WHERE segments.date DURING LAST_7_DAYS`),
+  })
+  // resp.Results is []map[string]any shaped by the SELECT clause:
+  // row["campaign"].(map[string]any)["name"], row["metrics"]...
+  ```
+
+  Use `SearchGoogleAdsStream` for large result sets (no paging; the
+  response is a slice of batches).
+
+  ## Writing: mutate operations
+
+  Writes are batched operations per resource type. The `Create`/`Update`
+  payloads are `map[string]any` in Google's REST JSON shape (camelCase,
+  int64s as strings, micros for money):
+
+  ```go
+  budget, err := c.MutateCampaignBudgets(ctx, &googleads.MutateCampaignBudgetsRequest{
+      CustomerId: "5551234567",
+      Operations: []googleads.CampaignBudgetOperation{{
+          Create: map[string]any{"name": "b1", "amountMicros": "5000000", "deliveryMethod": "STANDARD"},
+      }},
+  })
+  camp, err := c.MutateCampaigns(ctx, &googleads.MutateCampaignsRequest{
+      CustomerId: "5551234567",
+      Operations: []googleads.CampaignOperation{{
+          Create: map[string]any{
+              "name": "c1", "advertisingChannelType": "SEARCH", "status": "PAUSED",
+              "campaignBudget": *budget.Results[0].ResourceName, "manualCpc": map[string]any{},
+          },
+      }},
+  })
+  ```
+
+  Updates need `UpdateMask` (comma-separated field paths) and the resource
+  name inside `Update`; removals pass the resource name in `Remove`. Set
+  `ValidateOnly` to dry-run.
+
+  ## Errors
+
+  Non-2xx responses become `*connector.APIError`; `Code` is the RPC status
+  (e.g. `PERMISSION_DENIED`, `INVALID_ARGUMENT`, `RESOURCE_EXHAUSTED` =
+  quota/rate limit), `Message` is Google's message. Detailed per-operation
+  failures are in the raw `Body` (details[].errors[]). With
+  `PartialFailure: true`, HTTP 200 responses can still carry a
+  `PartialFailureError` — check it.
+
+  ## Capability boundaries (what this connector does NOT do)
+
+  - No OAuth consent flow: obtaining the refresh token happens outside
+    this SDK.
+  - Mutate payloads are untyped maps, not generated proto structs; only
+    budgets/campaigns/ad groups/ads/criteria have mutate endpoints here
+    (other resources: read via GAQL, mutate not covered).
+  - No typed GoogleAdsRow: query results are maps shaped by your GAQL.
+  - No batch jobs, offline conversions, audiences, assets, or planning
+    services.
+  - Developer-token access levels (Explorer/Basic/Standard) cap daily
+    operations — that quota management is outside this SDK.
+  - No retries by default; opt in with `connector.WithRetry`.
+datetime_type: connector.DateTime
+pinned_path_params: {version: "v23"}
+test_new_client: 'NewClient(&Config{DeveloperToken: "d", AccessToken: "t", BaseURL: srv.URL})'

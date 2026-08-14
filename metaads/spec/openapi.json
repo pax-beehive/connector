@@ -1,0 +1,490 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Meta Marketing API (ads management, curated)",
+    "version": "v26.0",
+    "description": "Curated OpenAPI description of the Meta Marketing API endpoints used to manage Facebook and Instagram ads: ad accounts, campaigns, ad sets, ads, creatives, and insights. Authored by hand from the official Meta documentation (Meta publishes no OpenAPI spec)."
+  },
+  "paths": {
+    "/{version}/me/adaccounts": {
+      "get": {
+        "operationId": "ListAdAccounts",
+        "tags": ["Accounts"],
+        "description": "Ad accounts the token's user can access.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}, "description": "e.g. id,account_id,name,currency,account_status."},
+          {"name": "limit", "in": "query", "schema": {"type": "integer"}},
+          {"name": "after", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Ad accounts", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/AdAccountList"}}}}}
+      }
+    },
+    "/{version}/{adAccountId}": {
+      "get": {
+        "operationId": "GetAdAccount",
+        "tags": ["Accounts"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "adAccountId", "in": "path", "required": true, "schema": {"type": "string"}, "description": "Prefixed with act_, e.g. act_123."},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Ad account", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/AdAccount"}}}}}
+      }
+    },
+    "/{version}/{adAccountId}/campaigns": {
+      "get": {
+        "operationId": "ListCampaigns",
+        "tags": ["Campaigns"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "adAccountId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}, "description": "e.g. id,name,objective,status,effective_status,daily_budget."},
+          {"name": "filtering", "in": "query", "schema": {"type": "string"}, "description": "JSON array string, e.g. [{\"field\":\"effective_status\",\"operator\":\"IN\",\"value\":[\"ACTIVE\"]}]."},
+          {"name": "limit", "in": "query", "schema": {"type": "integer"}},
+          {"name": "after", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Campaigns", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CampaignList"}}}}}
+      },
+      "post": {
+        "operationId": "CreateCampaign",
+        "tags": ["Campaigns"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "adAccountId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "name", "in": "query", "schema": {"type": "string"}, "description": "Required."},
+          {"name": "objective", "in": "query", "schema": {"type": "string"}, "description": "OUTCOME_* objective, e.g. OUTCOME_TRAFFIC. Required."},
+          {"name": "status", "in": "query", "schema": {"type": "string"}, "description": "ACTIVE or PAUSED (default PAUSED recommended)."},
+          {"name": "special_ad_categories", "in": "query", "schema": {"type": "string"}, "description": "JSON array string; [] or e.g. [\"HOUSING\"]. Required."},
+          {"name": "daily_budget", "in": "query", "schema": {"type": "integer", "format": "int64"}, "description": "Minor units (cents)."},
+          {"name": "lifetime_budget", "in": "query", "schema": {"type": "integer", "format": "int64"}},
+          {"name": "bid_strategy", "in": "query", "schema": {"type": "string"}},
+          {"name": "buying_type", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Created campaign", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateCampaignResponse"}}}}}
+      }
+    },
+    "/{version}/{campaignId}": {
+      "get": {
+        "operationId": "GetCampaign",
+        "tags": ["Campaigns"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "campaignId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Campaign", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Campaign"}}}}}
+      },
+      "post": {
+        "operationId": "UpdateCampaign",
+        "tags": ["Campaigns"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "campaignId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "name", "in": "query", "schema": {"type": "string"}},
+          {"name": "status", "in": "query", "schema": {"type": "string"}},
+          {"name": "daily_budget", "in": "query", "schema": {"type": "integer", "format": "int64"}},
+          {"name": "lifetime_budget", "in": "query", "schema": {"type": "integer", "format": "int64"}}
+        ],
+        "responses": {"200": {"description": "Result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UpdateCampaignResponse"}}}}}
+      },
+      "delete": {
+        "operationId": "DeleteCampaign",
+        "tags": ["Campaigns"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "campaignId", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DeleteCampaignResponse"}}}}}
+      }
+    },
+    "/{version}/{adAccountId}/adsets": {
+      "get": {
+        "operationId": "ListAdSets",
+        "tags": ["AdSets"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "adAccountId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "filtering", "in": "query", "schema": {"type": "string"}},
+          {"name": "limit", "in": "query", "schema": {"type": "integer"}},
+          {"name": "after", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Ad sets", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/AdSetList"}}}}}
+      },
+      "post": {
+        "operationId": "CreateAdSet",
+        "tags": ["AdSets"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "adAccountId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "name", "in": "query", "schema": {"type": "string"}, "description": "Required."},
+          {"name": "campaign_id", "in": "query", "schema": {"type": "string"}, "description": "Required."},
+          {"name": "status", "in": "query", "schema": {"type": "string"}},
+          {"name": "billing_event", "in": "query", "schema": {"type": "string"}, "description": "e.g. IMPRESSIONS. Required."},
+          {"name": "optimization_goal", "in": "query", "schema": {"type": "string"}, "description": "e.g. LINK_CLICKS. Required."},
+          {"name": "bid_amount", "in": "query", "schema": {"type": "integer", "format": "int64"}, "description": "Minor units; required for some bid strategies."},
+          {"name": "daily_budget", "in": "query", "schema": {"type": "integer", "format": "int64"}},
+          {"name": "lifetime_budget", "in": "query", "schema": {"type": "integer", "format": "int64"}},
+          {"name": "targeting", "in": "query", "schema": {"type": "string"}, "description": "JSON object string, e.g. {\"geo_locations\":{\"countries\":[\"US\"]}}. Required."},
+          {"name": "start_time", "in": "query", "schema": {"type": "string"}, "description": "ISO 8601."},
+          {"name": "end_time", "in": "query", "schema": {"type": "string"}},
+          {"name": "promoted_object", "in": "query", "schema": {"type": "string"}, "description": "JSON object string (page_id, pixel_id, ...)."}
+        ],
+        "responses": {"200": {"description": "Created ad set", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateAdSetResponse"}}}}}
+      }
+    },
+    "/{version}/{adSetId}": {
+      "get": {
+        "operationId": "GetAdSet",
+        "tags": ["AdSets"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "adSetId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Ad set", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/AdSet"}}}}}
+      },
+      "post": {
+        "operationId": "UpdateAdSet",
+        "tags": ["AdSets"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "adSetId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "name", "in": "query", "schema": {"type": "string"}},
+          {"name": "status", "in": "query", "schema": {"type": "string"}},
+          {"name": "daily_budget", "in": "query", "schema": {"type": "integer", "format": "int64"}},
+          {"name": "lifetime_budget", "in": "query", "schema": {"type": "integer", "format": "int64"}},
+          {"name": "bid_amount", "in": "query", "schema": {"type": "integer", "format": "int64"}},
+          {"name": "targeting", "in": "query", "schema": {"type": "string"}},
+          {"name": "end_time", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UpdateAdSetResponse"}}}}}
+      },
+      "delete": {
+        "operationId": "DeleteAdSet",
+        "tags": ["AdSets"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "adSetId", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DeleteAdSetResponse"}}}}}
+      }
+    },
+    "/{version}/{adAccountId}/ads": {
+      "get": {
+        "operationId": "ListAds",
+        "tags": ["Ads"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "adAccountId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "filtering", "in": "query", "schema": {"type": "string"}},
+          {"name": "limit", "in": "query", "schema": {"type": "integer"}},
+          {"name": "after", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Ads", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/AdList"}}}}}
+      },
+      "post": {
+        "operationId": "CreateAd",
+        "tags": ["Ads"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "adAccountId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "name", "in": "query", "schema": {"type": "string"}, "description": "Required."},
+          {"name": "adset_id", "in": "query", "schema": {"type": "string"}, "description": "Required."},
+          {"name": "creative", "in": "query", "schema": {"type": "string"}, "description": "JSON object string, e.g. {\"creative_id\":\"123\"}. Required."},
+          {"name": "status", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Created ad", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateAdResponse"}}}}}
+      }
+    },
+    "/{version}/{adId}": {
+      "get": {
+        "operationId": "GetAd",
+        "tags": ["Ads"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "adId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Ad", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Ad"}}}}}
+      },
+      "post": {
+        "operationId": "UpdateAd",
+        "tags": ["Ads"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "adId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "name", "in": "query", "schema": {"type": "string"}},
+          {"name": "status", "in": "query", "schema": {"type": "string"}},
+          {"name": "creative", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/UpdateAdResponse"}}}}}
+      },
+      "delete": {
+        "operationId": "DeleteAd",
+        "tags": ["Ads"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "adId", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DeleteAdResponse"}}}}}
+      }
+    },
+    "/{version}/{adAccountId}/adcreatives": {
+      "get": {
+        "operationId": "ListAdCreatives",
+        "tags": ["Creatives"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "adAccountId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}},
+          {"name": "limit", "in": "query", "schema": {"type": "integer"}},
+          {"name": "after", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Creatives", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/AdCreativeList"}}}}}
+      },
+      "post": {
+        "operationId": "CreateAdCreative",
+        "tags": ["Creatives"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "adAccountId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "name", "in": "query", "schema": {"type": "string"}},
+          {"name": "object_story_spec", "in": "query", "schema": {"type": "string"}, "description": "JSON object string: page_id plus link_data/photo_data/video_data."},
+          {"name": "object_story_id", "in": "query", "schema": {"type": "string"}, "description": "Promote an existing page post (pageid_postid)."},
+          {"name": "instagram_user_id", "in": "query", "schema": {"type": "string"}, "description": "Instagram identity for IG placements."}
+        ],
+        "responses": {"200": {"description": "Created creative", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateAdCreativeResponse"}}}}}
+      }
+    },
+    "/{version}/{creativeId}": {
+      "get": {
+        "operationId": "GetAdCreative",
+        "tags": ["Creatives"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "creativeId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Creative", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/AdCreative"}}}}}
+      },
+      "delete": {
+        "operationId": "DeleteAdCreative",
+        "tags": ["Creatives"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "creativeId", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Result", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DeleteAdCreativeResponse"}}}}}
+      }
+    },
+    "/{version}/{objectId}/insights": {
+      "get": {
+        "operationId": "GetInsights",
+        "tags": ["Insights"],
+        "description": "Performance insights for an ad account (act_...), campaign, ad set, or ad — the same edge works on all four.",
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "objectId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "fields", "in": "query", "schema": {"type": "string"}, "description": "e.g. impressions,clicks,spend,ctr,cpc,actions."},
+          {"name": "level", "in": "query", "schema": {"type": "string"}, "description": "account, campaign, adset, or ad."},
+          {"name": "date_preset", "in": "query", "schema": {"type": "string"}, "description": "e.g. last_7d, last_30d, this_month."},
+          {"name": "time_range", "in": "query", "schema": {"type": "string"}, "description": "JSON object string {\"since\":\"YYYY-MM-DD\",\"until\":\"YYYY-MM-DD\"}."},
+          {"name": "time_increment", "in": "query", "schema": {"type": "string"}, "description": "1 for daily rows, monthly, or all_days."},
+          {"name": "breakdowns", "in": "query", "schema": {"type": "string"}, "description": "e.g. publisher_platform (facebook vs instagram), age, gender."},
+          {"name": "action_breakdowns", "in": "query", "schema": {"type": "string"}},
+          {"name": "limit", "in": "query", "schema": {"type": "integer"}},
+          {"name": "after", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "Insights", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/AdsInsightList"}}}}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AdAccount": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "description": "act_-prefixed."},
+          "account_id": {"type": "string"},
+          "name": {"type": "string"},
+          "currency": {"type": "string"},
+          "account_status": {"type": "integer"},
+          "timezone_name": {"type": "string"},
+          "amount_spent": {"type": "string"},
+          "balance": {"type": "string"}
+        }
+      },
+      "AdAccountList": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/AdAccount"}},
+          "paging": {"$ref": "#/components/schemas/Paging"}
+        }
+      },
+      "Campaign": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "objective": {"type": "string"},
+          "status": {"type": "string"},
+          "effective_status": {"type": "string"},
+          "buying_type": {"type": "string"},
+          "bid_strategy": {"type": "string"},
+          "daily_budget": {"type": "string"},
+          "lifetime_budget": {"type": "string"},
+          "special_ad_categories": {"type": "array", "items": {"type": "string"}},
+          "created_time": {"type": "string", "format": "date-time"},
+          "start_time": {"type": "string", "format": "date-time"},
+          "stop_time": {"type": "string", "format": "date-time"}
+        }
+      },
+      "CampaignList": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/Campaign"}},
+          "paging": {"$ref": "#/components/schemas/Paging"}
+        }
+      },
+      "AdSet": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "campaign_id": {"type": "string"},
+          "status": {"type": "string"},
+          "effective_status": {"type": "string"},
+          "billing_event": {"type": "string"},
+          "optimization_goal": {"type": "string"},
+          "bid_amount": {"type": "integer", "format": "int64"},
+          "daily_budget": {"type": "string"},
+          "lifetime_budget": {"type": "string"},
+          "targeting": {"type": "object"},
+          "promoted_object": {"type": "object"},
+          "created_time": {"type": "string", "format": "date-time"},
+          "start_time": {"type": "string", "format": "date-time"},
+          "end_time": {"type": "string", "format": "date-time"}
+        }
+      },
+      "AdSetList": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/AdSet"}},
+          "paging": {"$ref": "#/components/schemas/Paging"}
+        }
+      },
+      "Ad": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "adset_id": {"type": "string"},
+          "campaign_id": {"type": "string"},
+          "status": {"type": "string"},
+          "effective_status": {"type": "string"},
+          "creative": {"$ref": "#/components/schemas/AdCreativeRef"},
+          "created_time": {"type": "string", "format": "date-time"}
+        }
+      },
+      "AdCreativeRef": {
+        "type": "object",
+        "properties": {"id": {"type": "string"}}
+      },
+      "AdList": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/Ad"}},
+          "paging": {"$ref": "#/components/schemas/Paging"}
+        }
+      },
+      "AdCreative": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "title": {"type": "string"},
+          "body": {"type": "string"},
+          "image_url": {"type": "string"},
+          "thumbnail_url": {"type": "string"},
+          "object_story_id": {"type": "string"},
+          "object_story_spec": {"type": "object"},
+          "effective_instagram_media_id": {"type": "string"}
+        }
+      },
+      "AdCreativeList": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/AdCreative"}},
+          "paging": {"$ref": "#/components/schemas/Paging"}
+        }
+      },
+      "AdsInsight": {
+        "type": "object",
+        "description": "Numeric metrics are returned as strings by the Marketing API.",
+        "properties": {
+          "date_start": {"type": "string"},
+          "date_stop": {"type": "string"},
+          "account_id": {"type": "string"},
+          "campaign_id": {"type": "string"},
+          "campaign_name": {"type": "string"},
+          "adset_id": {"type": "string"},
+          "adset_name": {"type": "string"},
+          "ad_id": {"type": "string"},
+          "ad_name": {"type": "string"},
+          "impressions": {"type": "string"},
+          "reach": {"type": "string"},
+          "frequency": {"type": "string"},
+          "clicks": {"type": "string"},
+          "spend": {"type": "string"},
+          "cpc": {"type": "string"},
+          "cpm": {"type": "string"},
+          "ctr": {"type": "string"},
+          "publisher_platform": {"type": "string"},
+          "age": {"type": "string"},
+          "gender": {"type": "string"},
+          "actions": {"type": "array", "items": {"$ref": "#/components/schemas/AdsActionStat"}}
+        }
+      },
+      "AdsActionStat": {
+        "type": "object",
+        "properties": {
+          "action_type": {"type": "string"},
+          "value": {"type": "string"}
+        }
+      },
+      "AdsInsightList": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "array", "items": {"$ref": "#/components/schemas/AdsInsight"}},
+          "paging": {"$ref": "#/components/schemas/Paging"}
+        }
+      },
+      "Paging": {
+        "type": "object",
+        "properties": {
+          "cursors": {"$ref": "#/components/schemas/PagingCursors"},
+          "next": {"type": "string"},
+          "previous": {"type": "string"}
+        }
+      },
+      "PagingCursors": {
+        "type": "object",
+        "properties": {"before": {"type": "string"}, "after": {"type": "string"}}
+      },
+      "CreateCampaignResponse": {"type": "object", "properties": {"id": {"type": "string"}}},
+      "UpdateCampaignResponse": {"type": "object", "properties": {"success": {"type": "boolean"}}},
+      "DeleteCampaignResponse": {"type": "object", "properties": {"success": {"type": "boolean"}}},
+      "CreateAdSetResponse": {"type": "object", "properties": {"id": {"type": "string"}}},
+      "UpdateAdSetResponse": {"type": "object", "properties": {"success": {"type": "boolean"}}},
+      "DeleteAdSetResponse": {"type": "object", "properties": {"success": {"type": "boolean"}}},
+      "CreateAdResponse": {"type": "object", "properties": {"id": {"type": "string"}}},
+      "UpdateAdResponse": {"type": "object", "properties": {"success": {"type": "boolean"}}},
+      "DeleteAdResponse": {"type": "object", "properties": {"success": {"type": "boolean"}}},
+      "CreateAdCreativeResponse": {"type": "object", "properties": {"id": {"type": "string"}}},
+      "DeleteAdCreativeResponse": {"type": "object", "properties": {"success": {"type": "boolean"}}}
+    }
+  }
+}
