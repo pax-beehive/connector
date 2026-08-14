@@ -1,0 +1,105 @@
+{
+  "swagger": "2.0",
+  "info": {"title": "Fixture API", "version": "1"},
+  "paths": {
+    "/public/v{version}/widget/widgets": {
+      "get": {
+        "operationId": "GetWidgets",
+        "tags": ["Widget"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "type": "string"},
+          {"name": "authorization", "in": "header", "type": "string"},
+          {"name": "request.limit", "in": "query", "type": "integer", "format": "int32"},
+          {"name": "request.ids", "in": "query", "type": "array", "items": {"type": "integer", "format": "int64"}, "collectionFormat": "multi"},
+          {"name": "request.startDate", "in": "query", "type": "string", "format": "date-time"},
+          {"name": "x-trace", "in": "header", "type": "string"}
+        ],
+        "responses": {"200": {"description": "ok", "schema": {"$ref": "#/definitions/Acme.Api.V1.WidgetController.GetWidgetsResponse"}}}
+      },
+      "post": {
+        "operationId": "Add Widget",
+        "tags": ["Widget"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "type": "string"},
+          {"name": "request", "in": "body", "schema": {"$ref": "#/definitions/Acme.Api.V1.WidgetController.AddWidgetRequest"}}
+        ],
+        "responses": {"201": {"description": "created", "schema": {"$ref": "#/definitions/Acme.Api.V1.Widget"}}}
+      }
+    },
+    "/public/v{version}/widget/{widgetId}/tags": {
+      "put": {
+        "operationId": "ReplaceTags",
+        "tags": ["Widget"],
+        "parameters": [
+          {"name": "version", "in": "path", "required": true, "type": "string"},
+          {"name": "widgetId", "in": "path", "required": true, "type": "integer", "format": "int64"},
+          {"name": "tags", "in": "body", "schema": {"type": "array", "items": {"$ref": "#/definitions/Acme.Api.V1.Tag"}}}
+        ],
+        "responses": {"200": {"description": "ok", "schema": {"type": "object"}}}
+      }
+    },
+    "/public/v{version}/widget/cardtypes": {
+      "get": {
+        "operationId": "GetCardTypes",
+        "tags": ["Misc"],
+        "parameters": [{"name": "version", "in": "path", "required": true, "type": "string"}],
+        "responses": {"200": {"description": "ok", "schema": {"type": "array", "items": {"type": "string"}}}}
+      },
+      "delete": {
+        "operationId": "DeleteCardType",
+        "tags": ["Misc"],
+        "parameters": [{"name": "version", "in": "path", "required": true, "type": "string"}],
+        "responses": {"204": {"description": "no content"}}
+      }
+    }
+  },
+  "definitions": {
+    "Acme.Api.V1.WidgetController.GetWidgetsResponse": {
+      "type": "object",
+      "properties": {
+        "PaginationResponse": {"$ref": "#/definitions/Acme.Api.V1.Pagination"},
+        "Widgets": {"type": "array", "items": {"$ref": "#/definitions/Acme.Api.V1.Widget"}}
+      }
+    },
+    "Acme.Api.V1.WidgetController.AddWidgetRequest": {
+      "type": "object",
+      "properties": {
+        "Name": {"type": "string"},
+        "Count": {"type": "integer", "format": "int32"},
+        "When": {"type": "string", "format": "date-time"},
+        "Widget": {"$ref": "#/definitions/Acme.Api.V1.Widget"}
+      }
+    },
+    "Acme.Api.V1.Pagination": {
+      "type": "object",
+      "properties": {
+        "RequestedLimit": {"type": "integer", "format": "int32"},
+        "TotalResults": {"type": "integer", "format": "int32"}
+      }
+    },
+    "Acme.Api.V1.Widget": {
+      "type": "object",
+      "properties": {
+        "Id": {"type": "integer", "format": "int64"},
+        "Name": {"type": "string"},
+        "Price": {"type": "number", "format": "double"},
+        "Active": {"type": "boolean"},
+        "Tags": {"type": "array", "items": {"$ref": "#/definitions/Acme.Api.V1.Tag"}},
+        "Extra": {"type": "object", "additionalProperties": {"type": "string"}},
+        "Blob": {"type": "string", "format": "byte"}
+      }
+    },
+    "Acme.Api.V1.Tag": {
+      "type": "object",
+      "properties": {"Label": {"$ref": "#/definitions/Acme.Common.Tag"}}
+    },
+    "Acme.Common.Tag": {
+      "type": "object",
+      "properties": {"Value": {"type": "string"}}
+    },
+    "Acme.Api.V1.Unused": {
+      "type": "object",
+      "properties": {"X": {"type": "string"}}
+    }
+  }
+}
