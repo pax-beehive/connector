@@ -381,26 +381,97 @@ Portability disciplines (hard rules):
 Migration to another cloud = move containers + `pg_dump` + swap the KMS
 adapter (~a week, not a rewrite).
 
-## 10. Build phases
+## 10. Data governance and tenant offboarding
+
+### Roles and processing boundaries
+
+Data on the platform falls into three classes with different obligations:
+
+| Class | Examples | Our role | Processing |
+|---|---|---|---|
+| Tenant operational data | config, usage, billing, audit logs | Controller | Service operation, billing, improvement |
+| Tenant content | event payloads (**DMs are end-user personal data**), action requests, LLM prompts | Processor | Only for purposes named in the DPA |
+| Aggregated, de-identified | anonymized usage stats, error rates | — | Retained if the DPA says so |
+
+Boundaries we commit to up front:
+
+- Processing tenant content beyond service delivery requires explicit DPA
+  terms; product-improvement analytics use aggregated/de-identified forms.
+- **Tenant content is never used for model training** without explicit
+  opt-in. LLM providers must be under zero-data-retention terms, or the
+  deletion promise cannot be kept downstream.
+- Upstream platform terms flow through us (e.g. Meta Platform Terms:
+  purpose limits and end-user deletion obligations on IG/FB data). The
+  platform honors provider deletion callbacks per connection.
+- DPA language itself requires counsel review; this section fixes the
+  architecture those terms will rely on.
+
+### Wipeout architecture (60–90 day contractual deletion)
+
+The tenancy model was built for this: every high-volume row carries
+`tenant_id`, events are time-partitioned, `action_logs` already expire at
+90 days. Four additions complete the guarantee:
+
+1. **Per-tenant crypto-shredding.** Each tenant gets a DEK (wrapped by the
+   KMS key). Content-class data — `events.payload`, LLM request/response
+   logs, `credentials.payload_enc` — is encrypted with the tenant DEK at
+   write time. Wipeout destroys the DEK: primary, replicas, and every
+   backup become unreadable at once. This is the only practical answer for
+   copies inside backups/PITR. **DEK infrastructure ships in Phase 1** —
+   it is part of the write path and cannot be retrofitted without a full
+   re-encryption.
+2. **Backup window ≤ 30 days**, so purge + natural backup expiry closes
+   inside the 90-day promise even without relying on shredding alone.
+   Logging discipline: payload content never enters application logs
+   (metadata only); log sinks get explicit retention.
+3. **Deletion state machine** — auditable process, not a one-off script:
+
+```sql
+CREATE TABLE deletion_requests (
+    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id    UUID NOT NULL REFERENCES tenants(id),
+    requested_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    due_at       TIMESTAMPTZ NOT NULL,          -- contractual 60/90d deadline
+    status       TEXT NOT NULL DEFAULT 'grace', -- grace | exporting | purging | verified
+    evidence     JSONB NOT NULL DEFAULT '{}',   -- per-step execution record
+    completed_at TIMESTAMPTZ
+);
+```
+
+   Flow: contract ends → tenant `offboarding` (grace window with **data
+   export** — customers usually take their event log) → purge job (delete
+   rows, drop tenant partitions, destroy DEK, unsubscribe provider
+   webhooks, revoke provider tokens) → **deletion certificate** delivered
+   to the customer, generated from `evidence`.
+4. **Data inventory (data map).** Every table classified: data class ×
+   deletion method × retention exception. Standard carve-outs stay
+   explicit: billing records (`usage_daily`, invoices) retained under
+   legal/tax obligations; aggregated de-identified stats retained. A
+   wipeout claim without this inventory does not survive a customer
+   security review.
+
+## 11. Build phases
 
 Each phase ships something FDE can use in production.
 
 | Phase | Deliverable | Acceptance |
 |---|---|---|
-| 1. Action Gateway | Multi-tenant service: key auth, connection CRUD, credential vault, typed action invoke, action_logs | An FDE app posts to Instagram via a hosted connection using only a platform key; audit row written |
+| 1. Action Gateway | Multi-tenant service: key auth, connection CRUD, credential vault, **per-tenant DEK infrastructure**, typed action invoke, action_logs | An FDE app posts to Instagram via a hosted connection using only a platform key; audit row written; destroying a test tenant's DEK renders its stored content unreadable |
 | 2. Event Source | Hosted webhook ingest, event log, poll/ack API, backfill job | Customer app consumes IG DMs by polling; a forced outage window is invisible after backfill |
 | 3. LLM Gateway | OpenAI-compatible endpoint, route config, failover; buy-vs-build decision executed | A route flip moves traffic between models with zero client changes; per-tenant token costs land in `llm_usage` |
 | 4. Metering & ops | Daily rollups, budgets/alerts, Grafana dashboards, monthly reconciliation | Per-tenant P&L for a real month reconciles against actual bills |
 
-## 11. Open questions
+## 12. Open questions
 
 1. Platform repo: new `pax-beehive/platform` (recommended) vs monorepo?
 2. OAuth consent flows for BYO apps: which providers first, and how much
    UI does Phase 1 need (vs FDE pasting tokens)?
 3. LLM gateway buy (Cloudflare AI Gateway) vs thin Go build — decide at
    Phase 3 entry with a 1-day spike each.
-4. Event payloads may contain end-user content (DMs): retention default,
-   encryption-at-rest scope, and per-tenant deletion guarantees.
+4. Data governance parameters to fix with counsel: DPA processing-purpose
+   language, default event retention (proposed 90 days), and the
+   contractual wipeout deadline (60 vs 90 days) — architecture in §10
+   supports either.
 5. When a second consumer of the webhook component appears, do we extract
    it into this SDK repo as a library (`webhook` package) for self-hosted
    customers?
