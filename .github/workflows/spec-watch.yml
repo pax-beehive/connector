@@ -1,0 +1,98 @@
+name: Spec watch
+
+# Daily scan of upstream OpenAPI specs for connectors that have an official
+# spec source. On drift, opens a GitHub issue mentioning the maintainer
+# (which triggers a GitHub email notification). No drift → no notification.
+# An already-open drift issue for the same connector suppresses duplicates.
+
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      MAINTAINER: qiz029
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan upstream specs for drift
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/specwatch
+
+          # name|snapshot path|source url
+          SOURCES=$(cat <<'EOF'
+          mindbody|mindbody/spec/swagger.json|https://api.mindbodyonline.com/public/v6/swagger/doc
+          openaiads|openaiads/spec/openapi.json|https://developers.openai.com/ads/openapi.json
+          EOF
+          )
+
+          gh label create spec-drift --description "Upstream OpenAPI spec changed" --color D93F0B 2>/dev/null || true
+
+          failed=0
+          while IFS='|' read -r name snapshot url; do
+            [ -z "$name" ] && continue
+            echo "::group::$name"
+            live="/tmp/specwatch/$name.json"
+            if ! curl -sSfL --retry 3 --retry-delay 5 --max-time 120 -o "$live" "$url"; then
+              echo "::error::$name: failed to fetch $url"
+              failed=1
+              echo "::endgroup::"
+              continue
+            fi
+            if ! jq -S . "$live" > "$live.norm" 2>/dev/null; then
+              echo "::error::$name: upstream response is not valid JSON"
+              failed=1
+              echo "::endgroup::"
+              continue
+            fi
+            jq -S . "$snapshot" > "/tmp/specwatch/$name.snap.norm"
+            if diff -q "/tmp/specwatch/$name.snap.norm" "$live.norm" >/dev/null; then
+              echo "$name: no drift"
+              echo "::endgroup::"
+              continue
+            fi
+
+            echo "$name: DRIFT DETECTED"
+            title="Spec drift: $name"
+            if gh issue list --state open --label spec-drift --json title --jq '.[].title' | grep -Fxq "$title"; then
+              echo "$name: open drift issue already exists, not duplicating"
+              echo "::endgroup::"
+              continue
+            fi
+
+            diff -u "/tmp/specwatch/$name.snap.norm" "$live.norm" | head -200 > "/tmp/specwatch/$name.diff" || true
+            added=$(grep -c '^+' "/tmp/specwatch/$name.diff" || true)
+            removed=$(grep -c '^-' "/tmp/specwatch/$name.diff" || true)
+            {
+              echo "@$MAINTAINER The upstream OpenAPI spec for \`$name\` has changed."
+              echo
+              echo "- Source: $url"
+              echo "- Snapshot: \`$snapshot\`"
+              echo "- Detected: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              echo
+              echo "To refresh:"
+              echo '```sh'
+              echo "curl -sL -o $snapshot '$url'"
+              echo "make gen && make lint test cover"
+              echo '```'
+              echo
+              echo "Diff excerpt (normalized, first 200 lines; +$added/-$removed shown):"
+              echo '```diff'
+              cat "/tmp/specwatch/$name.diff"
+              echo '```'
+            } > "/tmp/specwatch/$name.body.md"
+            gh issue create --title "$title" --label spec-drift \
+              --body-file "/tmp/specwatch/$name.body.md"
+            echo "::endgroup::"
+          done <<< "$SOURCES"
+
+          exit $failed
