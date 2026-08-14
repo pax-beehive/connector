@@ -41,11 +41,9 @@ type Operation struct {
 
 // IR is everything the renderer needs.
 type IR struct {
-	Package             string
-	Models              []Struct    // sorted by name
-	Aliases             []Alias     // response aliases, sorted by name
-	Ops                 []Operation // sorted by (Tag, MethodName)
-	Tags                []string    // sorted unique tags
-	UsesDateTime        bool
-	UsesConnectorImport bool
+	Package string
+	Models  []Struct    // sorted by name
+	Aliases []Alias     // response aliases, sorted by name
+	Ops     []Operation // sorted by (Tag, MethodName)
+	Tags    []string    // sorted unique tags
 }

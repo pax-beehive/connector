@@ -1,7 +1,6 @@
 package: mindbody
 spec: spec/swagger.json
 out_dir: .
-base_url: https://api.mindbodyonline.com
 datetime_type: connector.DateTime
 skip_headers: [authorization, version, siteId]
 query_prefix_strip: "request."

@@ -33,6 +33,9 @@ type CheckoutShoppingCartRequest struct {
 
 // CheckoutShoppingCart calls POST /public/v{version}/sale/checkoutshoppingcart.
 func (c *Client) CheckoutShoppingCart(ctx context.Context, req *CheckoutShoppingCartRequest) (*CheckoutShoppingCartResponse, error) {
+	if req == nil {
+		req = &CheckoutShoppingCartRequest{}
+	}
 	out := &CheckoutShoppingCartResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -59,6 +62,9 @@ type CompleteCheckoutShoppingCartUsingAlternativePaymentsResponse = CheckoutShop
 
 // CompleteCheckoutShoppingCartUsingAlternativePayments calls POST /public/v{version}/sale/completecheckoutshoppingcart.
 func (c *Client) CompleteCheckoutShoppingCartUsingAlternativePayments(ctx context.Context, req *CompleteCheckoutShoppingCartUsingAlternativePaymentsRequest) (*CompleteCheckoutShoppingCartUsingAlternativePaymentsResponse, error) {
+	if req == nil {
+		req = &CompleteCheckoutShoppingCartUsingAlternativePaymentsRequest{}
+	}
 	out := &CompleteCheckoutShoppingCartUsingAlternativePaymentsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -82,6 +88,9 @@ type GetAcceptedCardTypesResponse = []string
 
 // GetAcceptedCardTypes calls GET /public/v{version}/sale/acceptedcardtypes.
 func (c *Client) GetAcceptedCardTypes(ctx context.Context, req *GetAcceptedCardTypesRequest) (*GetAcceptedCardTypesResponse, error) {
+	if req == nil {
+		req = &GetAcceptedCardTypesRequest{}
+	}
 	out := &GetAcceptedCardTypesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -103,6 +112,9 @@ type GetAlternativePaymentMethodsRequest struct {
 
 // GetAlternativePaymentMethods calls GET /public/v{version}/sale/alternativepaymentmethods.
 func (c *Client) GetAlternativePaymentMethods(ctx context.Context, req *GetAlternativePaymentMethodsRequest) (*GetAlternativePaymentMethodsResponse, error) {
+	if req == nil {
+		req = &GetAlternativePaymentMethodsRequest{}
+	}
 	out := &GetAlternativePaymentMethodsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -129,6 +141,9 @@ type GetContractsRequest struct {
 
 // GetContracts calls GET /public/v{version}/sale/contracts.
 func (c *Client) GetContracts(ctx context.Context, req *GetContractsRequest) (*GetContractsResponse, error) {
+	if req == nil {
+		req = &GetContractsRequest{}
+	}
 	out := &GetContractsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -150,6 +165,9 @@ type GetCustomPaymentMethodsRequest struct {
 
 // GetCustomPaymentMethods calls GET /public/v{version}/sale/custompaymentmethods.
 func (c *Client) GetCustomPaymentMethods(ctx context.Context, req *GetCustomPaymentMethodsRequest) (*GetCustomPaymentMethodsResponse, error) {
+	if req == nil {
+		req = &GetCustomPaymentMethodsRequest{}
+	}
 	out := &GetCustomPaymentMethodsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -170,6 +188,9 @@ type GetGiftCardBalanceRequest struct {
 
 // GetGiftCardBalance calls GET /public/v{version}/sale/giftcardbalance.
 func (c *Client) GetGiftCardBalance(ctx context.Context, req *GetGiftCardBalanceRequest) (*GetGiftCardBalanceResponse, error) {
+	if req == nil {
+		req = &GetGiftCardBalanceRequest{}
+	}
 	out := &GetGiftCardBalanceResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -198,6 +219,9 @@ type GetGiftCardsResponse = GetGiftCardResponse
 
 // GetGiftCards calls GET /public/v{version}/sale/giftcards.
 func (c *Client) GetGiftCards(ctx context.Context, req *GetGiftCardsRequest) (*GetGiftCardsResponse, error) {
+	if req == nil {
+		req = &GetGiftCardsRequest{}
+	}
 	out := &GetGiftCardsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -222,6 +246,9 @@ type GetPackagesRequest struct {
 
 // GetPackages calls GET /public/v{version}/sale/packages.
 func (c *Client) GetPackages(ctx context.Context, req *GetPackagesRequest) (*GetPackagesResponse, error) {
+	if req == nil {
+		req = &GetPackagesRequest{}
+	}
 	out := &GetPackagesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -250,6 +277,9 @@ type GetProductsRequest struct {
 
 // GetProducts calls GET /public/v{version}/sale/products.
 func (c *Client) GetProducts(ctx context.Context, req *GetProductsRequest) (*GetProductsResponse, error) {
+	if req == nil {
+		req = &GetProductsRequest{}
+	}
 	out := &GetProductsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -274,6 +304,9 @@ type GetProductsInventoryRequest struct {
 
 // GetProductsInventory calls GET /public/v{version}/sale/productsinventory.
 func (c *Client) GetProductsInventory(ctx context.Context, req *GetProductsInventoryRequest) (*GetProductsInventoryResponse, error) {
+	if req == nil {
+		req = &GetProductsInventoryRequest{}
+	}
 	out := &GetProductsInventoryResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -297,6 +330,9 @@ type GetPurchaseContractStatusResponse = PurchaseContractResponse
 
 // GetPurchaseContractStatus calls GET /public/v{version}/sale/purchasecontractstatus.
 func (c *Client) GetPurchaseContractStatus(ctx context.Context, req *GetPurchaseContractStatusRequest) (*GetPurchaseContractStatusResponse, error) {
+	if req == nil {
+		req = &GetPurchaseContractStatusRequest{}
+	}
 	out := &GetPurchaseContractStatusResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -322,6 +358,9 @@ type GetSalesRequest struct {
 
 // GetSales calls GET /public/v{version}/sale/sales.
 func (c *Client) GetSales(ctx context.Context, req *GetSalesRequest) (*GetSalesResponse, error) {
+	if req == nil {
+		req = &GetSalesRequest{}
+	}
 	out := &GetSalesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -354,6 +393,9 @@ type GetServicesRequest struct {
 
 // GetServices calls GET /public/v{version}/sale/services.
 func (c *Client) GetServices(ctx context.Context, req *GetServicesRequest) (*GetServicesResponse, error) {
+	if req == nil {
+		req = &GetServicesRequest{}
+	}
 	out := &GetServicesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -382,6 +424,9 @@ type GetTransactionsRequest struct {
 
 // GetTransactions calls GET /public/v{version}/sale/transactions.
 func (c *Client) GetTransactions(ctx context.Context, req *GetTransactionsRequest) (*GetTransactionsResponse, error) {
+	if req == nil {
+		req = &GetTransactionsRequest{}
+	}
 	out := &GetTransactionsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -419,6 +464,9 @@ type InitiateCheckoutShoppingCartUsingAlternativePaymentsResponse = map[string]a
 
 // InitiateCheckoutShoppingCartUsingAlternativePayments calls POST /public/v{version}/sale/initiatecheckoutshoppingcart.
 func (c *Client) InitiateCheckoutShoppingCartUsingAlternativePayments(ctx context.Context, req *InitiateCheckoutShoppingCartUsingAlternativePaymentsRequest) (*InitiateCheckoutShoppingCartUsingAlternativePaymentsResponse, error) {
+	if req == nil {
+		req = &InitiateCheckoutShoppingCartUsingAlternativePaymentsRequest{}
+	}
 	out := &InitiateCheckoutShoppingCartUsingAlternativePaymentsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -452,6 +500,9 @@ type InitiatePurchaseContractUsingAlternativePaymentsResponse = map[string]any
 
 // InitiatePurchaseContractUsingAlternativePayments calls POST /public/v{version}/sale/initiatepurchasecontract.
 func (c *Client) InitiatePurchaseContractUsingAlternativePayments(ctx context.Context, req *InitiatePurchaseContractUsingAlternativePaymentsRequest) (*InitiatePurchaseContractUsingAlternativePaymentsResponse, error) {
+	if req == nil {
+		req = &InitiatePurchaseContractUsingAlternativePaymentsRequest{}
+	}
 	out := &InitiatePurchaseContractUsingAlternativePaymentsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -480,6 +531,9 @@ type PurchaseAccountCreditRequest struct {
 
 // PurchaseAccountCredit calls POST /public/v{version}/sale/purchaseaccountcredit.
 func (c *Client) PurchaseAccountCredit(ctx context.Context, req *PurchaseAccountCreditRequest) (*PurchaseAccountCreditResponse, error) {
+	if req == nil {
+		req = &PurchaseAccountCreditRequest{}
+	}
 	out := &PurchaseAccountCreditResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -519,6 +573,9 @@ type PurchaseContractRequest struct {
 
 // PurchaseContract calls POST /public/v{version}/sale/purchasecontract.
 func (c *Client) PurchaseContract(ctx context.Context, req *PurchaseContractRequest) (*PurchaseContractResponse, error) {
+	if req == nil {
+		req = &PurchaseContractRequest{}
+	}
 	out := &PurchaseContractResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -556,6 +613,9 @@ type PurchaseGiftCardRequest struct {
 
 // PurchaseGiftCard calls POST /public/v{version}/sale/purchasegiftcard.
 func (c *Client) PurchaseGiftCard(ctx context.Context, req *PurchaseGiftCardRequest) (*PurchaseGiftCardResponse, error) {
+	if req == nil {
+		req = &PurchaseGiftCardRequest{}
+	}
 	out := &PurchaseGiftCardResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -578,6 +638,9 @@ type ReturnSaleRequest struct {
 
 // ReturnSale calls POST /public/v{version}/sale/returnsale.
 func (c *Client) ReturnSale(ctx context.Context, req *ReturnSaleRequest) (*ReturnSaleResponse, error) {
+	if req == nil {
+		req = &ReturnSaleRequest{}
+	}
 	out := &ReturnSaleResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -601,6 +664,9 @@ type UpdateProductPriceRequest struct {
 
 // UpdateProductPrice calls POST /public/v{version}/sale/updateproductprice.
 func (c *Client) UpdateProductPrice(ctx context.Context, req *UpdateProductPriceRequest) (*UpdateProductPriceResponse, error) {
+	if req == nil {
+		req = &UpdateProductPriceRequest{}
+	}
 	out := &UpdateProductPriceResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -625,6 +691,9 @@ type UpdateProductsResponse = GetProductsResponse
 
 // UpdateProducts calls PUT /public/v{version}/sale/products.
 func (c *Client) UpdateProducts(ctx context.Context, req *UpdateProductsRequest) (*UpdateProductsResponse, error) {
+	if req == nil {
+		req = &UpdateProductsRequest{}
+	}
 	out := &UpdateProductsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "PUT",
@@ -647,6 +716,9 @@ type UpdateSaleDateRequest struct {
 
 // UpdateSaleDate calls PUT /public/v{version}/sale/updatesaledate.
 func (c *Client) UpdateSaleDate(ctx context.Context, req *UpdateSaleDateRequest) (*UpdateSaleDateResponse, error) {
+	if req == nil {
+		req = &UpdateSaleDateRequest{}
+	}
 	out := &UpdateSaleDateResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "PUT",
@@ -671,6 +743,9 @@ type UpdateServicesResponse = UpdateServiceResponse
 
 // UpdateServices calls PUT /public/v{version}/sale/services.
 func (c *Client) UpdateServices(ctx context.Context, req *UpdateServicesRequest) (*UpdateServicesResponse, error) {
+	if req == nil {
+		req = &UpdateServicesRequest{}
+	}
 	out := &UpdateServicesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "PUT",

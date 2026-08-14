@@ -8,6 +8,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/pax-beehive/connector"
 )
@@ -147,6 +148,32 @@ func TestStaffTokenReissuedAfter401(t *testing.T) {
 	}
 	if issues.Load() != 2 {
 		t.Errorf("issues = %d, want 2", issues.Load())
+	}
+}
+
+// A 401 from the token-issue endpoint itself (bad staff credentials) must
+// fail fast; a regression here deadlocks on the token mutex.
+func TestStaffTokenIssue401FailsFast(t *testing.T) {
+	c := newTestClient(t, Config{Username: "u", Password: "wrong"}, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/public/v6/usertoken/issue" {
+			w.WriteHeader(401)
+			_, _ = w.Write([]byte(`{"Error":{"Code":"InvalidCredentials","Message":"bad"}}`))
+			return
+		}
+		_, _ = w.Write([]byte(`{}`))
+	})
+	done := make(chan error, 1)
+	go func() {
+		done <- c.core.Do(context.Background(), &connector.Call{Method: "GET", Path: "/public/v{version}/class/classes"})
+	}()
+	select {
+	case err := <-done:
+		apiErr, ok := err.(*connector.APIError)
+		if !ok || apiErr.StatusCode != 401 {
+			t.Fatalf("want 401 APIError, got %v", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("deadlock: call with failing token issue never returned")
 	}
 }
 

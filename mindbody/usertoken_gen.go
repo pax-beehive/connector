@@ -18,6 +18,9 @@ type IssueTokenResponse = IssueResponse
 
 // IssueToken calls POST /public/v{version}/usertoken/issue.
 func (c *Client) IssueToken(ctx context.Context, req *IssueTokenRequest) (*IssueTokenResponse, error) {
+	if req == nil {
+		req = &IssueTokenRequest{}
+	}
 	out := &IssueTokenResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -41,6 +44,9 @@ type RenewTokenResponse = map[string]any
 
 // RenewToken calls POST /public/v{version}/usertoken/renew.
 func (c *Client) RenewToken(ctx context.Context, req *RenewTokenRequest) (*RenewTokenResponse, error) {
+	if req == nil {
+		req = &RenewTokenRequest{}
+	}
 	out := &RenewTokenResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -63,6 +69,9 @@ type RevokeTokenResponse = map[string]any
 
 // RevokeToken calls DELETE /public/v{version}/usertoken/revoke.
 func (c *Client) RevokeToken(ctx context.Context, req *RevokeTokenRequest) (*RevokeTokenResponse, error) {
+	if req == nil {
+		req = &RevokeTokenRequest{}
+	}
 	out := &RevokeTokenResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "DELETE",

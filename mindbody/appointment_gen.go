@@ -32,6 +32,9 @@ type AddAppointmentRequest struct {
 
 // AddAppointment calls POST /public/v{version}/appointment/addappointment.
 func (c *Client) AddAppointment(ctx context.Context, req *AddAppointmentRequest) (*AddAppointmentResponse, error) {
+	if req == nil {
+		req = &AddAppointmentRequest{}
+	}
 	out := &AddAppointmentResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -57,6 +60,9 @@ type AddAppointmentAddOnRequest struct {
 
 // AddAppointmentAddOn calls POST /public/v{version}/appointment/addappointmentaddon.
 func (c *Client) AddAppointmentAddOn(ctx context.Context, req *AddAppointmentAddOnRequest) (*AddAppointmentAddOnResponse, error) {
+	if req == nil {
+		req = &AddAppointmentAddOnRequest{}
+	}
 	out := &AddAppointmentAddOnResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -87,6 +93,9 @@ type AddAvailabilitiesRequest struct {
 
 // AddAvailabilities calls POST /public/v{version}/appointment/availabilities.
 func (c *Client) AddAvailabilities(ctx context.Context, req *AddAvailabilitiesRequest) (*AddAvailabilitiesResponse, error) {
+	if req == nil {
+		req = &AddAvailabilitiesRequest{}
+	}
 	out := &AddAvailabilitiesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -108,6 +117,9 @@ type AddMultipleAppointmentsRequest struct {
 
 // AddMultipleAppointments calls POST /public/v{version}/appointment/addmultipleappointments.
 func (c *Client) AddMultipleAppointments(ctx context.Context, req *AddMultipleAppointmentsRequest) (*AddMultipleAppointmentsResponse, error) {
+	if req == nil {
+		req = &AddMultipleAppointmentsRequest{}
+	}
 	out := &AddMultipleAppointmentsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -132,6 +144,9 @@ type DeleteAppointmentAddOnResponse struct{}
 
 // DeleteAppointmentAddOn calls DELETE /public/v{version}/appointment/deleteappointmentaddon.
 func (c *Client) DeleteAppointmentAddOn(ctx context.Context, req *DeleteAppointmentAddOnRequest) (*DeleteAppointmentAddOnResponse, error) {
+	if req == nil {
+		req = &DeleteAppointmentAddOnRequest{}
+	}
 	out := &DeleteAppointmentAddOnResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "DELETE",
@@ -155,6 +170,9 @@ type DeleteAvailabilityResponse struct{}
 
 // DeleteAvailability calls DELETE /public/v{version}/appointment/availability.
 func (c *Client) DeleteAvailability(ctx context.Context, req *DeleteAvailabilityRequest) (*DeleteAvailabilityResponse, error) {
+	if req == nil {
+		req = &DeleteAvailabilityRequest{}
+	}
 	out := &DeleteAvailabilityResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "DELETE",
@@ -179,6 +197,9 @@ type GetActiveSessionTimesRequest struct {
 
 // GetActiveSessionTimes calls GET /public/v{version}/appointment/activesessiontimes.
 func (c *Client) GetActiveSessionTimes(ctx context.Context, req *GetActiveSessionTimesRequest) (*GetActiveSessionTimesResponse, error) {
+	if req == nil {
+		req = &GetActiveSessionTimesRequest{}
+	}
 	out := &GetActiveSessionTimesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -201,6 +222,9 @@ type GetAddOnsRequest struct {
 
 // GetAddOns calls GET /public/v{version}/appointment/addons.
 func (c *Client) GetAddOns(ctx context.Context, req *GetAddOnsRequest) (*GetAddOnsResponse, error) {
+	if req == nil {
+		req = &GetAddOnsRequest{}
+	}
 	out := &GetAddOnsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -220,6 +244,9 @@ type GetAppointmentOptionsRequest struct {
 
 // GetAppointmentOptions calls GET /public/v{version}/appointment/appointmentoptions.
 func (c *Client) GetAppointmentOptions(ctx context.Context, req *GetAppointmentOptionsRequest) (*GetAppointmentOptionsResponse, error) {
+	if req == nil {
+		req = &GetAppointmentOptionsRequest{}
+	}
 	out := &GetAppointmentOptionsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -244,6 +271,9 @@ type GetAvailableDatesRequest struct {
 
 // GetAvailableDates calls GET /public/v{version}/appointment/availabledates.
 func (c *Client) GetAvailableDates(ctx context.Context, req *GetAvailableDatesRequest) (*GetAvailableDatesResponse, error) {
+	if req == nil {
+		req = &GetAvailableDatesRequest{}
+	}
 	out := &GetAvailableDatesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -273,6 +303,9 @@ type GetBookableItemsRequest struct {
 
 // GetBookableItems calls GET /public/v{version}/appointment/bookableitems.
 func (c *Client) GetBookableItems(ctx context.Context, req *GetBookableItemsRequest) (*GetBookableItemsResponse, error) {
+	if req == nil {
+		req = &GetBookableItemsRequest{}
+	}
 	out := &GetBookableItemsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -299,6 +332,9 @@ type GetScheduleItemsRequest struct {
 
 // GetScheduleItems calls GET /public/v{version}/appointment/scheduleitems.
 func (c *Client) GetScheduleItems(ctx context.Context, req *GetScheduleItemsRequest) (*GetScheduleItemsResponse, error) {
+	if req == nil {
+		req = &GetScheduleItemsRequest{}
+	}
 	out := &GetScheduleItemsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -327,6 +363,9 @@ type GetStaffAppointmentsRequest struct {
 
 // GetStaffAppointments calls GET /public/v{version}/appointment/staffappointments.
 func (c *Client) GetStaffAppointments(ctx context.Context, req *GetStaffAppointmentsRequest) (*GetStaffAppointmentsResponse, error) {
+	if req == nil {
+		req = &GetStaffAppointmentsRequest{}
+	}
 	out := &GetStaffAppointmentsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -351,6 +390,9 @@ type GetUnavailabilitiesRequest struct {
 
 // GetUnavailabilities calls GET /public/v{version}/appointment/unavailabilities.
 func (c *Client) GetUnavailabilities(ctx context.Context, req *GetUnavailabilitiesRequest) (*GetUnavailabilitiesResponse, error) {
+	if req == nil {
+		req = &GetUnavailabilitiesRequest{}
+	}
 	out := &GetUnavailabilitiesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -374,6 +416,9 @@ type RemoveAppointmentFromWaitlistResponse struct{}
 
 // RemoveAppointmentFromWaitlist calls DELETE /public/v{version}/appointment/appointmentfromwaitlist.
 func (c *Client) RemoveAppointmentFromWaitlist(ctx context.Context, req *RemoveAppointmentFromWaitlistRequest) (*RemoveAppointmentFromWaitlistResponse, error) {
+	if req == nil {
+		req = &RemoveAppointmentFromWaitlistRequest{}
+	}
 	out := &RemoveAppointmentFromWaitlistResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "DELETE",
@@ -406,6 +451,9 @@ type UpdateAppointmentRequest struct {
 
 // UpdateAppointment calls POST /public/v{version}/appointment/updateappointment.
 func (c *Client) UpdateAppointment(ctx context.Context, req *UpdateAppointmentRequest) (*UpdateAppointmentResponse, error) {
+	if req == nil {
+		req = &UpdateAppointmentRequest{}
+	}
 	out := &UpdateAppointmentResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -435,6 +483,9 @@ type UpdateAvailabilityRequest struct {
 
 // UpdateAvailability calls PUT /public/v{version}/appointment/availabilities.
 func (c *Client) UpdateAvailability(ctx context.Context, req *UpdateAvailabilityRequest) (*UpdateAvailabilityResponse, error) {
+	if req == nil {
+		req = &UpdateAvailabilityRequest{}
+	}
 	out := &UpdateAvailabilityResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "PUT",

@@ -14,6 +14,9 @@ type CreateReservationRequest struct {
 
 // CreateReservation calls POST /public/v{version}/pickaspot/v1/reservation/{pathInfo}.
 func (c *Client) CreateReservation(ctx context.Context, req *CreateReservationRequest) (*CreateReservationResponse, error) {
+	if req == nil {
+		req = &CreateReservationRequest{}
+	}
 	out := &CreateReservationResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -37,6 +40,9 @@ type DeleteReservationResponse = HttpContent
 
 // DeleteReservation calls DELETE /public/v{version}/pickaspot/v1/reservation/{pathInfo}.
 func (c *Client) DeleteReservation(ctx context.Context, req *DeleteReservationRequest) (*DeleteReservationResponse, error) {
+	if req == nil {
+		req = &DeleteReservationRequest{}
+	}
 	out := &DeleteReservationResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "DELETE",
@@ -60,6 +66,9 @@ type GetClassResponse = GetPickASpotClassResponse
 
 // GetClass calls GET /public/v{version}/pickaspot/v1/class/{classId}.
 func (c *Client) GetClass(ctx context.Context, req *GetClassRequest) (*GetClassResponse, error) {
+	if req == nil {
+		req = &GetClassRequest{}
+	}
 	out := &GetClassResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -82,6 +91,9 @@ type GetClassListResponse = GetPickASpotClassResponse
 
 // GetClassList calls GET /public/v{version}/pickaspot/v1/class.
 func (c *Client) GetClassList(ctx context.Context, req *GetClassListRequest) (*GetClassListResponse, error) {
+	if req == nil {
+		req = &GetClassListRequest{}
+	}
 	out := &GetClassListResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -102,6 +114,9 @@ type GetReservationRequest struct {
 
 // GetReservation calls GET /public/v{version}/pickaspot/v1/reservation/{pathInfo}.
 func (c *Client) GetReservation(ctx context.Context, req *GetReservationRequest) (*GetReservationResponse, error) {
+	if req == nil {
+		req = &GetReservationRequest{}
+	}
 	out := &GetReservationResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -122,6 +137,9 @@ type UpdateReservationRequest struct {
 
 // UpdateReservation calls PUT /public/v{version}/pickaspot/v1/reservation/{pathInfo}.
 func (c *Client) UpdateReservation(ctx context.Context, req *UpdateReservationRequest) (*UpdateReservationResponse, error) {
+	if req == nil {
+		req = &UpdateReservationRequest{}
+	}
 	out := &UpdateReservationResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "PUT",

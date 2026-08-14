@@ -11,11 +11,12 @@ import (
 )
 
 type roundtripCase struct {
-	name   string
-	method string
-	path   string
-	resp   string
-	invoke func(ctx context.Context, c *Client) (any, error)
+	name      string
+	method    string
+	path      string
+	resp      string
+	invoke    func(ctx context.Context, c *Client) (any, error)
+	invokeNil func(ctx context.Context, c *Client) (any, error)
 }
 
 var roundtripCases = []roundtripCase{
@@ -27,6 +28,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.DeleteCardType(ctx, &DeleteCardTypeRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.DeleteCardType(ctx, nil)
+		},
 	},
 	{
 		name:   "GetCardTypes",
@@ -35,6 +39,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "[]",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetCardTypes(ctx, &GetCardTypesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetCardTypes(ctx, nil)
 		},
 	},
 	{
@@ -45,6 +52,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddWidget(ctx, &AddWidgetRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddWidget(ctx, nil)
+		},
 	},
 	{
 		name:   "GetWidgets",
@@ -54,6 +64,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetWidgets(ctx, &GetWidgetsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetWidgets(ctx, nil)
+		},
 	},
 	{
 		name:   "ReplaceTags",
@@ -62,6 +75,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.ReplaceTags(ctx, &ReplaceTagsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.ReplaceTags(ctx, nil)
 		},
 	},
 }
@@ -103,6 +119,41 @@ func TestGeneratedRoundtrips(t *testing.T) {
 			}
 			if gotPath != tc.path {
 				t.Errorf("path = %q, want %q", gotPath, tc.path)
+			}
+		})
+	}
+}
+
+// TestGeneratedNilRequests verifies every method tolerates a nil request
+// without panicking (path params fall back to their zero values).
+func TestGeneratedNilRequests(t *testing.T) {
+	var mu sync.Mutex
+	var nextResp string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		defer mu.Unlock()
+		if nextResp == "" {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		_, _ = w.Write([]byte(nextResp))
+	}))
+	defer srv.Close()
+	c, err := NewClient(&Config{APIKey: "k", SiteID: "-99", BaseURL: srv.URL})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tc := range roundtripCases {
+		t.Run(tc.name, func(t *testing.T) {
+			mu.Lock()
+			nextResp = tc.resp
+			mu.Unlock()
+			out, err := tc.invokeNil(context.Background(), c)
+			if err != nil {
+				t.Fatalf("nil request: %v", err)
+			}
+			if out == nil {
+				t.Fatal("nil response")
 			}
 		})
 	}

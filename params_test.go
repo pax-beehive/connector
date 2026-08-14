@@ -63,6 +63,19 @@ func TestParseRequestParamsNilAndEmpty(t *testing.T) {
 	}
 }
 
+func TestParseRequestParamsFloat32(t *testing.T) {
+	req := &struct {
+		Rate *float32 `json:"-" query:"rate"`
+	}{Rate: Ptr(float32(1.1))}
+	p, err := ParseRequestParams(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := p.Query.Get("rate"); got != "1.1" {
+		t.Errorf("float32 encoded as %q, want 1.1", got)
+	}
+}
+
 func TestParseRequestParamsNonStruct(t *testing.T) {
 	if _, err := ParseRequestParams(Ptr(42)); err == nil {
 		t.Fatal("expected error for non-struct request")

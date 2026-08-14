@@ -18,6 +18,9 @@ type AddArrivalRequest struct {
 
 // AddArrival calls POST /public/v{version}/client/addarrival.
 func (c *Client) AddArrival(ctx context.Context, req *AddArrivalRequest) (*AddArrivalResponse, error) {
+	if req == nil {
+		req = &AddArrivalRequest{}
+	}
 	out := &AddArrivalResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -98,6 +101,9 @@ type AddClientRequest struct {
 
 // AddClient calls POST /public/v{version}/client/addclient.
 func (c *Client) AddClient(ctx context.Context, req *AddClientRequest) (*AddClientResponse, error) {
+	if req == nil {
+		req = &AddClientRequest{}
+	}
 	out := &AddClientResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -124,6 +130,9 @@ type AddClientDirectDebitInfoRequest struct {
 
 // AddClientDirectDebitInfo calls POST /public/v{version}/client/addclientdirectdebitinfo.
 func (c *Client) AddClientDirectDebitInfo(ctx context.Context, req *AddClientDirectDebitInfoRequest) (*AddClientDirectDebitInfoResponse, error) {
+	if req == nil {
+		req = &AddClientDirectDebitInfoRequest{}
+	}
 	out := &AddClientDirectDebitInfoResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -157,6 +166,9 @@ type AddContactLogResponse = ContactLog
 
 // AddContactLog calls POST /public/v{version}/client/addcontactlog.
 func (c *Client) AddContactLog(ctx context.Context, req *AddContactLogRequest) (*AddContactLogResponse, error) {
+	if req == nil {
+		req = &AddContactLogRequest{}
+	}
 	out := &AddContactLogResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -183,6 +195,9 @@ type AddFormulaNoteResponse = FormulaNoteResponse
 
 // AddFormulaNote calls POST /public/v{version}/client/addclientformulanote.
 func (c *Client) AddFormulaNote(ctx context.Context, req *AddFormulaNoteRequest) (*AddFormulaNoteResponse, error) {
+	if req == nil {
+		req = &AddFormulaNoteRequest{}
+	}
 	out := &AddFormulaNoteResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -210,6 +225,9 @@ type DeleteClientFormulaNoteResponse struct{}
 
 // DeleteClientFormulaNote calls DELETE /public/v{version}/client/clientformulanote.
 func (c *Client) DeleteClientFormulaNote(ctx context.Context, req *DeleteClientFormulaNoteRequest) (*DeleteClientFormulaNoteResponse, error) {
+	if req == nil {
+		req = &DeleteClientFormulaNoteRequest{}
+	}
 	out := &DeleteClientFormulaNoteResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "DELETE",
@@ -234,6 +252,9 @@ type DeleteContactLogResponse = map[string]any
 
 // DeleteContactLog calls DELETE /public/v{version}/client/deletecontactlog.
 func (c *Client) DeleteContactLog(ctx context.Context, req *DeleteContactLogRequest) (*DeleteContactLogResponse, error) {
+	if req == nil {
+		req = &DeleteContactLogRequest{}
+	}
 	out := &DeleteContactLogResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "DELETE",
@@ -257,6 +278,9 @@ type DeleteDirectDebitInfoResponse = map[string]any
 
 // DeleteDirectDebitInfo calls DELETE /public/v{version}/client/clientdirectdebitinfo.
 func (c *Client) DeleteDirectDebitInfo(ctx context.Context, req *DeleteDirectDebitInfoRequest) (*DeleteDirectDebitInfoResponse, error) {
+	if req == nil {
+		req = &DeleteDirectDebitInfoRequest{}
+	}
 	out := &DeleteDirectDebitInfoResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "DELETE",
@@ -283,6 +307,9 @@ type GetActiveClientMembershipsRequest struct {
 
 // GetActiveClientMemberships calls GET /public/v{version}/client/activeclientmemberships.
 func (c *Client) GetActiveClientMemberships(ctx context.Context, req *GetActiveClientMembershipsRequest) (*GetActiveClientMembershipsResponse, error) {
+	if req == nil {
+		req = &GetActiveClientMembershipsRequest{}
+	}
 	out := &GetActiveClientMembershipsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -308,6 +335,9 @@ type GetActiveClientsMembershipsRequest struct {
 
 // GetActiveClientsMemberships calls GET /public/v{version}/client/activeclientsmemberships.
 func (c *Client) GetActiveClientsMemberships(ctx context.Context, req *GetActiveClientsMembershipsRequest) (*GetActiveClientsMembershipsResponse, error) {
+	if req == nil {
+		req = &GetActiveClientsMembershipsRequest{}
+	}
 	out := &GetActiveClientsMembershipsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -332,6 +362,9 @@ type GetClientAccountBalancesRequest struct {
 
 // GetClientAccountBalances calls GET /public/v{version}/client/clientaccountbalances.
 func (c *Client) GetClientAccountBalances(ctx context.Context, req *GetClientAccountBalancesRequest) (*GetClientAccountBalancesResponse, error) {
+	if req == nil {
+		req = &GetClientAccountBalancesRequest{}
+	}
 	out := &GetClientAccountBalancesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -362,6 +395,9 @@ type GetClientCompleteInfoRequest struct {
 
 // GetClientCompleteInfo calls GET /public/v{version}/client/clientcompleteinfo.
 func (c *Client) GetClientCompleteInfo(ctx context.Context, req *GetClientCompleteInfoRequest) (*GetClientCompleteInfoResponse, error) {
+	if req == nil {
+		req = &GetClientCompleteInfoRequest{}
+	}
 	out := &GetClientCompleteInfoResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -387,6 +423,9 @@ type GetClientContractsRequest struct {
 
 // GetClientContracts calls GET /public/v{version}/client/clientcontracts.
 func (c *Client) GetClientContracts(ctx context.Context, req *GetClientContractsRequest) (*GetClientContractsResponse, error) {
+	if req == nil {
+		req = &GetClientContractsRequest{}
+	}
 	out := &GetClientContractsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -411,6 +450,9 @@ type GetClientDuplicatesRequest struct {
 
 // GetClientDuplicates calls GET /public/v{version}/client/clientduplicates.
 func (c *Client) GetClientDuplicates(ctx context.Context, req *GetClientDuplicatesRequest) (*GetClientDuplicatesResponse, error) {
+	if req == nil {
+		req = &GetClientDuplicatesRequest{}
+	}
 	out := &GetClientDuplicatesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -434,6 +476,9 @@ type GetClientFormulaNotesRequest struct {
 
 // GetClientFormulaNotes calls GET /public/v{version}/client/clientformulanotes.
 func (c *Client) GetClientFormulaNotes(ctx context.Context, req *GetClientFormulaNotesRequest) (*GetClientFormulaNotesResponse, error) {
+	if req == nil {
+		req = &GetClientFormulaNotesRequest{}
+	}
 	out := &GetClientFormulaNotesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -454,6 +499,9 @@ type GetClientIndexesRequest struct {
 
 // GetClientIndexes calls GET /public/v{version}/client/clientindexes.
 func (c *Client) GetClientIndexes(ctx context.Context, req *GetClientIndexesRequest) (*GetClientIndexesResponse, error) {
+	if req == nil {
+		req = &GetClientIndexesRequest{}
+	}
 	out := &GetClientIndexesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -480,6 +528,9 @@ type GetClientPurchasesRequest struct {
 
 // GetClientPurchases calls GET /public/v{version}/client/clientpurchases.
 func (c *Client) GetClientPurchases(ctx context.Context, req *GetClientPurchasesRequest) (*GetClientPurchasesResponse, error) {
+	if req == nil {
+		req = &GetClientPurchasesRequest{}
+	}
 	out := &GetClientPurchasesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -500,6 +551,9 @@ type GetClientReferralTypesRequest struct {
 
 // GetClientReferralTypes calls GET /public/v{version}/client/clientreferraltypes.
 func (c *Client) GetClientReferralTypes(ctx context.Context, req *GetClientReferralTypesRequest) (*GetClientReferralTypesResponse, error) {
+	if req == nil {
+		req = &GetClientReferralTypesRequest{}
+	}
 	out := &GetClientReferralTypesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -524,6 +578,9 @@ type GetClientRewardsRequest struct {
 
 // GetClientRewards calls GET /public/v{version}/client/clientrewards.
 func (c *Client) GetClientRewards(ctx context.Context, req *GetClientRewardsRequest) (*GetClientRewardsResponse, error) {
+	if req == nil {
+		req = &GetClientRewardsRequest{}
+	}
 	out := &GetClientRewardsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -552,6 +609,9 @@ type GetClientScheduleRequest struct {
 
 // GetClientSchedule calls GET /public/v{version}/client/clientschedule.
 func (c *Client) GetClientSchedule(ctx context.Context, req *GetClientScheduleRequest) (*GetClientScheduleResponse, error) {
+	if req == nil {
+		req = &GetClientScheduleRequest{}
+	}
 	out := &GetClientScheduleResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -591,6 +651,9 @@ type GetClientServicesRequest struct {
 
 // GetClientServices calls GET /public/v{version}/client/clientservices.
 func (c *Client) GetClientServices(ctx context.Context, req *GetClientServicesRequest) (*GetClientServicesResponse, error) {
+	if req == nil {
+		req = &GetClientServicesRequest{}
+	}
 	out := &GetClientServicesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -621,6 +684,9 @@ type GetClientVisitsRequest struct {
 
 // GetClientVisits calls GET /public/v{version}/client/clientvisits.
 func (c *Client) GetClientVisits(ctx context.Context, req *GetClientVisitsRequest) (*GetClientVisitsResponse, error) {
+	if req == nil {
+		req = &GetClientVisitsRequest{}
+	}
 	out := &GetClientVisitsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -648,6 +714,9 @@ type GetClientsRequest struct {
 
 // GetClients calls GET /public/v{version}/client/clients.
 func (c *Client) GetClients(ctx context.Context, req *GetClientsRequest) (*GetClientsResponse, error) {
+	if req == nil {
+		req = &GetClientsRequest{}
+	}
 	out := &GetClientsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -670,6 +739,9 @@ type GetContactLogTypesRequest struct {
 
 // GetContactLogTypes calls GET /public/v{version}/client/contactlogtypes.
 func (c *Client) GetContactLogTypes(ctx context.Context, req *GetContactLogTypesRequest) (*GetContactLogTypesResponse, error) {
+	if req == nil {
+		req = &GetContactLogTypesRequest{}
+	}
 	out := &GetContactLogTypesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -698,6 +770,9 @@ type GetContactLogsRequest struct {
 
 // GetContactLogs calls GET /public/v{version}/client/contactlogs.
 func (c *Client) GetContactLogs(ctx context.Context, req *GetContactLogsRequest) (*GetContactLogsResponse, error) {
+	if req == nil {
+		req = &GetContactLogsRequest{}
+	}
 	out := &GetContactLogsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -726,6 +801,9 @@ type GetCrossRegionalClientAssociationsRequest struct {
 
 // GetCrossRegionalClientAssociations calls GET /public/v{version}/client/crossregionalclientassociations.
 func (c *Client) GetCrossRegionalClientAssociations(ctx context.Context, req *GetCrossRegionalClientAssociationsRequest) (*GetCrossRegionalClientAssociationsResponse, error) {
+	if req == nil {
+		req = &GetCrossRegionalClientAssociationsRequest{}
+	}
 	out := &GetCrossRegionalClientAssociationsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -747,6 +825,9 @@ type GetCustomClientFieldsRequest struct {
 
 // GetCustomClientFields calls GET /public/v{version}/client/customclientfields.
 func (c *Client) GetCustomClientFields(ctx context.Context, req *GetCustomClientFieldsRequest) (*GetCustomClientFieldsResponse, error) {
+	if req == nil {
+		req = &GetCustomClientFieldsRequest{}
+	}
 	out := &GetCustomClientFieldsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -770,6 +851,9 @@ type GetDirectDebitInfoResponse = DirectDebitInfo
 
 // GetDirectDebitInfo calls GET /public/v{version}/client/clientdirectdebitinfo.
 func (c *Client) GetDirectDebitInfo(ctx context.Context, req *GetDirectDebitInfoRequest) (*GetDirectDebitInfoResponse, error) {
+	if req == nil {
+		req = &GetDirectDebitInfoRequest{}
+	}
 	out := &GetDirectDebitInfoResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -789,6 +873,9 @@ type GetRequiredClientFieldsRequest struct {
 
 // GetRequiredClientFields calls GET /public/v{version}/client/requiredclientfields.
 func (c *Client) GetRequiredClientFields(ctx context.Context, req *GetRequiredClientFieldsRequest) (*GetRequiredClientFieldsResponse, error) {
+	if req == nil {
+		req = &GetRequiredClientFieldsRequest{}
+	}
 	out := &GetRequiredClientFieldsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -813,6 +900,9 @@ type MergeClientResponse = map[string]any
 
 // MergeClient calls POST /public/v{version}/client/mergeclients.
 func (c *Client) MergeClient(ctx context.Context, req *MergeClientRequest) (*MergeClientResponse, error) {
+	if req == nil {
+		req = &MergeClientRequest{}
+	}
 	out := &MergeClientResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -838,6 +928,9 @@ type SendAutoEmailResponse = map[string]any
 
 // SendAutoEmail calls POST /public/v{version}/client/sendautoemail.
 func (c *Client) SendAutoEmail(ctx context.Context, req *SendAutoEmailRequest) (*SendAutoEmailResponse, error) {
+	if req == nil {
+		req = &SendAutoEmailRequest{}
+	}
 	out := &SendAutoEmailResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -864,6 +957,9 @@ type SendPasswordResetEmailResponse = map[string]any
 
 // SendPasswordResetEmail calls POST /public/v{version}/client/sendpasswordresetemail.
 func (c *Client) SendPasswordResetEmail(ctx context.Context, req *SendPasswordResetEmailRequest) (*SendPasswordResetEmailResponse, error) {
+	if req == nil {
+		req = &SendPasswordResetEmailRequest{}
+	}
 	out := &SendPasswordResetEmailResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -893,6 +989,9 @@ type SuspendContractRequest struct {
 
 // SuspendContract calls POST /public/v{version}/client/suspendcontract.
 func (c *Client) SuspendContract(ctx context.Context, req *SuspendContractRequest) (*SuspendContractResponse, error) {
+	if req == nil {
+		req = &SuspendContractRequest{}
+	}
 	out := &SuspendContractResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -918,6 +1017,9 @@ type TerminateContractRequest struct {
 
 // TerminateContract calls POST /public/v{version}/client/terminatecontract.
 func (c *Client) TerminateContract(ctx context.Context, req *TerminateContractRequest) (*TerminateContractResponse, error) {
+	if req == nil {
+		req = &TerminateContractRequest{}
+	}
 	out := &TerminateContractResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -943,6 +1045,9 @@ type UpdateClientRequest struct {
 
 // UpdateClient calls POST /public/v{version}/client/updateclient.
 func (c *Client) UpdateClient(ctx context.Context, req *UpdateClientRequest) (*UpdateClientResponse, error) {
+	if req == nil {
+		req = &UpdateClientRequest{}
+	}
 	out := &UpdateClientResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -973,6 +1078,9 @@ type UpdateClientContractAutopaysResponse = Contract
 
 // UpdateClientContractAutopays calls POST /public/v{version}/client/updateclientcontractautopays.
 func (c *Client) UpdateClientContractAutopays(ctx context.Context, req *UpdateClientContractAutopaysRequest) (*UpdateClientContractAutopaysResponse, error) {
+	if req == nil {
+		req = &UpdateClientContractAutopaysRequest{}
+	}
 	out := &UpdateClientContractAutopaysResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -1002,6 +1110,9 @@ type UpdateClientRewardsResponse = GetClientRewardsResponse
 
 // UpdateClientRewards calls POST /public/v{version}/client/clientrewards.
 func (c *Client) UpdateClientRewards(ctx context.Context, req *UpdateClientRewardsRequest) (*UpdateClientRewardsResponse, error) {
+	if req == nil {
+		req = &UpdateClientRewardsRequest{}
+	}
 	out := &UpdateClientRewardsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -1027,6 +1138,9 @@ type UpdateClientServiceRequest struct {
 
 // UpdateClientService calls POST /public/v{version}/client/updateclientservice.
 func (c *Client) UpdateClientService(ctx context.Context, req *UpdateClientServiceRequest) (*UpdateClientServiceResponse, error) {
+	if req == nil {
+		req = &UpdateClientServiceRequest{}
+	}
 	out := &UpdateClientServiceResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -1054,6 +1168,9 @@ type UpdateClientVisitRequest struct {
 
 // UpdateClientVisit calls POST /public/v{version}/client/updateclientvisit.
 func (c *Client) UpdateClientVisit(ctx context.Context, req *UpdateClientVisitRequest) (*UpdateClientVisitResponse, error) {
+	if req == nil {
+		req = &UpdateClientVisitRequest{}
+	}
 	out := &UpdateClientVisitResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -1087,6 +1204,9 @@ type UpdateContactLogResponse = ContactLog
 
 // UpdateContactLog calls POST /public/v{version}/client/updatecontactlog.
 func (c *Client) UpdateContactLog(ctx context.Context, req *UpdateContactLogRequest) (*UpdateContactLogResponse, error) {
+	if req == nil {
+		req = &UpdateContactLogRequest{}
+	}
 	out := &UpdateContactLogResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -1109,6 +1229,9 @@ type UploadClientDocumentRequest struct {
 
 // UploadClientDocument calls POST /public/v{version}/client/uploadclientdocument.
 func (c *Client) UploadClientDocument(ctx context.Context, req *UploadClientDocumentRequest) (*UploadClientDocumentResponse, error) {
+	if req == nil {
+		req = &UploadClientDocumentRequest{}
+	}
 	out := &UploadClientDocumentResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -1131,6 +1254,9 @@ type UploadClientPhotoRequest struct {
 
 // UploadClientPhoto calls POST /public/v{version}/client/uploadclientphoto.
 func (c *Client) UploadClientPhoto(ctx context.Context, req *UploadClientPhotoRequest) (*UploadClientPhotoResponse, error) {
+	if req == nil {
+		req = &UploadClientPhotoRequest{}
+	}
 	out := &UploadClientPhotoResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",

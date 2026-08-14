@@ -40,6 +40,9 @@ type AddStaffRequest struct {
 
 // AddStaff calls POST /public/v{version}/staff/addstaff.
 func (c *Client) AddStaff(ctx context.Context, req *AddStaffRequest) (*AddStaffResponse, error) {
+	if req == nil {
+		req = &AddStaffRequest{}
+	}
 	out := &AddStaffResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -74,6 +77,9 @@ type AddStaffAvailabilityResponse struct{}
 
 // AddStaffAvailability calls POST /public/v{version}/staff/staffavailability.
 func (c *Client) AddStaffAvailability(ctx context.Context, req *AddStaffAvailabilityRequest) (*AddStaffAvailabilityResponse, error) {
+	if req == nil {
+		req = &AddStaffAvailabilityRequest{}
+	}
 	out := &AddStaffAvailabilityResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -101,6 +107,9 @@ type AssignStaffSessionTypeRequest struct {
 
 // AssignStaffSessionType calls POST /public/v{version}/staff/assignsessiontype.
 func (c *Client) AssignStaffSessionType(ctx context.Context, req *AssignStaffSessionTypeRequest) (*AssignStaffSessionTypeResponse, error) {
+	if req == nil {
+		req = &AssignStaffSessionTypeRequest{}
+	}
 	out := &AssignStaffSessionTypeResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -125,6 +134,9 @@ type GetSalesRepsRequest struct {
 
 // GetSalesReps calls GET /public/v{version}/staff/salesreps.
 func (c *Client) GetSalesReps(ctx context.Context, req *GetSalesRepsRequest) (*GetSalesRepsResponse, error) {
+	if req == nil {
+		req = &GetSalesRepsRequest{}
+	}
 	out := &GetSalesRepsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -152,6 +164,9 @@ type GetStaffRequest struct {
 
 // GetStaff calls GET /public/v{version}/staff/staff.
 func (c *Client) GetStaff(ctx context.Context, req *GetStaffRequest) (*GetStaffResponse, error) {
+	if req == nil {
+		req = &GetStaffRequest{}
+	}
 	out := &GetStaffResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -172,6 +187,9 @@ type GetStaffImageURLRequest struct {
 
 // GetStaffImageURL calls GET /public/v{version}/staff/imageurl.
 func (c *Client) GetStaffImageURL(ctx context.Context, req *GetStaffImageURLRequest) (*GetStaffImageURLResponse, error) {
+	if req == nil {
+		req = &GetStaffImageURLRequest{}
+	}
 	out := &GetStaffImageURLResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -192,6 +210,9 @@ type GetStaffPermissionsRequest struct {
 
 // GetStaffPermissions calls GET /public/v{version}/staff/staffpermissions.
 func (c *Client) GetStaffPermissions(ctx context.Context, req *GetStaffPermissionsRequest) (*GetStaffPermissionsResponse, error) {
+	if req == nil {
+		req = &GetStaffPermissionsRequest{}
+	}
 	out := &GetStaffPermissionsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -216,6 +237,9 @@ type GetStaffSessionTypesRequest struct {
 
 // GetStaffSessionTypes calls GET /public/v{version}/staff/sessiontypes.
 func (c *Client) GetStaffSessionTypes(ctx context.Context, req *GetStaffSessionTypesRequest) (*GetStaffSessionTypesResponse, error) {
+	if req == nil {
+		req = &GetStaffSessionTypesRequest{}
+	}
 	out := &GetStaffSessionTypesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -264,6 +288,9 @@ type UpdateStaffRequest struct {
 
 // UpdateStaff calls POST /public/v{version}/staff/updatestaff.
 func (c *Client) UpdateStaff(ctx context.Context, req *UpdateStaffRequest) (*UpdateStaffResponse, error) {
+	if req == nil {
+		req = &UpdateStaffRequest{}
+	}
 	out := &UpdateStaffResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -286,6 +313,9 @@ type UpdateStaffPermissionsRequest struct {
 
 // UpdateStaffPermissions calls POST /public/v{version}/staff/updatestaffpermissions.
 func (c *Client) UpdateStaffPermissions(ctx context.Context, req *UpdateStaffPermissionsRequest) (*UpdateStaffPermissionsResponse, error) {
+	if req == nil {
+		req = &UpdateStaffPermissionsRequest{}
+	}
 	out := &UpdateStaffPermissionsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",

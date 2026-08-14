@@ -20,6 +20,9 @@ type AddWidgetResponse = Widget
 
 // AddWidget calls POST /public/v{version}/widget/widgets.
 func (c *Client) AddWidget(ctx context.Context, req *AddWidgetRequest) (*AddWidgetResponse, error) {
+	if req == nil {
+		req = &AddWidgetRequest{}
+	}
 	out := &AddWidgetResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -44,6 +47,9 @@ type GetWidgetsRequest struct {
 
 // GetWidgets calls GET /public/v{version}/widget/widgets.
 func (c *Client) GetWidgets(ctx context.Context, req *GetWidgetsRequest) (*GetWidgetsResponse, error) {
+	if req == nil {
+		req = &GetWidgetsRequest{}
+	}
 	out := &GetWidgetsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -68,6 +74,9 @@ type ReplaceTagsResponse = map[string]any
 
 // ReplaceTags calls PUT /public/v{version}/widget/{widgetId}/tags.
 func (c *Client) ReplaceTags(ctx context.Context, req *ReplaceTagsRequest) (*ReplaceTagsResponse, error) {
+	if req == nil {
+		req = &ReplaceTagsRequest{}
+	}
 	out := &ReplaceTagsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "PUT",

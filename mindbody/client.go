@@ -50,7 +50,17 @@ func NewClient(cfg *Config) (*Client, error) {
 	headers.Set("Api-Key", cfg.APIKey)
 	headers.Set("SiteId", cfg.SiteID)
 	headers.Set("Version", "6")
-	auth := &staffTokenAuth{username: cfg.Username, password: cfg.Password}
+	// issueCore has no Authorizer: the token-issue call must never recurse
+	// into auth, and a 401 from it must fail fast instead of triggering the
+	// invalidate-and-retry path (which would deadlock on the token mutex).
+	issueCore := &connector.Core{
+		BaseURL:    baseURL,
+		HTTPClient: cfg.HTTPClient,
+		Headers:    headers,
+		PathParams: map[string]string{"version": "6"},
+		ParseError: parseError,
+	}
+	auth := &staffTokenAuth{username: cfg.Username, password: cfg.Password, core: issueCore}
 	core := &connector.Core{
 		BaseURL:    baseURL,
 		HTTPClient: cfg.HTTPClient,
@@ -59,7 +69,6 @@ func NewClient(cfg *Config) (*Client, error) {
 		Auth:       auth,
 		ParseError: parseError,
 	}
-	auth.core = core
 	return &Client{core: core}, nil
 }
 
@@ -102,18 +111,21 @@ func (a *staffTokenAuth) getToken(ctx context.Context) (string, error) {
 	if a.token != "" {
 		return a.token, nil
 	}
-	body := map[string]string{"Username": a.username, "Password": a.password}
-	var out struct{ AccessToken string }
+	req := &IssueTokenRequest{Username: connector.Ptr(a.username), Password: connector.Ptr(a.password)}
+	out := &IssueTokenResponse{}
 	err := a.core.Do(ctx, &connector.Call{
 		Method: http.MethodPost,
 		Path:   "/public/v{version}" + issueTokenPath,
-		Body:   body,
-		Out:    &out,
+		Body:   req,
+		Out:    out,
 	})
 	if err != nil {
 		return "", err
 	}
-	a.token = out.AccessToken
+	if out.AccessToken == nil || *out.AccessToken == "" {
+		return "", errors.New("mindbody: token issue succeeded but returned no access token")
+	}
+	a.token = *out.AccessToken
 	return a.token, nil
 }
 

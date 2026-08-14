@@ -20,7 +20,7 @@ func fixtureIR(t *testing.T) *IR {
 
 func fixtureConfig() *Config {
 	return &Config{
-		Package: "fixture", BaseURL: "https://x",
+		Package:          "fixture",
 		DateTimeType:     "connector.DateTime",
 		SkipHeaders:      []string{"authorization", "version", "siteId"},
 		QueryPrefixStrip: "request.",
@@ -156,12 +156,6 @@ func TestBuildModelsAndAliases(t *testing.T) {
 	}
 	if aliases["GetCardTypesResponse"] != "[]string" {
 		t.Errorf("GetCardTypesResponse alias = %q", aliases["GetCardTypesResponse"])
-	}
-	if !ir.UsesDateTime {
-		t.Error("UsesDateTime should be true")
-	}
-	if !ir.UsesConnectorImport {
-		t.Error("UsesConnectorImport should be true")
 	}
 }
 

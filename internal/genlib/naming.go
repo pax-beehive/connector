@@ -78,37 +78,46 @@ func preferred(full string, cfg *Config) bool {
 // generated request structs.
 func defGoNames(fullNames []string, cfg *Config, forbidden map[string]bool) (map[string]string, error) {
 	names := map[string]string{}
+	taken := map[string]bool{}
+	for name := range forbidden {
+		taken[name] = true
+	}
 	groups := map[string][]string{}
 	for _, full := range fullNames {
 		if renamed, ok := cfg.RenameTypes[full]; ok {
 			names[full] = renamed
-			forbidden[renamed] = true
+			taken[renamed] = true
 			continue
 		}
 		base := camelize(lastSegment(full))
 		groups[base] = append(groups[base], full)
 	}
-	for base, group := range groups {
+	// Reserve every group's base name up front so a prefixed name derived in
+	// one group can never steal another group's base name.
+	baseFree := map[string]bool{}
+	var bases []string
+	for base := range groups {
+		bases = append(bases, base)
+		baseFree[base] = !taken[base]
+		taken[base] = true
+	}
+	sort.Strings(bases)
+	for _, base := range bases {
+		group := groups[base]
 		sort.Strings(group)
-		if err := assignGroup(base, group, cfg, forbidden, names); err != nil {
+		if err := assignGroup(base, group, cfg, baseFree, taken, names); err != nil {
 			return nil, err
 		}
 	}
 	return names, nil
 }
 
-func assignGroup(base string, group []string, cfg *Config, forbidden map[string]bool, names map[string]string) error {
-	taken := map[string]bool{}
-	for name := range forbidden {
-		taken[name] = true
-	}
+func assignGroup(base string, group []string, cfg *Config, baseFree, taken map[string]bool, names map[string]string) error {
 	for _, full := range group {
-		if len(group) == 1 || preferred(full, cfg) {
-			if !taken[base] {
-				names[full] = base
-				taken[base] = true
-				continue
-			}
+		if baseFree[base] && (len(group) == 1 || preferred(full, cfg)) {
+			names[full] = base
+			baseFree[base] = false
+			continue
 		}
 		name, err := prefixedName(full, base, taken)
 		if err != nil {

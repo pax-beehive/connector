@@ -9,6 +9,12 @@ import (
 // DateTime is a time.Time that tolerates API date-time strings with or
 // without timezone or fractional seconds, and marshals without a zone
 // (site-local convention used by APIs such as Mindbody).
+//
+// Marshaling emits the wall-clock reading of the stored time and DROPS any
+// zone/offset: a value parsed from "10:00:00+07:00" is re-emitted as
+// "10:00:00". The API interprets that wall clock in the site's local zone,
+// so construct DateTime values in the site's local time, not in UTC or the
+// caller's zone.
 type DateTime struct{ time.Time }
 
 const dateTimeLayout = "2006-01-02T15:04:05"

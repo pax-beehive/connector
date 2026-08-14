@@ -33,6 +33,9 @@ type UpdatePricingOptionResponse = map[string]any
 
 // UpdatePricingOption calls POST /public/v{version}/pricingoption/updatepricingoption.
 func (c *Client) UpdatePricingOption(ctx context.Context, req *UpdatePricingOptionRequest) (*UpdatePricingOptionResponse, error) {
+	if req == nil {
+		req = &UpdatePricingOptionRequest{}
+	}
 	out := &UpdatePricingOptionResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",

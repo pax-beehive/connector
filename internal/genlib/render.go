@@ -46,6 +46,9 @@ func opsForTag(ir *IR, tag string) []Operation {
 // renderFile executes a template, prepends the header and computed imports,
 // and gofmt-formats the result. forceImports (sorted in) are always added.
 func renderFile(files map[string][]byte, name, tmpl string, data *IR, forceImports []string) error {
+	if _, exists := files[name]; exists {
+		return fmt.Errorf("genlib: generated file name %q collides (tags differing only in case, or a tag named Types/Roundtrip?)", name)
+	}
 	body, err := execTemplate(name, tmpl, data)
 	if err != nil {
 		return err
@@ -76,15 +79,18 @@ func execTemplate(name, tmpl string, data *IR) (string, error) {
 }
 
 // importBlock derives the import list from identifiers the body references.
+// Comment lines are excluded so spec-derived doc text cannot trigger
+// spurious imports.
 func importBlock(body string, force []string) string {
+	code := stripCommentLines(body)
 	imports := append([]string{}, force...)
-	if strings.Contains(body, "context.") {
+	if strings.Contains(code, "context.") {
 		imports = append(imports, `"context"`)
 	}
-	if strings.Contains(body, "time.Time") {
+	if strings.Contains(code, "time.Time") {
 		imports = append(imports, `"time"`)
 	}
-	if strings.Contains(body, "connector.") {
+	if strings.Contains(code, "connector.") {
 		imports = append(imports, connectorImport)
 	}
 	if len(imports) == 0 {
@@ -92,6 +98,18 @@ func importBlock(body string, force []string) string {
 	}
 	imports = dedupe(imports)
 	return "\nimport (\n\t" + strings.Join(imports, "\n\t") + "\n)\n"
+}
+
+func stripCommentLines(body string) string {
+	var b strings.Builder
+	for _, line := range strings.Split(body, "\n") {
+		if strings.HasPrefix(strings.TrimSpace(line), "//") {
+			continue
+		}
+		b.WriteString(line)
+		b.WriteByte('\n')
+	}
+	return b.String()
 }
 
 func dedupe(in []string) []string {

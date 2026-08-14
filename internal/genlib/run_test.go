@@ -15,7 +15,7 @@ func TestRunGeneratesFiles(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "spec.json"), fixture, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	yml := []byte("package: fixture\nspec: spec.json\nbase_url: https://x\ndatetime_type: connector.DateTime\nskip_headers: [authorization]\nquery_prefix_strip: \"request.\"\npinned_path_params: {version: \"6\"}\nprefer_namespaces: [\"Acme.Api.V1\"]\n")
+	yml := []byte("package: fixture\nspec: spec.json\ndatetime_type: connector.DateTime\nskip_headers: [authorization]\nquery_prefix_strip: \"request.\"\npinned_path_params: {version: \"6\"}\nprefer_namespaces: [\"Acme.Api.V1\"]\n")
 	cfgPath := filepath.Join(dir, "gen.yaml")
 	if err := os.WriteFile(cfgPath, yml, 0o644); err != nil {
 		t.Fatal(err)

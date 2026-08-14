@@ -16,6 +16,9 @@ type DeleteCardTypeResponse struct{}
 
 // DeleteCardType calls DELETE /public/v{version}/widget/cardtypes.
 func (c *Client) DeleteCardType(ctx context.Context, req *DeleteCardTypeRequest) (*DeleteCardTypeResponse, error) {
+	if req == nil {
+		req = &DeleteCardTypeRequest{}
+	}
 	out := &DeleteCardTypeResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "DELETE",
@@ -37,6 +40,9 @@ type GetCardTypesResponse = []string
 
 // GetCardTypes calls GET /public/v{version}/widget/cardtypes.
 func (c *Client) GetCardTypes(ctx context.Context, req *GetCardTypesRequest) (*GetCardTypesResponse, error) {
+	if req == nil {
+		req = &GetCardTypesRequest{}
+	}
 	out := &GetCardTypesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",

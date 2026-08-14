@@ -40,6 +40,9 @@ type AddClassScheduleResponse = WrittenClassSchedulesInfo
 
 // AddClassSchedule calls POST /public/v{version}/class/addclassschedule.
 func (c *Client) AddClassSchedule(ctx context.Context, req *AddClassScheduleRequest) (*AddClassScheduleResponse, error) {
+	if req == nil {
+		req = &AddClassScheduleRequest{}
+	}
 	out := &AddClassScheduleResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -72,6 +75,9 @@ type AddClientToClassRequest struct {
 
 // AddClientToClass calls POST /public/v{version}/class/addclienttoclass.
 func (c *Client) AddClientToClass(ctx context.Context, req *AddClientToClassRequest) (*AddClientToClassResponse, error) {
+	if req == nil {
+		req = &AddClientToClassRequest{}
+	}
 	out := &AddClientToClassResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -96,6 +102,9 @@ type CancelSingleClassRequest struct {
 
 // CancelSingleClass calls POST /public/v{version}/class/cancelsingleclass.
 func (c *Client) CancelSingleClass(ctx context.Context, req *CancelSingleClassRequest) (*CancelSingleClassResponse, error) {
+	if req == nil {
+		req = &CancelSingleClassRequest{}
+	}
 	out := &CancelSingleClassResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -125,6 +134,9 @@ type GetClassDescriptionsRequest struct {
 
 // GetClassDescriptions calls GET /public/v{version}/class/classdescriptions.
 func (c *Client) GetClassDescriptions(ctx context.Context, req *GetClassDescriptionsRequest) (*GetClassDescriptionsResponse, error) {
+	if req == nil {
+		req = &GetClassDescriptionsRequest{}
+	}
 	out := &GetClassDescriptionsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -153,6 +165,9 @@ type GetClassSchedulesRequest struct {
 
 // GetClassSchedules calls GET /public/v{version}/class/classschedules.
 func (c *Client) GetClassSchedules(ctx context.Context, req *GetClassSchedulesRequest) (*GetClassSchedulesResponse, error) {
+	if req == nil {
+		req = &GetClassSchedulesRequest{}
+	}
 	out := &GetClassSchedulesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -175,6 +190,9 @@ type GetClassVisitsRequest struct {
 
 // GetClassVisits calls GET /public/v{version}/class/classvisits.
 func (c *Client) GetClassVisits(ctx context.Context, req *GetClassVisitsRequest) (*GetClassVisitsResponse, error) {
+	if req == nil {
+		req = &GetClassVisitsRequest{}
+	}
 	out := &GetClassVisitsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -211,6 +229,9 @@ type GetClassesRequest struct {
 
 // GetClasses calls GET /public/v{version}/class/classes.
 func (c *Client) GetClasses(ctx context.Context, req *GetClassesRequest) (*GetClassesResponse, error) {
+	if req == nil {
+		req = &GetClassesRequest{}
+	}
 	out := &GetClassesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -242,6 +263,9 @@ type GetCoursesResponse = GetCoursesReponse
 
 // GetCourses calls GET /public/v{version}/class/courses.
 func (c *Client) GetCourses(ctx context.Context, req *GetCoursesRequest) (*GetCoursesResponse, error) {
+	if req == nil {
+		req = &GetCoursesRequest{}
+	}
 	out := &GetCoursesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -267,6 +291,9 @@ type GetSemestersRequest struct {
 
 // GetSemesters calls GET /public/v{version}/class/semesters.
 func (c *Client) GetSemesters(ctx context.Context, req *GetSemestersRequest) (*GetSemestersResponse, error) {
+	if req == nil {
+		req = &GetSemestersRequest{}
+	}
 	out := &GetSemestersResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -293,6 +320,9 @@ type GetWaitlistEntriesRequest struct {
 
 // GetWaitlistEntries calls GET /public/v{version}/class/waitlistentries.
 func (c *Client) GetWaitlistEntries(ctx context.Context, req *GetWaitlistEntriesRequest) (*GetWaitlistEntriesResponse, error) {
+	if req == nil {
+		req = &GetWaitlistEntriesRequest{}
+	}
 	out := &GetWaitlistEntriesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -319,6 +349,9 @@ type RemoveClientFromClassRequest struct {
 
 // RemoveClientFromClass calls POST /public/v{version}/class/removeclientfromclass.
 func (c *Client) RemoveClientFromClass(ctx context.Context, req *RemoveClientFromClassRequest) (*RemoveClientFromClassResponse, error) {
+	if req == nil {
+		req = &RemoveClientFromClassRequest{}
+	}
 	out := &RemoveClientFromClassResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -345,6 +378,9 @@ type RemoveClientsFromClassesRequest struct {
 
 // RemoveClientsFromClasses calls POST /public/v{version}/class/removeclientsfromclasses.
 func (c *Client) RemoveClientsFromClasses(ctx context.Context, req *RemoveClientsFromClassesRequest) (*RemoveClientsFromClassesResponse, error) {
+	if req == nil {
+		req = &RemoveClientsFromClassesRequest{}
+	}
 	out := &RemoveClientsFromClassesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -366,6 +402,9 @@ type RemoveFromWaitlistRequest struct {
 
 // RemoveFromWaitlist calls POST /public/v{version}/class/removefromwaitlist.
 func (c *Client) RemoveFromWaitlist(ctx context.Context, req *RemoveFromWaitlistRequest) (*RemoveFromWaitlistResponse, error) {
+	if req == nil {
+		req = &RemoveFromWaitlistRequest{}
+	}
 	out := &RemoveFromWaitlistResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -391,6 +430,9 @@ type SubstituteClassTeacherRequest struct {
 
 // SubstituteClassTeacher calls POST /public/v{version}/class/substituteclassteacher.
 func (c *Client) SubstituteClassTeacher(ctx context.Context, req *SubstituteClassTeacherRequest) (*SubstituteClassTeacherResponse, error) {
+	if req == nil {
+		req = &SubstituteClassTeacherRequest{}
+	}
 	out := &SubstituteClassTeacherResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -416,6 +458,9 @@ type UpdateClassResponse struct{}
 
 // UpdateClass calls POST /public/v{version}/class/updateclass.
 func (c *Client) UpdateClass(ctx context.Context, req *UpdateClassRequest) (*UpdateClassResponse, error) {
+	if req == nil {
+		req = &UpdateClassRequest{}
+	}
 	out := &UpdateClassResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -462,6 +507,9 @@ type UpdateClassScheduleResponse = WrittenClassSchedulesInfo
 
 // UpdateClassSchedule calls POST /public/v{version}/class/updateclassschedule.
 func (c *Client) UpdateClassSchedule(ctx context.Context, req *UpdateClassScheduleRequest) (*UpdateClassScheduleResponse, error) {
+	if req == nil {
+		req = &UpdateClassScheduleRequest{}
+	}
 	out := &UpdateClassScheduleResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -487,6 +535,9 @@ type UpdateClassScheduleNotesResponse struct{}
 
 // UpdateClassScheduleNotes calls PATCH /public/v{version}/class/updateclassschedulenotes/{classScheduleId}.
 func (c *Client) UpdateClassScheduleNotes(ctx context.Context, req *UpdateClassScheduleNotesRequest) (*UpdateClassScheduleNotesResponse, error) {
+	if req == nil {
+		req = &UpdateClassScheduleNotesRequest{}
+	}
 	out := &UpdateClassScheduleNotesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "PATCH",

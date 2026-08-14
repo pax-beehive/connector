@@ -16,7 +16,6 @@ type Config struct {
 	Package          string            `yaml:"package"`
 	Spec             string            `yaml:"spec"`
 	OutDir           string            `yaml:"out_dir"`
-	BaseURL          string            `yaml:"base_url"`
 	DateTimeType     string            `yaml:"datetime_type"` // e.g. connector.DateTime; empty means time.Time
 	SkipHeaders      []string          `yaml:"skip_headers"`
 	QueryPrefixStrip string            `yaml:"query_prefix_strip"`
@@ -37,8 +36,8 @@ func LoadConfig(path string) (*Config, error) {
 	if err := yaml.Unmarshal(data, cfg); err != nil {
 		return nil, err
 	}
-	if cfg.Package == "" || cfg.Spec == "" || cfg.BaseURL == "" {
-		return nil, errors.New("genlib: package, spec and base_url are required")
+	if cfg.Package == "" || cfg.Spec == "" {
+		return nil, errors.New("genlib: package and spec are required")
 	}
 	dir := filepath.Dir(path)
 	cfg.Spec = filepath.Join(dir, cfg.Spec)

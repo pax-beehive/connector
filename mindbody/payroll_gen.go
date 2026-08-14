@@ -19,6 +19,9 @@ type GetCommissionsRequest struct {
 
 // GetCommissions calls GET /public/v{version}/payroll/commissions.
 func (c *Client) GetCommissions(ctx context.Context, req *GetCommissionsRequest) (*GetCommissionsResponse, error) {
+	if req == nil {
+		req = &GetCommissionsRequest{}
+	}
 	out := &GetCommissionsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -46,6 +49,9 @@ type GetScheduledServiceEarningsRequest struct {
 
 // GetScheduledServiceEarnings calls GET /public/v{version}/payroll/scheduledserviceearnings.
 func (c *Client) GetScheduledServiceEarnings(ctx context.Context, req *GetScheduledServiceEarningsRequest) (*GetScheduledServiceEarningsResponse, error) {
+	if req == nil {
+		req = &GetScheduledServiceEarningsRequest{}
+	}
 	out := &GetScheduledServiceEarningsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -71,6 +77,9 @@ type GetTimeCardsRequest struct {
 
 // GetTimeCards calls GET /public/v{version}/payroll/timecards.
 func (c *Client) GetTimeCards(ctx context.Context, req *GetTimeCardsRequest) (*GetTimeCardsResponse, error) {
+	if req == nil {
+		req = &GetTimeCardsRequest{}
+	}
 	out := &GetTimeCardsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -96,6 +105,9 @@ type GetTipsRequest struct {
 
 // GetTips calls GET /public/v{version}/payroll/tips.
 func (c *Client) GetTips(ctx context.Context, req *GetTipsRequest) (*GetTipsResponse, error) {
+	if req == nil {
+		req = &GetTipsRequest{}
+	}
 	out := &GetTipsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",

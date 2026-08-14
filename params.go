@@ -104,7 +104,9 @@ func formatValue(v reflect.Value) (string, error) {
 		return v.String(), nil
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return strconv.FormatInt(v.Int(), 10), nil
-	case reflect.Float32, reflect.Float64:
+	case reflect.Float32:
+		return strconv.FormatFloat(v.Float(), 'f', -1, 32), nil
+	case reflect.Float64:
 		return strconv.FormatFloat(v.Float(), 'f', -1, 64), nil
 	case reflect.Bool:
 		return strconv.FormatBool(v.Bool()), nil

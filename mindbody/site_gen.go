@@ -25,6 +25,9 @@ type AddClientIndexResponse = AddSiteClientIndexResponse
 
 // AddClientIndex calls POST /public/v{version}/site/addclientindex.
 func (c *Client) AddClientIndex(ctx context.Context, req *AddClientIndexRequest) (*AddClientIndexResponse, error) {
+	if req == nil {
+		req = &AddClientIndexRequest{}
+	}
 	out := &AddClientIndexResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -56,6 +59,9 @@ type AddPromoCodeRequest struct {
 
 // AddPromoCode calls POST /public/v{version}/site/addpromocode.
 func (c *Client) AddPromoCode(ctx context.Context, req *AddPromoCodeRequest) (*AddPromoCodeResponse, error) {
+	if req == nil {
+		req = &AddPromoCodeRequest{}
+	}
 	out := &AddPromoCodeResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -80,6 +86,9 @@ type DeactivatePromoCodeResponse = map[string]any
 
 // DeactivatePromoCode calls POST /public/v{version}/site/deactivatepromocode.
 func (c *Client) DeactivatePromoCode(ctx context.Context, req *DeactivatePromoCodeRequest) (*DeactivatePromoCodeResponse, error) {
+	if req == nil {
+		req = &DeactivatePromoCodeRequest{}
+	}
 	out := &DeactivatePromoCodeResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -100,6 +109,9 @@ type GetActivationCodeRequest struct {
 
 // GetActivationCode calls GET /public/v{version}/site/activationcode.
 func (c *Client) GetActivationCode(ctx context.Context, req *GetActivationCodeRequest) (*GetActivationCodeResponse, error) {
+	if req == nil {
+		req = &GetActivationCodeRequest{}
+	}
 	out := &GetActivationCodeResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -125,6 +137,9 @@ type GetCategoriesRequest struct {
 
 // GetCategories calls GET /public/v{version}/site/categories.
 func (c *Client) GetCategories(ctx context.Context, req *GetCategoriesRequest) (*GetCategoriesResponse, error) {
+	if req == nil {
+		req = &GetCategoriesRequest{}
+	}
 	out := &GetCategoriesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -144,6 +159,9 @@ type GetGendersRequest struct {
 
 // GetGenders calls GET /public/v{version}/site/genders.
 func (c *Client) GetGenders(ctx context.Context, req *GetGendersRequest) (*GetGendersResponse, error) {
+	if req == nil {
+		req = &GetGendersRequest{}
+	}
 	out := &GetGendersResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -163,6 +181,9 @@ type GetLiabilityWaiverRequest struct {
 
 // GetLiabilityWaiver calls GET /public/v{version}/site/liabilitywaiver.
 func (c *Client) GetLiabilityWaiver(ctx context.Context, req *GetLiabilityWaiverRequest) (*GetLiabilityWaiverResponse, error) {
+	if req == nil {
+		req = &GetLiabilityWaiverRequest{}
+	}
 	out := &GetLiabilityWaiverResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -184,6 +205,9 @@ type GetLocationsRequest struct {
 
 // GetLocations calls GET /public/v{version}/site/locations.
 func (c *Client) GetLocations(ctx context.Context, req *GetLocationsRequest) (*GetLocationsResponse, error) {
+	if req == nil {
+		req = &GetLocationsRequest{}
+	}
 	out := &GetLocationsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -204,6 +228,9 @@ type GetMembershipsRequest struct {
 
 // GetMemberships calls GET /public/v{version}/site/memberships.
 func (c *Client) GetMemberships(ctx context.Context, req *GetMembershipsRequest) (*GetMembershipsResponse, error) {
+	if req == nil {
+		req = &GetMembershipsRequest{}
+	}
 	out := &GetMembershipsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -224,6 +251,9 @@ type GetMobileProvidersRequest struct {
 
 // GetMobileProviders calls GET /public/v{version}/site/mobileproviders.
 func (c *Client) GetMobileProviders(ctx context.Context, req *GetMobileProvidersRequest) (*GetMobileProvidersResponse, error) {
+	if req == nil {
+		req = &GetMobileProvidersRequest{}
+	}
 	out := &GetMobileProvidersResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -244,6 +274,9 @@ type GetPaymentTypesRequest struct {
 
 // GetPaymentTypes calls GET /public/v{version}/site/paymenttypes.
 func (c *Client) GetPaymentTypes(ctx context.Context, req *GetPaymentTypesRequest) (*GetPaymentTypesResponse, error) {
+	if req == nil {
+		req = &GetPaymentTypesRequest{}
+	}
 	out := &GetPaymentTypesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -268,6 +301,9 @@ type GetProgramsRequest struct {
 
 // GetPrograms calls GET /public/v{version}/site/programs.
 func (c *Client) GetPrograms(ctx context.Context, req *GetProgramsRequest) (*GetProgramsResponse, error) {
+	if req == nil {
+		req = &GetProgramsRequest{}
+	}
 	out := &GetProgramsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -294,6 +330,9 @@ type GetPromoCodesRequest struct {
 
 // GetPromoCodes calls GET /public/v{version}/site/promocodes.
 func (c *Client) GetPromoCodes(ctx context.Context, req *GetPromoCodesRequest) (*GetPromoCodesResponse, error) {
+	if req == nil {
+		req = &GetPromoCodesRequest{}
+	}
 	out := &GetPromoCodesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -314,6 +353,9 @@ type GetProspectStagesRequest struct {
 
 // GetProspectStages calls GET /public/v{version}/site/prospectstages.
 func (c *Client) GetProspectStages(ctx context.Context, req *GetProspectStagesRequest) (*GetProspectStagesResponse, error) {
+	if req == nil {
+		req = &GetProspectStagesRequest{}
+	}
 	out := &GetProspectStagesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -336,6 +378,9 @@ type GetRelationshipsRequest struct {
 
 // GetRelationships calls GET /public/v{version}/site/relationships.
 func (c *Client) GetRelationships(ctx context.Context, req *GetRelationshipsRequest) (*GetRelationshipsResponse, error) {
+	if req == nil {
+		req = &GetRelationshipsRequest{}
+	}
 	out := &GetRelationshipsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -363,6 +408,9 @@ type GetResourceAvailabilitiesRequest struct {
 
 // GetResourceAvailabilities calls GET /public/v{version}/site/resourceavailabilities.
 func (c *Client) GetResourceAvailabilities(ctx context.Context, req *GetResourceAvailabilitiesRequest) (*GetResourceAvailabilitiesResponse, error) {
+	if req == nil {
+		req = &GetResourceAvailabilitiesRequest{}
+	}
 	out := &GetResourceAvailabilitiesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -392,6 +440,9 @@ type GetResourcesResponse = map[string]any
 
 // GetResources calls GET /public/v{version}/site/resources.
 func (c *Client) GetResources(ctx context.Context, req *GetResourcesRequest) (*GetResourcesResponse, error) {
+	if req == nil {
+		req = &GetResourcesRequest{}
+	}
 	out := &GetResourcesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -415,6 +466,9 @@ type GetSessionTypesRequest struct {
 
 // GetSessionTypes calls GET /public/v{version}/site/sessiontypes.
 func (c *Client) GetSessionTypes(ctx context.Context, req *GetSessionTypesRequest) (*GetSessionTypesResponse, error) {
+	if req == nil {
+		req = &GetSessionTypesRequest{}
+	}
 	out := &GetSessionTypesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -439,6 +493,9 @@ type GetSitesRequest struct {
 
 // GetSites calls GET /public/v{version}/site/sites.
 func (c *Client) GetSites(ctx context.Context, req *GetSitesRequest) (*GetSitesResponse, error) {
+	if req == nil {
+		req = &GetSitesRequest{}
+	}
 	out := &GetSitesResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -471,6 +528,9 @@ type UpdateClientIndexResponse = UpdateSiteClientIndexResponse
 
 // UpdateClientIndex calls POST /public/v{version}/site/updateclientindex.
 func (c *Client) UpdateClientIndex(ctx context.Context, req *UpdateClientIndexRequest) (*UpdateClientIndexResponse, error) {
+	if req == nil {
+		req = &UpdateClientIndexRequest{}
+	}
 	out := &UpdateClientIndexResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",

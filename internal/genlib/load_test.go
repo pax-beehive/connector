@@ -8,7 +8,7 @@ import (
 
 func TestLoadConfig(t *testing.T) {
 	dir := t.TempDir()
-	yml := []byte("package: mindbody\nspec: spec/swagger.json\nout_dir: .\nbase_url: https://x\nquery_prefix_strip: \"request.\"\nskip_headers: [authorization]\npinned_path_params: {version: \"6\"}\n")
+	yml := []byte("package: mindbody\nspec: spec/swagger.json\nout_dir: .\nquery_prefix_strip: \"request.\"\nskip_headers: [authorization]\npinned_path_params: {version: \"6\"}\n")
 	path := filepath.Join(dir, "gen.yaml")
 	if err := os.WriteFile(path, yml, 0o644); err != nil {
 		t.Fatal(err)
@@ -32,7 +32,7 @@ func TestLoadConfigValidates(t *testing.T) {
 		t.Fatal(err)
 	}
 	if _, err := LoadConfig(path); err == nil {
-		t.Fatal("expected validation error for missing spec/base_url")
+		t.Fatal("expected validation error for missing spec")
 	}
 	if _, err := LoadConfig(filepath.Join(dir, "missing.yaml")); err == nil {
 		t.Fatal("expected error for missing file")

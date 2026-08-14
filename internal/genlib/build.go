@@ -372,7 +372,6 @@ func (b *builder) stringGoType(s *openapi3.Schema) string {
 	case "byte":
 		return "[]byte"
 	case "date-time":
-		b.ir.UsesDateTime = true
 		if b.cfg.DateTimeType != "" {
 			return "*" + b.cfg.DateTimeType
 		}
@@ -475,7 +474,6 @@ func (b *builder) finish() {
 	}
 	sort.Strings(b.ir.Tags)
 	sort.Slice(b.ir.Aliases, func(i, j int) bool { return b.ir.Aliases[i].Name < b.ir.Aliases[j].Name })
-	b.ir.UsesConnectorImport = strings.Contains(b.cfg.DateTimeType, "connector.")
 }
 
 // checkTypeNames verifies every generated type name is unique.

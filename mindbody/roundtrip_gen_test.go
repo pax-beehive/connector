@@ -11,11 +11,12 @@ import (
 )
 
 type roundtripCase struct {
-	name   string
-	method string
-	path   string
-	resp   string
-	invoke func(ctx context.Context, c *Client) (any, error)
+	name      string
+	method    string
+	path      string
+	resp      string
+	invoke    func(ctx context.Context, c *Client) (any, error)
+	invokeNil func(ctx context.Context, c *Client) (any, error)
 }
 
 var roundtripCases = []roundtripCase{
@@ -27,6 +28,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddAppointment(ctx, &AddAppointmentRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddAppointment(ctx, nil)
+		},
 	},
 	{
 		name:   "AddAppointmentAddOn",
@@ -35,6 +39,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddAppointmentAddOn(ctx, &AddAppointmentAddOnRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddAppointmentAddOn(ctx, nil)
 		},
 	},
 	{
@@ -45,6 +52,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddAvailabilities(ctx, &AddAvailabilitiesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddAvailabilities(ctx, nil)
+		},
 	},
 	{
 		name:   "AddMultipleAppointments",
@@ -53,6 +63,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddMultipleAppointments(ctx, &AddMultipleAppointmentsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddMultipleAppointments(ctx, nil)
 		},
 	},
 	{
@@ -63,6 +76,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.DeleteAppointmentAddOn(ctx, &DeleteAppointmentAddOnRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.DeleteAppointmentAddOn(ctx, nil)
+		},
 	},
 	{
 		name:   "DeleteAvailability",
@@ -71,6 +87,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.DeleteAvailability(ctx, &DeleteAvailabilityRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.DeleteAvailability(ctx, nil)
 		},
 	},
 	{
@@ -81,6 +100,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetActiveSessionTimes(ctx, &GetActiveSessionTimesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetActiveSessionTimes(ctx, nil)
+		},
 	},
 	{
 		name:   "GetAddOns",
@@ -89,6 +111,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetAddOns(ctx, &GetAddOnsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetAddOns(ctx, nil)
 		},
 	},
 	{
@@ -99,6 +124,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetAppointmentOptions(ctx, &GetAppointmentOptionsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetAppointmentOptions(ctx, nil)
+		},
 	},
 	{
 		name:   "GetAvailableDates",
@@ -107,6 +135,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetAvailableDates(ctx, &GetAvailableDatesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetAvailableDates(ctx, nil)
 		},
 	},
 	{
@@ -117,6 +148,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetBookableItems(ctx, &GetBookableItemsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetBookableItems(ctx, nil)
+		},
 	},
 	{
 		name:   "GetScheduleItems",
@@ -125,6 +159,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetScheduleItems(ctx, &GetScheduleItemsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetScheduleItems(ctx, nil)
 		},
 	},
 	{
@@ -135,6 +172,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetStaffAppointments(ctx, &GetStaffAppointmentsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetStaffAppointments(ctx, nil)
+		},
 	},
 	{
 		name:   "GetUnavailabilities",
@@ -143,6 +183,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetUnavailabilities(ctx, &GetUnavailabilitiesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetUnavailabilities(ctx, nil)
 		},
 	},
 	{
@@ -153,6 +196,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.RemoveAppointmentFromWaitlist(ctx, &RemoveAppointmentFromWaitlistRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.RemoveAppointmentFromWaitlist(ctx, nil)
+		},
 	},
 	{
 		name:   "UpdateAppointment",
@@ -161,6 +207,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateAppointment(ctx, &UpdateAppointmentRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateAppointment(ctx, nil)
 		},
 	},
 	{
@@ -171,6 +220,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateAvailability(ctx, &UpdateAvailabilityRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateAvailability(ctx, nil)
+		},
 	},
 	{
 		name:   "AddClassSchedule",
@@ -179,6 +231,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddClassSchedule(ctx, &AddClassScheduleRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddClassSchedule(ctx, nil)
 		},
 	},
 	{
@@ -189,6 +244,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddClientToClass(ctx, &AddClientToClassRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddClientToClass(ctx, nil)
+		},
 	},
 	{
 		name:   "CancelSingleClass",
@@ -197,6 +255,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.CancelSingleClass(ctx, &CancelSingleClassRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.CancelSingleClass(ctx, nil)
 		},
 	},
 	{
@@ -207,6 +268,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClassDescriptions(ctx, &GetClassDescriptionsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClassDescriptions(ctx, nil)
+		},
 	},
 	{
 		name:   "GetClassSchedules",
@@ -215,6 +279,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClassSchedules(ctx, &GetClassSchedulesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClassSchedules(ctx, nil)
 		},
 	},
 	{
@@ -225,6 +292,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClassVisits(ctx, &GetClassVisitsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClassVisits(ctx, nil)
+		},
 	},
 	{
 		name:   "GetClasses",
@@ -233,6 +303,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClasses(ctx, &GetClassesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClasses(ctx, nil)
 		},
 	},
 	{
@@ -243,6 +316,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetCourses(ctx, &GetCoursesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetCourses(ctx, nil)
+		},
 	},
 	{
 		name:   "GetSemesters",
@@ -251,6 +327,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetSemesters(ctx, &GetSemestersRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetSemesters(ctx, nil)
 		},
 	},
 	{
@@ -261,6 +340,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetWaitlistEntries(ctx, &GetWaitlistEntriesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetWaitlistEntries(ctx, nil)
+		},
 	},
 	{
 		name:   "RemoveClientFromClass",
@@ -269,6 +351,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.RemoveClientFromClass(ctx, &RemoveClientFromClassRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.RemoveClientFromClass(ctx, nil)
 		},
 	},
 	{
@@ -279,6 +364,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.RemoveClientsFromClasses(ctx, &RemoveClientsFromClassesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.RemoveClientsFromClasses(ctx, nil)
+		},
 	},
 	{
 		name:   "RemoveFromWaitlist",
@@ -287,6 +375,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.RemoveFromWaitlist(ctx, &RemoveFromWaitlistRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.RemoveFromWaitlist(ctx, nil)
 		},
 	},
 	{
@@ -297,6 +388,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.SubstituteClassTeacher(ctx, &SubstituteClassTeacherRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.SubstituteClassTeacher(ctx, nil)
+		},
 	},
 	{
 		name:   "UpdateClass",
@@ -305,6 +399,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateClass(ctx, &UpdateClassRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateClass(ctx, nil)
 		},
 	},
 	{
@@ -315,6 +412,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateClassSchedule(ctx, &UpdateClassScheduleRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateClassSchedule(ctx, nil)
+		},
 	},
 	{
 		name:   "UpdateClassScheduleNotes",
@@ -323,6 +423,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateClassScheduleNotes(ctx, &UpdateClassScheduleNotesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateClassScheduleNotes(ctx, nil)
 		},
 	},
 	{
@@ -333,6 +436,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddArrival(ctx, &AddArrivalRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddArrival(ctx, nil)
+		},
 	},
 	{
 		name:   "AddClient",
@@ -341,6 +447,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddClient(ctx, &AddClientRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddClient(ctx, nil)
 		},
 	},
 	{
@@ -351,6 +460,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddClientDirectDebitInfo(ctx, &AddClientDirectDebitInfoRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddClientDirectDebitInfo(ctx, nil)
+		},
 	},
 	{
 		name:   "AddContactLog",
@@ -359,6 +471,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddContactLog(ctx, &AddContactLogRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddContactLog(ctx, nil)
 		},
 	},
 	{
@@ -369,6 +484,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddFormulaNote(ctx, &AddFormulaNoteRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddFormulaNote(ctx, nil)
+		},
 	},
 	{
 		name:   "DeleteClientFormulaNote",
@@ -377,6 +495,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.DeleteClientFormulaNote(ctx, &DeleteClientFormulaNoteRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.DeleteClientFormulaNote(ctx, nil)
 		},
 	},
 	{
@@ -387,6 +508,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.DeleteContactLog(ctx, &DeleteContactLogRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.DeleteContactLog(ctx, nil)
+		},
 	},
 	{
 		name:   "DeleteDirectDebitInfo",
@@ -395,6 +519,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.DeleteDirectDebitInfo(ctx, &DeleteDirectDebitInfoRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.DeleteDirectDebitInfo(ctx, nil)
 		},
 	},
 	{
@@ -405,6 +532,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetActiveClientMemberships(ctx, &GetActiveClientMembershipsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetActiveClientMemberships(ctx, nil)
+		},
 	},
 	{
 		name:   "GetActiveClientsMemberships",
@@ -413,6 +543,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetActiveClientsMemberships(ctx, &GetActiveClientsMembershipsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetActiveClientsMemberships(ctx, nil)
 		},
 	},
 	{
@@ -423,6 +556,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClientAccountBalances(ctx, &GetClientAccountBalancesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClientAccountBalances(ctx, nil)
+		},
 	},
 	{
 		name:   "GetClientCompleteInfo",
@@ -431,6 +567,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClientCompleteInfo(ctx, &GetClientCompleteInfoRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClientCompleteInfo(ctx, nil)
 		},
 	},
 	{
@@ -441,6 +580,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClientContracts(ctx, &GetClientContractsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClientContracts(ctx, nil)
+		},
 	},
 	{
 		name:   "GetClientDuplicates",
@@ -449,6 +591,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClientDuplicates(ctx, &GetClientDuplicatesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClientDuplicates(ctx, nil)
 		},
 	},
 	{
@@ -459,6 +604,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClientFormulaNotes(ctx, &GetClientFormulaNotesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClientFormulaNotes(ctx, nil)
+		},
 	},
 	{
 		name:   "GetClientIndexes",
@@ -467,6 +615,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClientIndexes(ctx, &GetClientIndexesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClientIndexes(ctx, nil)
 		},
 	},
 	{
@@ -477,6 +628,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClientPurchases(ctx, &GetClientPurchasesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClientPurchases(ctx, nil)
+		},
 	},
 	{
 		name:   "GetClientReferralTypes",
@@ -485,6 +639,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClientReferralTypes(ctx, &GetClientReferralTypesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClientReferralTypes(ctx, nil)
 		},
 	},
 	{
@@ -495,6 +652,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClientRewards(ctx, &GetClientRewardsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClientRewards(ctx, nil)
+		},
 	},
 	{
 		name:   "GetClientSchedule",
@@ -503,6 +663,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClientSchedule(ctx, &GetClientScheduleRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClientSchedule(ctx, nil)
 		},
 	},
 	{
@@ -513,6 +676,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClientServices(ctx, &GetClientServicesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClientServices(ctx, nil)
+		},
 	},
 	{
 		name:   "GetClientVisits",
@@ -521,6 +687,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClientVisits(ctx, &GetClientVisitsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClientVisits(ctx, nil)
 		},
 	},
 	{
@@ -531,6 +700,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClients(ctx, &GetClientsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClients(ctx, nil)
+		},
 	},
 	{
 		name:   "GetContactLogTypes",
@@ -539,6 +711,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetContactLogTypes(ctx, &GetContactLogTypesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetContactLogTypes(ctx, nil)
 		},
 	},
 	{
@@ -549,6 +724,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetContactLogs(ctx, &GetContactLogsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetContactLogs(ctx, nil)
+		},
 	},
 	{
 		name:   "GetCrossRegionalClientAssociations",
@@ -557,6 +735,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetCrossRegionalClientAssociations(ctx, &GetCrossRegionalClientAssociationsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetCrossRegionalClientAssociations(ctx, nil)
 		},
 	},
 	{
@@ -567,6 +748,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetCustomClientFields(ctx, &GetCustomClientFieldsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetCustomClientFields(ctx, nil)
+		},
 	},
 	{
 		name:   "GetDirectDebitInfo",
@@ -575,6 +759,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetDirectDebitInfo(ctx, &GetDirectDebitInfoRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetDirectDebitInfo(ctx, nil)
 		},
 	},
 	{
@@ -585,6 +772,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetRequiredClientFields(ctx, &GetRequiredClientFieldsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetRequiredClientFields(ctx, nil)
+		},
 	},
 	{
 		name:   "MergeClient",
@@ -593,6 +783,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.MergeClient(ctx, &MergeClientRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.MergeClient(ctx, nil)
 		},
 	},
 	{
@@ -603,6 +796,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.SendAutoEmail(ctx, &SendAutoEmailRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.SendAutoEmail(ctx, nil)
+		},
 	},
 	{
 		name:   "SendPasswordResetEmail",
@@ -611,6 +807,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.SendPasswordResetEmail(ctx, &SendPasswordResetEmailRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.SendPasswordResetEmail(ctx, nil)
 		},
 	},
 	{
@@ -621,6 +820,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.SuspendContract(ctx, &SuspendContractRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.SuspendContract(ctx, nil)
+		},
 	},
 	{
 		name:   "TerminateContract",
@@ -629,6 +831,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.TerminateContract(ctx, &TerminateContractRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.TerminateContract(ctx, nil)
 		},
 	},
 	{
@@ -639,6 +844,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateClient(ctx, &UpdateClientRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateClient(ctx, nil)
+		},
 	},
 	{
 		name:   "UpdateClientContractAutopays",
@@ -647,6 +855,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateClientContractAutopays(ctx, &UpdateClientContractAutopaysRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateClientContractAutopays(ctx, nil)
 		},
 	},
 	{
@@ -657,6 +868,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateClientRewards(ctx, &UpdateClientRewardsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateClientRewards(ctx, nil)
+		},
 	},
 	{
 		name:   "UpdateClientService",
@@ -665,6 +879,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateClientService(ctx, &UpdateClientServiceRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateClientService(ctx, nil)
 		},
 	},
 	{
@@ -675,6 +892,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateClientVisit(ctx, &UpdateClientVisitRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateClientVisit(ctx, nil)
+		},
 	},
 	{
 		name:   "UpdateContactLog",
@@ -683,6 +903,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateContactLog(ctx, &UpdateContactLogRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateContactLog(ctx, nil)
 		},
 	},
 	{
@@ -693,6 +916,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UploadClientDocument(ctx, &UploadClientDocumentRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UploadClientDocument(ctx, nil)
+		},
 	},
 	{
 		name:   "UploadClientPhoto",
@@ -701,6 +927,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UploadClientPhoto(ctx, &UploadClientPhotoRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UploadClientPhoto(ctx, nil)
 		},
 	},
 	{
@@ -711,6 +940,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.CopyCreditCard(ctx, &CopyCreditCardRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.CopyCreditCard(ctx, nil)
+		},
 	},
 	{
 		name:   "AddClientToEnrollment",
@@ -719,6 +951,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddClientToEnrollment(ctx, &AddClientToEnrollmentRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddClientToEnrollment(ctx, nil)
 		},
 	},
 	{
@@ -729,6 +964,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddEnrollmentSchedule(ctx, &AddEnrollmentScheduleRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddEnrollmentSchedule(ctx, nil)
+		},
 	},
 	{
 		name:   "GetEnrollments",
@@ -737,6 +975,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetEnrollments(ctx, &GetEnrollmentsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetEnrollments(ctx, nil)
 		},
 	},
 	{
@@ -747,6 +988,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateEnrollmentSchedule(ctx, &UpdateEnrollmentScheduleRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateEnrollmentSchedule(ctx, nil)
+		},
 	},
 	{
 		name:   "GetCommissions",
@@ -755,6 +999,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetCommissions(ctx, &GetCommissionsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetCommissions(ctx, nil)
 		},
 	},
 	{
@@ -765,6 +1012,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetScheduledServiceEarnings(ctx, &GetScheduledServiceEarningsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetScheduledServiceEarnings(ctx, nil)
+		},
 	},
 	{
 		name:   "GetTimeCards",
@@ -773,6 +1023,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetTimeCards(ctx, &GetTimeCardsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetTimeCards(ctx, nil)
 		},
 	},
 	{
@@ -783,6 +1036,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetTips(ctx, &GetTipsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetTips(ctx, nil)
+		},
 	},
 	{
 		name:   "CreateReservation",
@@ -791,6 +1047,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.CreateReservation(ctx, &CreateReservationRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.CreateReservation(ctx, nil)
 		},
 	},
 	{
@@ -801,6 +1060,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.DeleteReservation(ctx, &DeleteReservationRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.DeleteReservation(ctx, nil)
+		},
 	},
 	{
 		name:   "GetClass",
@@ -809,6 +1071,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClass(ctx, &GetClassRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClass(ctx, nil)
 		},
 	},
 	{
@@ -819,6 +1084,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetClassList(ctx, &GetClassListRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetClassList(ctx, nil)
+		},
 	},
 	{
 		name:   "GetReservation",
@@ -827,6 +1095,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetReservation(ctx, &GetReservationRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetReservation(ctx, nil)
 		},
 	},
 	{
@@ -837,6 +1108,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateReservation(ctx, &UpdateReservationRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateReservation(ctx, nil)
+		},
 	},
 	{
 		name:   "UpdatePricingOption",
@@ -845,6 +1119,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdatePricingOption(ctx, &UpdatePricingOptionRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdatePricingOption(ctx, nil)
 		},
 	},
 	{
@@ -855,6 +1132,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.CheckoutShoppingCart(ctx, &CheckoutShoppingCartRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.CheckoutShoppingCart(ctx, nil)
+		},
 	},
 	{
 		name:   "CompleteCheckoutShoppingCartUsingAlternativePayments",
@@ -863,6 +1143,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.CompleteCheckoutShoppingCartUsingAlternativePayments(ctx, &CompleteCheckoutShoppingCartUsingAlternativePaymentsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.CompleteCheckoutShoppingCartUsingAlternativePayments(ctx, nil)
 		},
 	},
 	{
@@ -873,6 +1156,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetAcceptedCardTypes(ctx, &GetAcceptedCardTypesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetAcceptedCardTypes(ctx, nil)
+		},
 	},
 	{
 		name:   "GetAlternativePaymentMethods",
@@ -881,6 +1167,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetAlternativePaymentMethods(ctx, &GetAlternativePaymentMethodsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetAlternativePaymentMethods(ctx, nil)
 		},
 	},
 	{
@@ -891,6 +1180,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetContracts(ctx, &GetContractsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetContracts(ctx, nil)
+		},
 	},
 	{
 		name:   "GetCustomPaymentMethods",
@@ -899,6 +1191,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetCustomPaymentMethods(ctx, &GetCustomPaymentMethodsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetCustomPaymentMethods(ctx, nil)
 		},
 	},
 	{
@@ -909,6 +1204,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetGiftCardBalance(ctx, &GetGiftCardBalanceRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetGiftCardBalance(ctx, nil)
+		},
 	},
 	{
 		name:   "GetGiftCards",
@@ -917,6 +1215,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetGiftCards(ctx, &GetGiftCardsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetGiftCards(ctx, nil)
 		},
 	},
 	{
@@ -927,6 +1228,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetPackages(ctx, &GetPackagesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetPackages(ctx, nil)
+		},
 	},
 	{
 		name:   "GetProducts",
@@ -935,6 +1239,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetProducts(ctx, &GetProductsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetProducts(ctx, nil)
 		},
 	},
 	{
@@ -945,6 +1252,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetProductsInventory(ctx, &GetProductsInventoryRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetProductsInventory(ctx, nil)
+		},
 	},
 	{
 		name:   "GetPurchaseContractStatus",
@@ -953,6 +1263,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetPurchaseContractStatus(ctx, &GetPurchaseContractStatusRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetPurchaseContractStatus(ctx, nil)
 		},
 	},
 	{
@@ -963,6 +1276,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetSales(ctx, &GetSalesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetSales(ctx, nil)
+		},
 	},
 	{
 		name:   "GetServices",
@@ -971,6 +1287,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetServices(ctx, &GetServicesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetServices(ctx, nil)
 		},
 	},
 	{
@@ -981,6 +1300,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetTransactions(ctx, &GetTransactionsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetTransactions(ctx, nil)
+		},
 	},
 	{
 		name:   "InitiateCheckoutShoppingCartUsingAlternativePayments",
@@ -989,6 +1311,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.InitiateCheckoutShoppingCartUsingAlternativePayments(ctx, &InitiateCheckoutShoppingCartUsingAlternativePaymentsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.InitiateCheckoutShoppingCartUsingAlternativePayments(ctx, nil)
 		},
 	},
 	{
@@ -999,6 +1324,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.InitiatePurchaseContractUsingAlternativePayments(ctx, &InitiatePurchaseContractUsingAlternativePaymentsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.InitiatePurchaseContractUsingAlternativePayments(ctx, nil)
+		},
 	},
 	{
 		name:   "PurchaseAccountCredit",
@@ -1007,6 +1335,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.PurchaseAccountCredit(ctx, &PurchaseAccountCreditRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.PurchaseAccountCredit(ctx, nil)
 		},
 	},
 	{
@@ -1017,6 +1348,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.PurchaseContract(ctx, &PurchaseContractRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.PurchaseContract(ctx, nil)
+		},
 	},
 	{
 		name:   "PurchaseGiftCard",
@@ -1025,6 +1359,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.PurchaseGiftCard(ctx, &PurchaseGiftCardRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.PurchaseGiftCard(ctx, nil)
 		},
 	},
 	{
@@ -1035,6 +1372,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.ReturnSale(ctx, &ReturnSaleRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.ReturnSale(ctx, nil)
+		},
 	},
 	{
 		name:   "UpdateProductPrice",
@@ -1043,6 +1383,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateProductPrice(ctx, &UpdateProductPriceRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateProductPrice(ctx, nil)
 		},
 	},
 	{
@@ -1053,6 +1396,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateProducts(ctx, &UpdateProductsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateProducts(ctx, nil)
+		},
 	},
 	{
 		name:   "UpdateSaleDate",
@@ -1061,6 +1407,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateSaleDate(ctx, &UpdateSaleDateRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateSaleDate(ctx, nil)
 		},
 	},
 	{
@@ -1071,6 +1420,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateServices(ctx, &UpdateServicesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateServices(ctx, nil)
+		},
 	},
 	{
 		name:   "AddClientIndex",
@@ -1079,6 +1431,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddClientIndex(ctx, &AddClientIndexRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddClientIndex(ctx, nil)
 		},
 	},
 	{
@@ -1089,6 +1444,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddPromoCode(ctx, &AddPromoCodeRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddPromoCode(ctx, nil)
+		},
 	},
 	{
 		name:   "DeactivatePromoCode",
@@ -1097,6 +1455,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.DeactivatePromoCode(ctx, &DeactivatePromoCodeRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.DeactivatePromoCode(ctx, nil)
 		},
 	},
 	{
@@ -1107,6 +1468,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetActivationCode(ctx, &GetActivationCodeRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetActivationCode(ctx, nil)
+		},
 	},
 	{
 		name:   "GetCategories",
@@ -1115,6 +1479,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetCategories(ctx, &GetCategoriesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetCategories(ctx, nil)
 		},
 	},
 	{
@@ -1125,6 +1492,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetGenders(ctx, &GetGendersRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetGenders(ctx, nil)
+		},
 	},
 	{
 		name:   "GetLiabilityWaiver",
@@ -1133,6 +1503,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetLiabilityWaiver(ctx, &GetLiabilityWaiverRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetLiabilityWaiver(ctx, nil)
 		},
 	},
 	{
@@ -1143,6 +1516,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetLocations(ctx, &GetLocationsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetLocations(ctx, nil)
+		},
 	},
 	{
 		name:   "GetMemberships",
@@ -1151,6 +1527,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetMemberships(ctx, &GetMembershipsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetMemberships(ctx, nil)
 		},
 	},
 	{
@@ -1161,6 +1540,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetMobileProviders(ctx, &GetMobileProvidersRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetMobileProviders(ctx, nil)
+		},
 	},
 	{
 		name:   "GetPaymentTypes",
@@ -1169,6 +1551,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetPaymentTypes(ctx, &GetPaymentTypesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetPaymentTypes(ctx, nil)
 		},
 	},
 	{
@@ -1179,6 +1564,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetPrograms(ctx, &GetProgramsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetPrograms(ctx, nil)
+		},
 	},
 	{
 		name:   "GetPromoCodes",
@@ -1187,6 +1575,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetPromoCodes(ctx, &GetPromoCodesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetPromoCodes(ctx, nil)
 		},
 	},
 	{
@@ -1197,6 +1588,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetProspectStages(ctx, &GetProspectStagesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetProspectStages(ctx, nil)
+		},
 	},
 	{
 		name:   "GetRelationships",
@@ -1205,6 +1599,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetRelationships(ctx, &GetRelationshipsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetRelationships(ctx, nil)
 		},
 	},
 	{
@@ -1215,6 +1612,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetResourceAvailabilities(ctx, &GetResourceAvailabilitiesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetResourceAvailabilities(ctx, nil)
+		},
 	},
 	{
 		name:   "GetResources",
@@ -1223,6 +1623,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetResources(ctx, &GetResourcesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetResources(ctx, nil)
 		},
 	},
 	{
@@ -1233,6 +1636,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetSessionTypes(ctx, &GetSessionTypesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetSessionTypes(ctx, nil)
+		},
 	},
 	{
 		name:   "GetSites",
@@ -1241,6 +1647,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetSites(ctx, &GetSitesRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetSites(ctx, nil)
 		},
 	},
 	{
@@ -1251,6 +1660,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateClientIndex(ctx, &UpdateClientIndexRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateClientIndex(ctx, nil)
+		},
 	},
 	{
 		name:   "AddStaff",
@@ -1259,6 +1671,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddStaff(ctx, &AddStaffRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddStaff(ctx, nil)
 		},
 	},
 	{
@@ -1269,6 +1684,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AddStaffAvailability(ctx, &AddStaffAvailabilityRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AddStaffAvailability(ctx, nil)
+		},
 	},
 	{
 		name:   "AssignStaffSessionType",
@@ -1277,6 +1695,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.AssignStaffSessionType(ctx, &AssignStaffSessionTypeRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.AssignStaffSessionType(ctx, nil)
 		},
 	},
 	{
@@ -1287,6 +1708,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetSalesReps(ctx, &GetSalesRepsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetSalesReps(ctx, nil)
+		},
 	},
 	{
 		name:   "GetStaff",
@@ -1295,6 +1719,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetStaff(ctx, &GetStaffRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetStaff(ctx, nil)
 		},
 	},
 	{
@@ -1305,6 +1732,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetStaffImageURL(ctx, &GetStaffImageURLRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetStaffImageURL(ctx, nil)
+		},
 	},
 	{
 		name:   "GetStaffPermissions",
@@ -1313,6 +1743,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetStaffPermissions(ctx, &GetStaffPermissionsRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetStaffPermissions(ctx, nil)
 		},
 	},
 	{
@@ -1323,6 +1756,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.GetStaffSessionTypes(ctx, &GetStaffSessionTypesRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.GetStaffSessionTypes(ctx, nil)
+		},
 	},
 	{
 		name:   "UpdateStaff",
@@ -1331,6 +1767,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateStaff(ctx, &UpdateStaffRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateStaff(ctx, nil)
 		},
 	},
 	{
@@ -1341,6 +1780,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.UpdateStaffPermissions(ctx, &UpdateStaffPermissionsRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.UpdateStaffPermissions(ctx, nil)
+		},
 	},
 	{
 		name:   "IssueToken",
@@ -1349,6 +1791,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.IssueToken(ctx, &IssueTokenRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.IssueToken(ctx, nil)
 		},
 	},
 	{
@@ -1359,6 +1804,9 @@ var roundtripCases = []roundtripCase{
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.RenewToken(ctx, &RenewTokenRequest{})
 		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.RenewToken(ctx, nil)
+		},
 	},
 	{
 		name:   "RevokeToken",
@@ -1367,6 +1815,9 @@ var roundtripCases = []roundtripCase{
 		resp:   "{}",
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.RevokeToken(ctx, &RevokeTokenRequest{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.RevokeToken(ctx, nil)
 		},
 	},
 }
@@ -1408,6 +1859,41 @@ func TestGeneratedRoundtrips(t *testing.T) {
 			}
 			if gotPath != tc.path {
 				t.Errorf("path = %q, want %q", gotPath, tc.path)
+			}
+		})
+	}
+}
+
+// TestGeneratedNilRequests verifies every method tolerates a nil request
+// without panicking (path params fall back to their zero values).
+func TestGeneratedNilRequests(t *testing.T) {
+	var mu sync.Mutex
+	var nextResp string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		defer mu.Unlock()
+		if nextResp == "" {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		_, _ = w.Write([]byte(nextResp))
+	}))
+	defer srv.Close()
+	c, err := NewClient(&Config{APIKey: "k", SiteID: "-99", BaseURL: srv.URL})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tc := range roundtripCases {
+		t.Run(tc.name, func(t *testing.T) {
+			mu.Lock()
+			nextResp = tc.resp
+			mu.Unlock()
+			out, err := tc.invokeNil(context.Background(), c)
+			if err != nil {
+				t.Fatalf("nil request: %v", err)
+			}
+			if out == nil {
+				t.Fatal("nil response")
 			}
 		})
 	}

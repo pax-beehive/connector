@@ -19,6 +19,9 @@ type CopyCreditCardRequest struct {
 
 // CopyCreditCard calls POST /public/v{version}/crossSite/copycreditcard.
 func (c *Client) CopyCreditCard(ctx context.Context, req *CopyCreditCardRequest) (*CopyCreditCardResponse, error) {
+	if req == nil {
+		req = &CopyCreditCardRequest{}
+	}
 	out := &CopyCreditCardResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",

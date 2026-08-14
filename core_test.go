@@ -71,6 +71,22 @@ func TestCoreDoSuccess(t *testing.T) {
 	}
 }
 
+func TestCoreDoMultiValueStaticHeaders(t *testing.T) {
+	var got []string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		got = r.Header.Values("X-Multi")
+		_, _ = w.Write([]byte(`{}`))
+	}))
+	defer srv.Close()
+	core := &Core{BaseURL: srv.URL, Headers: http.Header{"X-Multi": []string{"a", "b"}}}
+	if err := core.Do(context.Background(), &Call{Method: "GET", Path: "/x"}); err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 2 || got[0] != "a" || got[1] != "b" {
+		t.Errorf("multi-value header = %v, want [a b]", got)
+	}
+}
+
 func TestCoreDoAPIError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)

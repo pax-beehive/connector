@@ -24,6 +24,9 @@ type AddClientToEnrollmentResponse = ClassSchedule
 
 // AddClientToEnrollment calls POST /public/v{version}/enrollment/addclienttoenrollment.
 func (c *Client) AddClientToEnrollment(ctx context.Context, req *AddClientToEnrollmentRequest) (*AddClientToEnrollmentResponse, error) {
+	if req == nil {
+		req = &AddClientToEnrollmentRequest{}
+	}
 	out := &AddClientToEnrollmentResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -71,6 +74,9 @@ type AddEnrollmentScheduleResponse = WrittenClassSchedulesInfo
 
 // AddEnrollmentSchedule calls POST /public/v{version}/enrollment/addenrollmentschedule.
 func (c *Client) AddEnrollmentSchedule(ctx context.Context, req *AddEnrollmentScheduleRequest) (*AddEnrollmentScheduleResponse, error) {
+	if req == nil {
+		req = &AddEnrollmentScheduleRequest{}
+	}
 	out := &AddEnrollmentScheduleResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",
@@ -100,6 +106,9 @@ type GetEnrollmentsRequest struct {
 
 // GetEnrollments calls GET /public/v{version}/enrollment/enrollments.
 func (c *Client) GetEnrollments(ctx context.Context, req *GetEnrollmentsRequest) (*GetEnrollmentsResponse, error) {
+	if req == nil {
+		req = &GetEnrollmentsRequest{}
+	}
 	out := &GetEnrollmentsResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "GET",
@@ -146,6 +155,9 @@ type UpdateEnrollmentScheduleResponse = WrittenClassSchedulesInfo
 
 // UpdateEnrollmentSchedule calls POST /public/v{version}/enrollment/updateenrollmentschedule.
 func (c *Client) UpdateEnrollmentSchedule(ctx context.Context, req *UpdateEnrollmentScheduleRequest) (*UpdateEnrollmentScheduleResponse, error) {
+	if req == nil {
+		req = &UpdateEnrollmentScheduleRequest{}
+	}
 	out := &UpdateEnrollmentScheduleResponse{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "POST",

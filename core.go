@@ -109,8 +109,9 @@ func (c *Core) setHeaders(req *http.Request, params *RequestParams, hasBody bool
 		req.Header.Set("Content-Type", "application/json")
 	}
 	for k, vs := range c.Headers {
+		req.Header.Del(k)
 		for _, v := range vs {
-			req.Header.Set(k, v)
+			req.Header.Add(k, v)
 		}
 	}
 	for k, v := range params.Header {

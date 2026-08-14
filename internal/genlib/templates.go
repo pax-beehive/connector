@@ -36,6 +36,9 @@ type {{.MethodName}}Response struct{}
 {{end -}}
 // {{.MethodName}} calls {{.HTTPMethod}} {{.Path}}.
 func (c *Client) {{.MethodName}}(ctx context.Context, req *{{.MethodName}}Request) (*{{.MethodName}}Response, error) {
+	if req == nil {
+		req = &{{.MethodName}}Request{}
+	}
 	out := &{{.MethodName}}Response{}
 	err := c.core.Do(ctx, &connector.Call{
 		Method: "{{.HTTPMethod}}",
@@ -62,11 +65,12 @@ func (c *Client) {{.MethodName}}(ctx context.Context, req *{{.MethodName}}Reques
 // template.
 const roundtripTmpl = `
 type roundtripCase struct {
-	name   string
-	method string
-	path   string
-	resp   string
-	invoke func(ctx context.Context, c *Client) (any, error)
+	name      string
+	method    string
+	path      string
+	resp      string
+	invoke    func(ctx context.Context, c *Client) (any, error)
+	invokeNil func(ctx context.Context, c *Client) (any, error)
 }
 
 var roundtripCases = []roundtripCase{
@@ -78,6 +82,9 @@ var roundtripCases = []roundtripCase{
 		resp:   {{printf "%q" .RespBodyLit}},
 		invoke: func(ctx context.Context, c *Client) (any, error) {
 			return c.{{.MethodName}}(ctx, &{{.MethodName}}Request{})
+		},
+		invokeNil: func(ctx context.Context, c *Client) (any, error) {
+			return c.{{.MethodName}}(ctx, nil)
 		},
 	},
 {{- end}}
@@ -120,6 +127,41 @@ func TestGeneratedRoundtrips(t *testing.T) {
 			}
 			if gotPath != tc.path {
 				t.Errorf("path = %q, want %q", gotPath, tc.path)
+			}
+		})
+	}
+}
+
+// TestGeneratedNilRequests verifies every method tolerates a nil request
+// without panicking (path params fall back to their zero values).
+func TestGeneratedNilRequests(t *testing.T) {
+	var mu sync.Mutex
+	var nextResp string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		defer mu.Unlock()
+		if nextResp == "" {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		_, _ = w.Write([]byte(nextResp))
+	}))
+	defer srv.Close()
+	c, err := NewClient(&Config{APIKey: "k", SiteID: "-99", BaseURL: srv.URL})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tc := range roundtripCases {
+		t.Run(tc.name, func(t *testing.T) {
+			mu.Lock()
+			nextResp = tc.resp
+			mu.Unlock()
+			out, err := tc.invokeNil(context.Background(), c)
+			if err != nil {
+				t.Fatalf("nil request: %v", err)
+			}
+			if out == nil {
+				t.Fatal("nil response")
 			}
 		})
 	}
