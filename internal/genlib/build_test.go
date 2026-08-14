@@ -51,7 +51,7 @@ func fieldByName(t *testing.T, s Struct, name string) Field {
 	return Field{}
 }
 
-func TestBuildOperations(t *testing.T) {
+func TestBuildQueryAndHeaderParams(t *testing.T) {
 	ir := fixtureIR(t)
 	if len(ir.Ops) != 5 {
 		t.Fatalf("want 5 ops, got %d", len(ir.Ops))
@@ -82,7 +82,10 @@ func TestBuildOperations(t *testing.T) {
 			t.Error("authorization header must be skipped")
 		}
 	}
+}
 
+func TestBuildBodies(t *testing.T) {
+	ir := fixtureIR(t)
 	add := opByName(t, ir, "AddWidget") // space stripped from "Add Widget"
 	if add.BodyExpr != "req" {
 		t.Errorf("AddWidget.BodyExpr = %q", add.BodyExpr)
@@ -111,7 +114,10 @@ func TestBuildOperations(t *testing.T) {
 	if repl.TestPath != "/public/v6/widget/0/tags" {
 		t.Errorf("TestPath = %q", repl.TestPath)
 	}
+}
 
+func TestBuildResponseKinds(t *testing.T) {
+	ir := fixtureIR(t)
 	del := opByName(t, ir, "DeleteCardType")
 	if del.HasOut || del.RespBodyLit != "" {
 		t.Errorf("DeleteCardType = %+v", del)
