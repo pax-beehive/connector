@@ -7,6 +7,11 @@ end-to-end behavior rather than only adding one horizontal layer. `AFK` items
 can be implemented and verified without a product decision; `HITL` items need
 explicit human review or external authorization.
 
+Implementation sequencing defers every sanity or authorized-provider smoke
+check to TODO 16. Deferred checks remain unchecked and must pass before the
+platform is production-ready, but they do not block starting the next TODO
+after all non-deferred verification for the current TODO passes.
+
 ## TODO 01 — Accept the hardened platform contract
 
 - **Type:** HITL
@@ -102,8 +107,9 @@ explicit human review or external authorization.
         retried as a write.
   - [x] Raw provider bodies, tokens, and request payloads are absent from logs,
         traces, audit metadata, and public errors.
-  - [ ] A guarded smoke test posts through an authorized Instagram test
-        account and records the provider request/outcome evidence.
+  - [ ] **Deferred to TODO 16:** A guarded smoke test posts through an
+        authorized Instagram test account and records the provider
+        request/outcome evidence.
 
 ## TODO 06 — Deploy and remotely verify the Action Gateway tracer bullet
 
@@ -117,7 +123,8 @@ explicit human review or external authorization.
   relying on the RFC's target budget.
 - **Verification:**
   - [ ] Remote revision/image identity matches the validated source commit.
-  - [ ] A remote platform key invokes the authorized Instagram smoke action.
+  - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
+        Instagram smoke action.
   - [ ] Direct-origin, invalid-key, wrong-tenant, and revoked-connection calls
         are rejected.
   - [ ] Backup restore, rollback, migration, and key-access failure drills have
@@ -315,7 +322,8 @@ explicit human review or external authorization.
   and explicitly record any risk accepted for the first FDE customer.
 - **Verification:**
   - [ ] Authorized live smoke evidence covers every capability advertised as
-        production-ready; generated/stub tests alone do not qualify.
+        production-ready, including the deferred TODO 05 guarded action and
+        TODO 06 remote action; generated/stub tests alone do not qualify.
   - [ ] Cross-tenant, secret-redaction, idempotency, webhook retry, cursor,
         streaming, key-destruction, restore, and rollback suites pass against
         the release candidate.
