@@ -74,14 +74,14 @@ explicit human review or external authorization.
   cached client using an older version. Implement GCP KMS and deterministic
   in-memory test adapters at the same seam.
 - **Verification:**
-  - [ ] Database inspection finds no plaintext token or raw endpoint secret.
-  - [ ] Ciphertext copied to another tenant, record, or key version cannot be
+  - [x] Database inspection finds no plaintext token or raw endpoint secret.
+  - [x] Ciphertext copied to another tenant, record, or key version cannot be
         opened.
-  - [ ] Rotation makes the new version current, retires the old version, and
+  - [x] Rotation makes the new version current, retires the old version, and
         invalidates the old cached client.
-  - [ ] KMS denial and partial-rotation failures leave one recoverable current
+  - [x] KMS denial and partial-rotation failures leave one recoverable current
         credential and an audit record.
-  - [ ] A tenant cannot address or decrypt another tenant's connection.
+  - [x] A tenant cannot address or decrypt another tenant's connection.
 
 ## TODO 05 — Invoke an idempotent Instagram action with one platform key
 
