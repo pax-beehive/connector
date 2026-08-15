@@ -53,14 +53,14 @@ explicit human review or external authorization.
   request identity, forced RLS, and a tenant-visible identity endpoint. This
   slice ends when two tenants can authenticate but cannot observe each other.
 - **Verification:**
-  - [ ] Migrations apply from empty and roll forward in a real Postgres test.
-  - [ ] A generated platform key is displayed once and only its hash/prefix is
+  - [x] Migrations apply from empty and roll forward in a real Postgres test.
+  - [x] A generated platform key is displayed once and only its hash/prefix is
         persisted.
-  - [ ] Valid, revoked, expired, malformed, and wrong-scope keys have stable
+  - [x] Valid, revoked, expired, malformed, and wrong-scope keys have stable
         responses.
-  - [ ] Cross-tenant integration tests attempt direct IDs and unscoped queries
+  - [x] Cross-tenant integration tests attempt direct IDs and unscoped queries
         and are rejected by forced RLS.
-  - [ ] Health and identity endpoints pass in the container image.
+  - [x] Health and identity endpoints pass in the container image.
 
 ## TODO 04 — Store and rotate an encrypted Instagram connection
 
