@@ -121,13 +121,20 @@ after all non-deferred verification for the current TODO passes.
   origin authentication, backups/PITR, log retention, secret redaction, and a
   rollback release. Record actual resource configuration and cost rather than
   relying on the RFC's target budget.
-- **Implementation status:** The deployment implementation at platform commit
-  `4a46da29435f70806497c0a6a90389394834e1e9` passes the full quality gate,
-  deployment configuration checks, committed-source Docker E2E, and spec plus
-  standards review. Remote verification remains open pending staging access,
-  private environment configuration, drill execution, and billing evidence.
+- **Implementation status:** Platform commit
+  `76311bbf5be297c4ea39e1e787de967a37bc5a5a` passes the full quality gate at
+  80.1 percent coverage, deployment checks, committed-source Docker E2E, and
+  spec plus standards review. Staging runs that source at 100 percent traffic
+  from immutable digest `sha256:a070068f0231d9ed68924584b7639a6806b1f7ee59e8b4bc31de92686b4e0214`,
+  whose OCI revision label matches the commit. Resource configuration, two
+  successful migration executions, and typed KMS-denial evidence were captured
+  on 2026-08-15. The backup/crypto-shred drill has a successful dedicated
+  backup and is waiting for its 24-hour key destruction at
+  2026-08-16T09:01:56Z before restore verification. Edge rejection and rollback
+  evidence await the explicitly authorized Cloudflare secret deployment; cost
+  evidence awaits a detailed Cloud Billing BigQuery export.
 - **Verification:**
-  - [ ] Remote revision/image identity matches the validated source commit.
+  - [x] Remote revision/image identity matches the validated source commit.
   - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
         Instagram smoke action.
   - [ ] Direct-origin, invalid-key, wrong-tenant, and revoked-connection calls
