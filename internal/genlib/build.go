@@ -125,6 +125,9 @@ func (b *builder) schemaFor(full string) *openapi3.SchemaRef {
 }
 
 func (b *builder) buildOp(raw rawOp) error {
+	if raw.methodName == "InvokeAction" {
+		return fmt.Errorf("genlib: operation method name %q is reserved", raw.methodName)
+	}
 	op := Operation{
 		MethodName: raw.methodName,
 		HTTPMethod: raw.httpMethod,
@@ -138,6 +141,8 @@ func (b *builder) buildOp(raw rawOp) error {
 	if err := b.buildBody(&op, raw.op); err != nil {
 		return err
 	}
+	op.RequiredScope = "actions:" + b.cfg.Package + ":" + op.MethodName
+	op.Idempotency = actionIdempotency(op)
 	if err := b.buildResponse(&op, raw.op); err != nil {
 		return err
 	}
@@ -198,16 +203,22 @@ func (b *builder) paramField(p *openapi3.Parameter) (Field, string, error) {
 			return Field{}, "", nil
 		}
 		return Field{
-			Name: camelize(p.Name),
-			Type: strings.TrimPrefix(b.goType(p.Schema), "*"),
-			Tag:  fmt.Sprintf(`json:"-" path:%q`, p.Name),
+			Name:       camelize(p.Name),
+			Type:       strings.TrimPrefix(b.goType(p.Schema), "*"),
+			Tag:        fmt.Sprintf(`json:"-" path:%q`, p.Name),
+			ActionName: p.Name,
+			ActionTag:  actionJSONTag(p.Name),
+			Location:   "path",
 		}, "path", nil
 	case "query":
 		goName := camelize(strings.TrimPrefix(p.Name, b.cfg.QueryPrefixStrip))
 		return Field{
-			Name: goName,
-			Type: b.goType(p.Schema),
-			Tag:  fmt.Sprintf(`json:"-" query:%q`, p.Name),
+			Name:       goName,
+			Type:       b.goType(p.Schema),
+			Tag:        fmt.Sprintf(`json:"-" query:%q`, p.Name),
+			ActionName: p.Name,
+			ActionTag:  actionJSONTag(p.Name),
+			Location:   "query",
 		}, "query", nil
 	case "header":
 		for _, skip := range b.cfg.SkipHeaders {
@@ -216,9 +227,12 @@ func (b *builder) paramField(p *openapi3.Parameter) (Field, string, error) {
 			}
 		}
 		return Field{
-			Name: camelize(p.Name),
-			Type: "*string",
-			Tag:  fmt.Sprintf(`json:"-" header:%q`, p.Name),
+			Name:       camelize(p.Name),
+			Type:       "*string",
+			Tag:        fmt.Sprintf(`json:"-" header:%q`, p.Name),
+			ActionName: p.Name,
+			ActionTag:  actionJSONTag(p.Name),
+			Location:   "header",
 		}, "header", nil
 	default:
 		return Field{}, "", fmt.Errorf("unsupported parameter location %q", p.In)
@@ -245,9 +259,12 @@ func (b *builder) buildBody(op *Operation, src *openapi3.Operation) error {
 	if typeOf(schema.Value) == "array" {
 		op.BodyExpr = "req.Body"
 		op.Request.Fields = append(op.Request.Fields, Field{
-			Name: "Body",
-			Type: "[]" + b.elemType(schema.Value.Items),
-			Tag:  `json:"-"`,
+			Name:       "Body",
+			Type:       "[]" + b.elemType(schema.Value.Items),
+			Tag:        `json:"-"`,
+			ActionName: "body",
+			ActionTag:  actionJSONTag("body"),
+			Location:   "body",
 		})
 		b.markReachable(schema.Value.Items)
 		return nil
@@ -280,12 +297,35 @@ func (b *builder) flattenBodyProps(op *Operation, def *openapi3.Schema) {
 	for _, name := range sortedKeys(def.Properties) {
 		prop := def.Properties[name]
 		op.Request.Fields = append(op.Request.Fields, Field{
-			Name: camelize(name),
-			Type: b.goType(prop),
-			Tag:  fmt.Sprintf(`json:"%s,omitempty"`, name),
+			Name:       camelize(name),
+			Type:       b.goType(prop),
+			Tag:        fmt.Sprintf(`json:"%s,omitempty"`, name),
+			ActionName: name,
+			ActionTag:  actionJSONTag(name),
+			Location:   "body",
 		})
 		b.markReachable(prop)
 	}
+}
+
+func actionJSONTag(name string) string {
+	return fmt.Sprintf("json:%q", name+",omitempty")
+}
+
+func actionIdempotency(op Operation) string {
+	switch op.HTTPMethod {
+	case "GET", "HEAD", "OPTIONS":
+		return "safe"
+	case "PUT", "DELETE":
+		return "idempotent"
+	case "POST", "PATCH":
+		for _, field := range op.Request.Fields {
+			if field.Location == "header" && strings.EqualFold(field.ActionName, "Idempotency-Key") {
+				return "provider-key"
+			}
+		}
+	}
+	return "unsafe"
 }
 
 // buildResponse resolves the first 2xx response into a type, alias, or

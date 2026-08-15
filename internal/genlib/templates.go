@@ -58,6 +58,67 @@ func (c *Client) {{.MethodName}}(ctx context.Context, req *{{.MethodName}}Reques
 }
 {{end}}`
 
+const actionsTmpl = `
+var connectorActionManifest = [...]connector.ActionDescriptor{
+{{- range .Ops}}
+	{
+		Provider:      "{{$.Package}}",
+		Method:        "{{.MethodName}}",
+		HTTPMethod:    "{{.HTTPMethod}}",
+		RequestType:   "{{.Request.Name}}",
+		ResponseType:  "{{.MethodName}}Response",
+		RequiredScope: "{{.RequiredScope}}",
+		Idempotency:   connector.ActionIdempotency("{{.Idempotency}}"),
+	},
+{{- end}}
+}
+
+// ConnectorActions returns the deterministic action manifest for this provider.
+func ConnectorActions() []connector.ActionDescriptor {
+	return append([]connector.ActionDescriptor(nil), connectorActionManifest[:]...)
+}
+
+type connectorActionHandler func(context.Context, *Client, json.RawMessage) (json.RawMessage, error)
+
+var connectorActionHandlers = map[string]connectorActionHandler{
+{{- range .Ops}}
+	"{{.MethodName}}": invoke{{.MethodName}}Action,
+{{- end}}
+}
+
+// InvokeAction validates and invokes one generated connector action.
+func (c *Client) InvokeAction(ctx context.Context, call connector.ActionCall) (json.RawMessage, error) {
+	if call.Provider != "{{.Package}}" {
+		return nil, &connector.UnknownProviderError{Provider: call.Provider}
+	}
+	handler, ok := connectorActionHandlers[call.Method]
+	if !ok {
+		return nil, &connector.UnknownActionError{Provider: call.Provider, Method: call.Method}
+	}
+	return handler(ctx, c, call.Request)
+}
+{{range .Ops}}
+func invoke{{.MethodName}}Action(ctx context.Context, c *Client, input json.RawMessage) (json.RawMessage, error) {
+	var wire struct {
+{{- range .Request.Fields}}
+		{{.Name}} {{.Type}} ` + "`{{.ActionTag}}`" + `
+{{- end}}
+	}
+	if err := connector.DecodeActionRequest("{{$.Package}}", "{{.MethodName}}", input, &wire); err != nil {
+		return nil, err
+	}
+	out, err := c.{{.MethodName}}(ctx, &{{.MethodName}}Request{
+{{- range .Request.Fields}}
+		{{.Name}}: wire.{{.Name}},
+{{- end}}
+	})
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(out)
+}
+{{end}}`
+
 // agentsTmpl generates AGENTS.md: an agent-facing capability guide for one
 // connector. Handwritten content (title, description, notes) comes from
 // gen.yaml; the operation catalog is derived from the spec.
@@ -218,6 +279,137 @@ func TestGeneratedNilRequests(t *testing.T) {
 				t.Fatal("nil response")
 			}
 		})
+	}
+}
+`
+
+const actionsTestTmpl = `
+func TestGeneratedActionManifest(t *testing.T) {
+	actions := ConnectorActions()
+	if len(actions) != len(roundtripCases) {
+		t.Fatalf("manifest entries = %d, operations = %d", len(actions), len(roundtripCases))
+	}
+	seen := make(map[string]bool, len(actions))
+	for _, action := range actions {
+		if action.Provider != "{{.Package}}" {
+			t.Errorf("provider = %q", action.Provider)
+		}
+		if action.Method == "" || action.HTTPMethod == "" || action.RequestType == "" || action.ResponseType == "" || action.RequiredScope == "" || action.Idempotency == "" {
+			t.Errorf("incomplete descriptor: %+v", action)
+		}
+		if seen[action.Method] {
+			t.Errorf("duplicate action %q", action.Method)
+		}
+		seen[action.Method] = true
+	}
+	if len(actions) > 0 {
+		actions[0].Method = "mutated"
+		if ConnectorActions()[0].Method == "mutated" {
+			t.Fatal("ConnectorActions exposed mutable manifest storage")
+		}
+	}
+}
+
+func TestGeneratedActionDispatch(t *testing.T) {
+	actions := ConnectorActions()
+	var mu sync.Mutex
+	var gotMethod, gotPath, nextResp string
+	var nextStatus int
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		defer mu.Unlock()
+		gotMethod, gotPath = r.Method, r.URL.Path
+		if nextStatus != 0 {
+			w.WriteHeader(nextStatus)
+			nextStatus = 0
+		}
+		if nextResp != "" {
+			_, _ = w.Write([]byte(nextResp))
+		}
+	}))
+	defer srv.Close()
+	c, err := {{.TestNewClient}}
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for i, tc := range roundtripCases {
+		t.Run(tc.name, func(t *testing.T) {
+			action := actions[i]
+			if action.Method != tc.name {
+				t.Fatalf("manifest method = %q, operation = %q", action.Method, tc.name)
+			}
+			mu.Lock()
+			nextResp = tc.resp
+			mu.Unlock()
+			out, err := c.InvokeAction(context.Background(), connector.ActionCall{
+				Provider: action.Provider,
+				Method:   action.Method,
+				Request:  json.RawMessage(` + "`{}`" + `),
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !json.Valid(out) {
+				t.Fatalf("invalid JSON response: %s", out)
+			}
+			mu.Lock()
+			defer mu.Unlock()
+			if gotMethod != tc.method || gotPath != tc.path {
+				t.Errorf("request = %s %s, want %s %s", gotMethod, gotPath, tc.method, tc.path)
+			}
+		})
+	}
+}
+
+func TestGeneratedActionDispatchErrors(t *testing.T) {
+	if len(roundtripCases) == 0 {
+		t.Skip("connector has no actions")
+	}
+	var mu sync.Mutex
+	nextStatus := http.StatusOK
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		defer mu.Unlock()
+		w.WriteHeader(nextStatus)
+		_, _ = w.Write([]byte(roundtripCases[0].resp))
+	}))
+	defer srv.Close()
+	c, err := {{.TestNewClient}}
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx := context.Background()
+	first := roundtripCases[0]
+
+	_, err = c.InvokeAction(ctx, connector.ActionCall{Provider: "wrong", Method: first.name})
+	var providerErr *connector.UnknownProviderError
+	if !errors.As(err, &providerErr) {
+		t.Fatalf("wrong provider error = %T, want *connector.UnknownProviderError", err)
+	}
+
+	_, err = c.InvokeAction(ctx, connector.ActionCall{Provider: "{{.Package}}", Method: "Missing"})
+	var actionErr *connector.UnknownActionError
+	if !errors.As(err, &actionErr) {
+		t.Fatalf("unknown method error = %T, want *connector.UnknownActionError", err)
+	}
+
+	_, err = c.InvokeAction(ctx, connector.ActionCall{
+		Provider: "{{.Package}}",
+		Method:   first.name,
+		Request:  json.RawMessage(` + "`{`" + `),
+	})
+	var requestErr *connector.InvalidActionRequestError
+	if !errors.As(err, &requestErr) {
+		t.Fatalf("malformed request error = %T, want *connector.InvalidActionRequestError", err)
+	}
+
+	mu.Lock()
+	nextStatus = http.StatusTooManyRequests
+	mu.Unlock()
+	_, err = c.InvokeAction(ctx, connector.ActionCall{Provider: "{{.Package}}", Method: first.name})
+	if _, ok := connector.AsAPIError(err); !ok {
+		t.Fatalf("provider error = %T, want *connector.APIError", err)
 	}
 }
 `

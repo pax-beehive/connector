@@ -68,6 +68,9 @@ func TestBuildQueryAndHeaderParams(t *testing.T) {
 	if limit.Type != "*int" || !strings.Contains(limit.Tag, `query:"request.limit"`) {
 		t.Errorf("Limit = %+v", limit)
 	}
+	if limit.ActionName != "request.limit" {
+		t.Errorf("Limit.ActionName = %q", limit.ActionName)
+	}
 	ids := fieldByName(t, get.Request, "Ids")
 	if ids.Type != "[]int64" {
 		t.Errorf("Ids = %+v", ids)
@@ -79,6 +82,9 @@ func TestBuildQueryAndHeaderParams(t *testing.T) {
 	trace := fieldByName(t, get.Request, "XTrace")
 	if !strings.Contains(trace.Tag, `header:"x-trace"`) {
 		t.Errorf("XTrace = %+v", trace)
+	}
+	if trace.ActionName != "x-trace" {
+		t.Errorf("XTrace.ActionName = %q", trace.ActionName)
 	}
 	for _, f := range get.Request.Fields {
 		if strings.Contains(f.Tag, "authorization") {
@@ -97,6 +103,9 @@ func TestBuildBodies(t *testing.T) {
 	if name.Type != "*string" || !strings.Contains(name.Tag, `json:"Name,omitempty"`) {
 		t.Errorf("Name = %+v", name)
 	}
+	if name.ActionName != "Name" {
+		t.Errorf("Name.ActionName = %q", name.ActionName)
+	}
 	widget := fieldByName(t, add.Request, "Widget")
 	if widget.Type != "*Widget" {
 		t.Errorf("Widget = %+v", widget)
@@ -110,12 +119,43 @@ func TestBuildBodies(t *testing.T) {
 	if body.Type != "[]Tag" {
 		t.Errorf("Body = %+v", body)
 	}
+	if body.ActionName != "body" {
+		t.Errorf("Body.ActionName = %q", body.ActionName)
+	}
 	wid := fieldByName(t, repl.Request, "WidgetId")
 	if wid.Type != "int64" || !strings.Contains(wid.Tag, `path:"widgetId"`) {
 		t.Errorf("WidgetId = %+v", wid)
 	}
 	if repl.TestPath != "/public/v6/widget/0/tags" {
 		t.Errorf("TestPath = %q", repl.TestPath)
+	}
+}
+
+func TestBuildActionMetadata(t *testing.T) {
+	ir := fixtureIR(t)
+	tests := []struct {
+		method      string
+		scope       string
+		idempotency string
+	}{
+		{method: "AddWidget", scope: "actions:fixture:AddWidget", idempotency: "unsafe"},
+		{method: "GetWidgets", scope: "actions:fixture:GetWidgets", idempotency: "safe"},
+		{method: "ReplaceTags", scope: "actions:fixture:ReplaceTags", idempotency: "idempotent"},
+	}
+	for _, tc := range tests {
+		op := opByName(t, ir, tc.method)
+		if op.RequiredScope != tc.scope || op.Idempotency != tc.idempotency {
+			t.Errorf("%s metadata = scope %q, idempotency %q", tc.method, op.RequiredScope, op.Idempotency)
+		}
+	}
+
+	op := Operation{HTTPMethod: "POST", Request: Struct{Fields: []Field{{ActionName: "Idempotency-Key", Location: "header"}}}}
+	if got := actionIdempotency(op); got != "provider-key" {
+		t.Fatalf("idempotency header classification = %q", got)
+	}
+	op.Request.Fields[0].Location = "body"
+	if got := actionIdempotency(op); got != "unsafe" {
+		t.Fatalf("body field idempotency classification = %q", got)
 	}
 }
 
@@ -197,6 +237,18 @@ func TestBuildDuplicateMethodNames(t *testing.T) {
 	cfg.Rename = map[string]string{"Add Widget": "GetWidgets"} // force a clash
 	if _, err := Build(doc, cfg); err == nil {
 		t.Fatal("expected duplicate method name error")
+	}
+}
+
+func TestBuildReservedActionMethodName(t *testing.T) {
+	doc, err := LoadSpec("testdata/fixture-swagger.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg := fixtureConfig()
+	cfg.Rename = map[string]string{"Add Widget": "InvokeAction"}
+	if _, err := Build(doc, cfg); err == nil || !strings.Contains(err.Error(), "reserved") {
+		t.Fatalf("error = %v, want reserved method name error", err)
 	}
 }
 

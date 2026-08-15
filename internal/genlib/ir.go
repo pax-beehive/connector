@@ -2,9 +2,12 @@ package genlib
 
 // Field is one generated struct field.
 type Field struct {
-	Name string
-	Type string
-	Tag  string // full struct tag, without backticks
+	Name       string
+	Type       string
+	Tag        string // full struct tag, without backticks
+	ActionName string // JSON field accepted by the generated action dispatcher
+	ActionTag  string // action JSON struct tag, without backticks
+	Location   string // path, query, header, or body for action metadata
 }
 
 // Struct is a generated struct type.
@@ -40,6 +43,9 @@ type Operation struct {
 	// DocPath is the path with pinned params substituted but caller-supplied
 	// path params kept as {name} placeholders, for documentation.
 	DocPath string
+	// RequiredScope and Idempotency are emitted in the action manifest.
+	RequiredScope string
+	Idempotency   string
 }
 
 // IR is everything the renderer needs.

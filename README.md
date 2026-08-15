@@ -209,6 +209,33 @@ case connector.IsRetryable(err):    // 429/502/503/504
 }
 ```
 
+## Generated action dispatch
+
+Every provider package exports `ConnectorActions()`, a deterministic manifest
+containing the provider, generated method, HTTP verb, request and response type
+names, required platform scope, and idempotency classification. Every generated
+`*Client` also implements `connector.ActionInvoker`:
+
+```go
+out, err := client.InvokeAction(ctx, connector.ActionCall{
+	Provider: "instagram",
+	Method:   "ListMedia",
+	Request:  json.RawMessage(`{"igUserId":"123"}`),
+})
+```
+
+Dispatch uses a generated allowlist and statically calls the concrete client
+method. Request JSON is decoded strictly; unknown fields, malformed input, an
+unknown provider, and an unknown method return typed errors. JSON field names
+preserve the provider specification, including path, query, header, and body
+names. Empty input is treated as `{}`.
+
+Idempotency is classified as `safe` for read-only HTTP methods, `idempotent`
+for PUT and DELETE, `provider-key` when POST or PATCH exposes an
+`Idempotency-Key` header, and `unsafe` otherwise. This metadata describes
+provider support; gateway-level retry and idempotency policy remains the
+caller's responsibility.
+
 ## For AI agents
 
 Each connector ships a generated `AGENTS.md`
@@ -247,7 +274,12 @@ make gen
 ## Development
 
 ```sh
-make lint   # go vet + cyclomatic complexity gate (<20 per function)
-make test   # unit tests
-make cover  # coverage gate (>=80%)
+make quality # all blocking local and CI quality gates
+make lint    # vet, gofmt, source-language, complexity, module imports
+make test    # uncached unit tests
+make cover   # uncached aggregate coverage gate (>=80%)
 ```
+
+`make quality` also runs the race detector. See
+[`docs/quality-gates.md`](docs/quality-gates.md) for the enforced rules and
+module review checklist.

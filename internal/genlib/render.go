@@ -12,8 +12,8 @@ import (
 const connectorImport = `"github.com/pax-beehive/connector"`
 
 // Render produces the generated files, keyed by file name: types_gen.go,
-// one <lowertag>_gen.go per tag, and roundtrip_gen_test.go. Output is
-// gofmt-formatted.
+// one <lowertag>_gen.go per tag, action dispatch files, and roundtrip tests.
+// Output is gofmt-formatted.
 func Render(ir *IR, cfg *Config) (map[string][]byte, error) {
 	files := map[string][]byte{}
 	if err := renderFile(files, "types_gen.go", typesTmpl, ir, nil); err != nil {
@@ -26,8 +26,15 @@ func Render(ir *IR, cfg *Config) (map[string][]byte, error) {
 			return nil, err
 		}
 	}
+	if err := renderFile(files, "actions_gen.go", actionsTmpl, ir, []string{`"context"`, `"encoding/json"`}); err != nil {
+		return nil, err
+	}
 	testImports := []string{`"context"`, `"net/http"`, `"net/http/httptest"`, `"sync"`, `"testing"`}
 	if err := renderFile(files, "roundtrip_gen_test.go", roundtripTmpl, ir, testImports); err != nil {
+		return nil, err
+	}
+	actionTestImports := []string{`"context"`, `"encoding/json"`, `"errors"`, `"net/http"`, `"net/http/httptest"`, `"sync"`, `"testing"`}
+	if err := renderFile(files, "actions_gen_test.go", actionsTestTmpl, ir, actionTestImports); err != nil {
 		return nil, err
 	}
 	if err := renderAgents(files, ir, cfg); err != nil {

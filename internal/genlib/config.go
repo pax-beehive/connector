@@ -20,9 +20,9 @@ type Config struct {
 	// and Description introduce the connector; AgentNotes is handwritten
 	// markdown (auth model, usage, boundaries) included verbatim before the
 	// generated capability catalog.
-	Title            string            `yaml:"title"`
-	Description      string            `yaml:"description"`
-	AgentNotes       string            `yaml:"agent_notes"`
+	Title       string `yaml:"title"`
+	Description string `yaml:"description"`
+	AgentNotes  string `yaml:"agent_notes"`
 	// TestNewClient is the Go expression the generated round-trip test uses
 	// to build the client; `srv` (an *httptest.Server) is in scope. Defaults
 	// to `NewClient(&Config{BaseURL: srv.URL})`.

@@ -94,7 +94,9 @@ func TestCoreDoAPIError(t *testing.T) {
 	}))
 	defer srv.Close()
 	core := &Core{BaseURL: srv.URL, ParseError: func(b []byte) (string, string) {
-		var e struct{ Error struct{ Code, Message string } }
+		var e struct {
+			Error struct{ Code, Message string }
+		}
 		_ = json.Unmarshal(b, &e)
 		return e.Error.Code, e.Error.Message
 	}}

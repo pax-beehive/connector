@@ -82,7 +82,7 @@ jobs:
               echo "To refresh:"
               echo '```sh'
               echo "curl -sL -o $snapshot '$url'"
-              echo "make gen && make lint test cover"
+              echo "make gen && make quality"
               echo '```'
               echo
               echo "Diff excerpt (normalized, first 200 lines; +$added/-$removed shown):"
