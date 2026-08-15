@@ -121,6 +121,11 @@ after all non-deferred verification for the current TODO passes.
   origin authentication, backups/PITR, log retention, secret redaction, and a
   rollback release. Record actual resource configuration and cost rather than
   relying on the RFC's target budget.
+- **Implementation status:** The deployment implementation at platform commit
+  `4a46da29435f70806497c0a6a90389394834e1e9` passes the full quality gate,
+  deployment configuration checks, committed-source Docker E2E, and spec plus
+  standards review. Remote verification remains open pending staging access,
+  private environment configuration, drill execution, and billing evidence.
 - **Verification:**
   - [ ] Remote revision/image identity matches the validated source commit.
   - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
