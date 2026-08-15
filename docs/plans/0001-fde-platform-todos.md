@@ -131,7 +131,13 @@ after all non-deferred verification for the current TODO passes.
   on 2026-08-15. The backup/crypto-shred drill has a successful dedicated
   backup and is waiting for its 24-hour key destruction at
   2026-08-16T09:01:56Z before restore verification. Edge rejection and rollback
-  evidence await the explicitly authorized Cloudflare secret deployment; cost
+  evidence remain open: both service URLs, an exact revision-tag URL, and a
+  same-project Scheduler OIDC probe return an application-external `404`, while
+  disposable same-project Cloud Run probes return `200` and the command service
+  returns its expected `403`. Cloud Run reports all ingress routes ready, and
+  the documented VPC Service Controls policy-log query is empty, isolating the
+  fault to the `fde-staging` service route object. Recreating that service needs
+  explicit destructive approval before the Cloudflare secret deployment. Cost
   evidence awaits a detailed Cloud Billing BigQuery export.
 - **Verification:**
   - [x] Remote revision/image identity matches the validated source commit.
