@@ -95,12 +95,12 @@ explicit human review or external authorization.
   Mutating calls require an idempotency key and ambiguous upstream outcomes
   remain `unknown` until reconciled.
 - **Verification:**
-  - [ ] Repeating the same idempotency key and request makes one provider call
+  - [x] Repeating the same idempotency key and request makes one provider call
         and replays the stored result.
-  - [ ] Reusing a key with a different request hash returns `409`.
-  - [ ] Timeout-after-send is recorded as `unknown` and is not automatically
+  - [x] Reusing a key with a different request hash returns `409`.
+  - [x] Timeout-after-send is recorded as `unknown` and is not automatically
         retried as a write.
-  - [ ] Raw provider bodies, tokens, and request payloads are absent from logs,
+  - [x] Raw provider bodies, tokens, and request payloads are absent from logs,
         traces, audit metadata, and public errors.
   - [ ] A guarded smoke test posts through an authorized Instagram test
         account and records the provider request/outcome evidence.
