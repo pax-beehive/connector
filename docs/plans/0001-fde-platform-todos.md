@@ -141,8 +141,10 @@ after all non-deferred verification for the current TODO passes.
   request or container log even though Ready, ConfigurationsReady, and
   RoutesReady are true, ingress is `all`, and invoker IAM checks are disabled.
   Endpoint identity and direct-origin rejection therefore remain unverified.
-  An origin-token probe requires explicit secret-use authorization. KMS denial,
-  backup/restore, rollback, and observed-cost evidence also remain open.
+  One explicitly authorized request with the correct origin token also returned
+  `404` and produced no request or container log, ruling out application origin
+  authentication as the rejection point. KMS denial, backup/restore, rollback,
+  and observed-cost evidence also remain open.
 - **Verification:**
   - [ ] Remote revision/image identity matches the validated source commit.
   - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
