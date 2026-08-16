@@ -123,25 +123,26 @@ after all non-deferred verification for the current TODO passes.
   relying on the RFC's target budget.
 - **Implementation status:** Platform commit
   `6ace5736e8ee14a7e23ce415b442e5530cad9d52` passes the full quality gate at
-  80.1 percent coverage, deployment checks, and spec plus standards review.
-  Fresh minimal staging project `pax-fde-stg-20260816` was created in
-  `us-west1` on 2026-08-16. It runs that source at 100 percent traffic from
-  immutable digest
-  `sha256:be9d0348ba65e0f468f8d5b7ef56d2cafab926fb60df1cf72c8a184ec889aa8d`.
-  Terraform is no-drift; the zonal `db-f1-micro` Cloud SQL instance is
-  `RUNNABLE`; migration and runtime-role configuration executions succeeded;
-  and the timestamped resource record captures the one-instance application,
+  80.1 percent coverage and deployment checks. At the operator's direction, the
+  fresh staging project `pax-fde-stg-20260816` was deleted on 2026-08-16 before
+  further verification. Minimal production project `pax-fde-prod` was then
+  created in `us-west1` with a private versioned state bucket. It runs the same
+  source at 100 percent traffic from immutable digest
+  `sha256:bd23b7ac483b8ddd95f1b7effa226b2348c95d1648f99e64b270bf5ed644ff04`.
+  The digest and OCI revision label match the deployed source. Terraform is
+  no-drift; the zonal `db-f1-micro` Cloud SQL instance is `RUNNABLE`; migration
+  and runtime-role configuration executions succeeded; and resource evidence
+  `20260816T204950Z-resource-config.json` captures the one-instance application,
   scale-to-zero command service, seven retained backups and PITR days, 30-day
-  log bucket, KMS boundary, and bounded build storage. The new project
-  independently reproduces the application-external `404` on both official
-  `fde-staging` URLs with no request log. A temporary secret-free same-project
-  service named `fde-staging-routeprobe` returned `200` during the 2026-08-16
-  comparison and was then deleted. Ingress is `all`, the default URL is enabled,
-  RoutesReady is true, and the documented VPC Service Controls policy-log query
-  is empty. The configured revision, digest, and OCI label agree, but endpoint
-  identity cannot be verified until requests reach the application. Replacing
-  or renaming the live service requires explicit approval. Edge rejection, KMS
-  denial, backup/restore, rollback, and observed-cost evidence remain open.
+  log bucket, KMS boundary, and bounded build storage. Follow-up platform commit
+  `b8b36f549f530b71cd5800e21c3592ce12b66f42` makes Terraform applies explicitly
+  non-interactive and documents the scoped Cloud Build operator permissions.
+  Both official `fde-prod` URLs return an application-external `404` with no
+  request or container log even though Ready, ConfigurationsReady, and
+  RoutesReady are true, ingress is `all`, and invoker IAM checks are disabled.
+  Endpoint identity and direct-origin rejection therefore remain unverified.
+  An origin-token probe requires explicit secret-use authorization. KMS denial,
+  backup/restore, rollback, and observed-cost evidence also remain open.
 - **Verification:**
   - [ ] Remote revision/image identity matches the validated source commit.
   - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
