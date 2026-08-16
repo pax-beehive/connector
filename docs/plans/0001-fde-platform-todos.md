@@ -122,25 +122,28 @@ after all non-deferred verification for the current TODO passes.
   rollback release. Record actual resource configuration and cost rather than
   relying on the RFC's target budget.
 - **Implementation status:** Platform commit
-  `76311bbf5be297c4ea39e1e787de967a37bc5a5a` passes the full quality gate at
-  80.1 percent coverage, deployment checks, committed-source Docker E2E, and
-  spec plus standards review. Staging runs that source at 100 percent traffic
-  from immutable digest `sha256:a070068f0231d9ed68924584b7639a6806b1f7ee59e8b4bc31de92686b4e0214`,
-  whose OCI revision label matches the commit. Resource configuration, two
-  successful migration executions, and typed KMS-denial evidence were captured
-  on 2026-08-15. The backup/crypto-shred drill has a successful dedicated
-  backup and is waiting for its 24-hour key destruction at
-  2026-08-16T09:01:56Z before restore verification. Edge rejection and rollback
-  evidence remain open: both service URLs, an exact revision-tag URL, and a
-  same-project Scheduler OIDC probe return an application-external `404`, while
-  disposable same-project Cloud Run probes return `200` and the command service
-  returns its expected `403`. Cloud Run reports all ingress routes ready, and
-  the documented VPC Service Controls policy-log query is empty, isolating the
-  fault to the `fde-staging` service route object. Recreating that service needs
-  explicit destructive approval before the Cloudflare secret deployment. Cost
-  evidence awaits a detailed Cloud Billing BigQuery export.
+  `6ace5736e8ee14a7e23ce415b442e5530cad9d52` passes the full quality gate at
+  80.1 percent coverage, deployment checks, and spec plus standards review.
+  Fresh minimal staging project `pax-fde-stg-20260816` was created in
+  `us-west1` on 2026-08-16. It runs that source at 100 percent traffic from
+  immutable digest
+  `sha256:be9d0348ba65e0f468f8d5b7ef56d2cafab926fb60df1cf72c8a184ec889aa8d`.
+  Terraform is no-drift; the zonal `db-f1-micro` Cloud SQL instance is
+  `RUNNABLE`; migration and runtime-role configuration executions succeeded;
+  and the timestamped resource record captures the one-instance application,
+  scale-to-zero command service, seven retained backups and PITR days, 30-day
+  log bucket, KMS boundary, and bounded build storage. The new project
+  independently reproduces the application-external `404` on both official
+  `fde-staging` URLs with no request log. A temporary secret-free same-project
+  service named `fde-staging-routeprobe` returned `200` during the 2026-08-16
+  comparison and was then deleted. Ingress is `all`, the default URL is enabled,
+  RoutesReady is true, and the documented VPC Service Controls policy-log query
+  is empty. The configured revision, digest, and OCI label agree, but endpoint
+  identity cannot be verified until requests reach the application. Replacing
+  or renaming the live service requires explicit approval. Edge rejection, KMS
+  denial, backup/restore, rollback, and observed-cost evidence remain open.
 - **Verification:**
-  - [x] Remote revision/image identity matches the validated source commit.
+  - [ ] Remote revision/image identity matches the validated source commit.
   - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
         Instagram smoke action.
   - [ ] Direct-origin, invalid-key, wrong-tenant, and revoked-connection calls
