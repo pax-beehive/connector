@@ -183,9 +183,33 @@ after all non-deferred verification for the current TODO passes.
   was deleted with deletion verified. An initial attempt used an unavailable
   BusyBox applet, failed before becoming routable, sent no request, and was also
   deleted. The immutable image itself is therefore ruled out; the remaining
-  boundary is the `platformd` API-mode process and its environment.
+  boundary is the `platformd` API-mode process and its environment. Follow-up
+  diagnosis isolated the actual provider boundary: Cloud Run documents that
+  some paths ending in `z` are reserved and recommends avoiding all such
+  paths. The Google Frontend returned its branded `404` for `/healthz` before
+  the request log, while otherwise equivalent non-`z` paths reached the
+  container. Platform commits `d4a6510`, `4ee664f`, and `363e921` make origin
+  rejection an application-specific `403`, require its exact non-secret body
+  marker in release verification, and move the canonical health contract to
+  `/health` while retaining the old handler alias for non-Cloud-Run use. The
+  full quality gate passes at 80.1 percent coverage, deployment checks and the
+  container E2E pass, and both Standards and Spec review report no findings.
+  Production now serves commit `363e921ae63cd3c406504b3daf6af45cbc202f03`
+  from immutable digest
+  `sha256:56e4f7f9285dc4cc36e5d0660c4ba48825e445ec67ffa109d9124130e380f0b0`
+  on revision `fde-prod-00003-nm7` at 100 percent traffic. Terraform output,
+  the Cloud Run source label, the deployed image, its OCI revision label, and
+  local HEAD agree. Anonymous `GET /health` returns application marker `403
+  origin authentication failed`. Migration execution
+  `fde-prod-migrate-75nsc`, runtime-role configuration execution
+  `fde-prod-configure-runtime-x2b7c`, and current-image KMS denial execution
+  `fde-prod-kms-denial-t5szt` all completed successfully. New evidence files
+  `20260817T025256Z-kms-denial.json` and
+  `20260817T025317Z-resource-config.json` contain no secret values. Cloudflare
+  edge deployment, fixture-backed tenant rejection checks, backup/restore,
+  rollback, and observed-cost evidence remain open.
 - **Verification:**
-  - [ ] Remote revision/image identity matches the validated source commit.
+  - [x] Remote revision/image identity matches the validated source commit.
   - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
         Instagram smoke action.
   - [ ] Direct-origin, invalid-key, wrong-tenant, and revoked-connection calls
