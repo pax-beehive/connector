@@ -143,8 +143,15 @@ after all non-deferred verification for the current TODO passes.
   Endpoint identity and direct-origin rejection therefore remain unverified.
   One explicitly authorized request with the correct origin token also returned
   `404` and produced no request or container log, ruling out application origin
-  authentication as the rejection point. KMS denial, backup/restore, rollback,
-  and observed-cost evidence also remain open.
+  authentication as the rejection point. Domain Restricted Sharing rejects an
+  `allUsers` invoker binding. Explicitly reconciling and toggling the disabled
+  Invoker IAM check left the same revision at `404`. A temporary secret-free
+  `fde-prod-routeprobe` created through the Cloud Run v1 API returned `200` and
+  was deleted, while audit records show the failing Terraform service was
+  created through the v2 API. A production-configured v1 comparison requires
+  explicit authorization because it would briefly duplicate access to the
+  production database, KMS, and secret references. KMS denial, backup/restore,
+  rollback, and observed-cost evidence also remain open.
 - **Verification:**
   - [ ] Remote revision/image identity matches the validated source commit.
   - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
