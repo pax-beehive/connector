@@ -169,7 +169,14 @@ after all non-deferred verification for the current TODO passes.
   zero minimum and one maximum instance, received exactly one anonymous
   request, and was deleted with deletion verified. The runtime service account
   and Cloud SQL attachment are therefore ruled out, leaving the production
-  image entrypoint or API-mode environment as the remaining differentiators.
+  image entrypoint or API-mode environment as the remaining differentiators. A
+  final secret-free `fde-prod-imageprobe` used the exact production image but
+  replaced its entrypoint with a locally verified BusyBox network responder.
+  Its single anonymous `HEAD /platformd` request returned `200`, and the probe
+  was deleted with deletion verified. An initial attempt used an unavailable
+  BusyBox applet, failed before becoming routable, sent no request, and was also
+  deleted. The immutable image itself is therefore ruled out; the remaining
+  boundary is the `platformd` API-mode process and its environment.
 - **Verification:**
   - [ ] Remote revision/image identity matches the validated source commit.
   - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
