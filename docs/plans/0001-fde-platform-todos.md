@@ -207,7 +207,30 @@ after all non-deferred verification for the current TODO passes.
   `20260817T025256Z-kms-denial.json` and
   `20260817T025317Z-resource-config.json` contain no secret values. Cloudflare
   edge deployment, fixture-backed tenant rejection checks, backup/restore,
-  rollback, and observed-cost evidence remain open.
+  rollback, and observed-cost evidence remain open. Authorized follow-up found
+  that the edge deployer's Bash interval regex rejected a valid Terraform
+  token on macOS Bash 3.2 before any Cloudflare mutation. Platform commit
+  `bb0b25a76887ccf9e4c5a08c57fc3db46eac77d6` replaces interval regexes with
+  portable explicit length checks; the full quality gate remains at 80.1
+  percent coverage, deployment checks and Docker E2E pass. Production now runs
+  this exact commit on revision `fde-prod-00004-lz5` at 100 percent traffic
+  from immutable digest
+  `sha256:5d1c721128759fa5715f908b242f1da901d0831f9c8537d19f2a01e0107f7773`.
+  Migration execution `fde-prod-migrate-4f4gw`, runtime-role configuration
+  execution `fde-prod-configure-runtime-gfz25`, and typed KMS-denial execution
+  `fde-prod-kms-denial-pm5dr` succeeded. A single disposable tenant and
+  connection created one 24-hour KMS key version; the single-use fixture job
+  was deleted. Dedicated on-demand backup `1786939777688` is successful and
+  the exact key version is `DESTROY_SCHEDULED` until
+  `2026-08-18T04:11:12.905914Z`. Pending evidence
+  `20260817T040927Z-backup-restore.json` correctly does not claim final restore
+  success. Current-image evidence files `20260817T041139Z-kms-denial.json` and
+  `20260817T041155Z-resource-config.json` contain no secret values. The labeled
+  `US` multi-region BigQuery dataset `pax-fde-prod:fde_billing_export` exists;
+  enabling Detailed Billing export awaits operator reauthentication in Cloud
+  Console. Cloudflare deployment awaits a second explicitly authorized secret
+  read because the first one-time read was consumed by the fail-closed portable
+  regex defect. Final restore, rollback, and actual-cost evidence remain open.
 - **Verification:**
   - [x] Remote revision/image identity matches the validated source commit.
   - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
