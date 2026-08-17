@@ -161,11 +161,18 @@ after all non-deferred verification for the current TODO passes.
   traffic, and successful route conditions; no `HttpIngress` policy-denial log
   is present. A single request carrying the project owner's short-lived Google
   OIDC identity token returned the identical Google Frontend `404`, so the
-  failure is not limited to anonymous invocation. KMS denial, backup/restore,
-  rollback, and observed-cost evidence also remain open. Two additional
-  secret-free probes used the same runtime service account with the public
-  hello image. `fde-prod-saprobe` returned `200`; `fde-prod-sqlprobe` added the
-  production Cloud SQL attachment and also returned `200`. Each probe used
+  failure is not limited to anonymous invocation. Production migration
+  executions `fde-prod-migrate-b9hxt` and `fde-prod-migrate-mvzrh` completed
+  successfully, proving repeat execution is idempotent. Isolated execution
+  `fde-prod-kms-denial-r2nb6` also completed successfully and recorded the
+  expected typed KMS denial. Evidence files `20260817T021319Z-migration.json`,
+  `20260817T021356Z-kms-denial.json`, and
+  `20260817T021533Z-resource-config.json` contain no secret values.
+  Backup/restore, rollback, and observed-cost evidence remain open. Two
+  additional secret-free probes used the public hello image with the same
+  runtime service account. `fde-prod-saprobe` returned `200`;
+  `fde-prod-sqlprobe` also returned `200` after adding the production Cloud SQL
+  attachment. Each probe used
   zero minimum and one maximum instance, received exactly one anonymous
   request, and was deleted with deletion verified. The runtime service account
   and Cloud SQL attachment are therefore ruled out, leaving the production
