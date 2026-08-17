@@ -228,9 +228,20 @@ after all non-deferred verification for the current TODO passes.
   `20260817T041155Z-resource-config.json` contain no secret values. The labeled
   `US` multi-region BigQuery dataset `pax-fde-prod:fde_billing_export` exists;
   enabling Detailed Billing export awaits operator reauthentication in Cloud
-  Console. Cloudflare deployment awaits a second explicitly authorized secret
-  read because the first one-time read was consumed by the fail-closed portable
-  regex defect. Final restore, rollback, and actual-cost evidence remain open.
+  Console. The second explicitly authorized origin-token read was used only to
+  upload the value as an encrypted Worker secret. Cloudflare Worker
+  `fde-platform-prod-edge` now serves custom domain `fde-api.paxtech.net` from
+  Worker version `2e0fa223-1f73-498f-b2db-2ad6b02a8c42`; an edge `GET /health`
+  returned `200`, status `ok`, and source revision
+  `bb0b25a76887ccf9e4c5a08c57fc3db46eac77d6`, while a direct-origin request
+  continued to return the exact application marker `403 origin authentication
+  failed`. Evidence file `20260817T041839Z-cloudflare-edge.json` contains no
+  secret values. The rollback drill temporarily routed 100 percent traffic to
+  revision `fde-prod-00003-nm7`, verified edge health, then restored 100 percent
+  traffic to `fde-prod-00004-lz5`; a subsequent read-only check confirmed that
+  restored traffic state. Evidence file `20260817T042051Z-rollback.json` records
+  both source revisions. Final backup restore and actual-cost evidence remain
+  open.
 - **Verification:**
   - [x] Remote revision/image identity matches the validated source commit.
   - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
