@@ -159,8 +159,10 @@ after all non-deferred verification for the current TODO passes.
   configuration interaction. Cloud Run v2 reports the default URI enabled,
   ingress `all`, the Invoker IAM check disabled, 100 percent latest-revision
   traffic, and successful route conditions; no `HttpIngress` policy-denial log
-  is present. KMS denial, backup/restore, rollback, and observed-cost evidence
-  also remain open.
+  is present. A single request carrying the project owner's short-lived Google
+  OIDC identity token returned the identical Google Frontend `404`, so the
+  failure is not limited to anonymous invocation. KMS denial, backup/restore,
+  rollback, and observed-cost evidence also remain open.
 - **Verification:**
   - [ ] Remote revision/image identity matches the validated source commit.
   - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
