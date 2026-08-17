@@ -147,11 +147,20 @@ after all non-deferred verification for the current TODO passes.
   `allUsers` invoker binding. Explicitly reconciling and toggling the disabled
   Invoker IAM check left the same revision at `404`. A temporary secret-free
   `fde-prod-routeprobe` created through the Cloud Run v1 API returned `200` and
-  was deleted, while audit records show the failing Terraform service was
-  created through the v2 API. A production-configured v1 comparison requires
-  explicit authorization because it would briefly duplicate access to the
-  production database, KMS, and secret references. KMS denial, backup/restore,
-  rollback, and observed-cost evidence also remain open.
+  was deleted. A separately authorized `fde-prod-v1probe` used the deployed
+  production image, runtime service account, Cloud SQL attachment, KMS key-ring
+  setting, and Secret Manager references with zero minimum and one maximum
+  instance. Its anonymous `/healthz` request returned the same Google Frontend
+  `404`, so the conditional origin-token request was not sent; the probe was
+  immediately deleted and deletion was verified. This rules out the v2 create
+  API as the sole cause. The scheduled `fde-prod-commands` service uses the same
+  image and Cloud SQL instance and continues to return `200`, which narrows the
+  failure to the main API service's public invocation path or an API-specific
+  configuration interaction. Cloud Run v2 reports the default URI enabled,
+  ingress `all`, the Invoker IAM check disabled, 100 percent latest-revision
+  traffic, and successful route conditions; no `HttpIngress` policy-denial log
+  is present. KMS denial, backup/restore, rollback, and observed-cost evidence
+  also remain open.
 - **Verification:**
   - [ ] Remote revision/image identity matches the validated source commit.
   - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
