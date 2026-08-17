@@ -224,11 +224,18 @@ after all non-deferred verification for the current TODO passes.
   the exact key version is `DESTROY_SCHEDULED` until
   `2026-08-18T04:11:12.905914Z`. Pending evidence
   `20260817T040927Z-backup-restore.json` correctly does not claim final restore
-  success. Current-image evidence files `20260817T041139Z-kms-denial.json` and
+  success. After refreshing operator ADC against the PAX Google account, a
+  complete waiting-state rerun validated the deployed source, dedicated backup,
+  Cloud SQL proxy, database-secret shape, fixture metadata, and external key
+  state before exiting with the expected code 75. A read-only Go KMS client call
+  using the same ADC also returned `DESTROY_SCHEDULED`. Evidence files
+  `20260817T051906Z-backup-restore.json` and
+  `20260817T052019Z-adc-preflight.json` record these preconditions without
+  credentials or access tokens. Current-image evidence files
+  `20260817T041139Z-kms-denial.json` and
   `20260817T041155Z-resource-config.json` contain no secret values. The labeled
-  `US` multi-region BigQuery dataset `pax-fde-prod:fde_billing_export` exists;
-  enabling Detailed Billing export awaits operator reauthentication in Cloud
-  Console. The second explicitly authorized origin-token read was used only to
+  `US` multi-region BigQuery dataset `pax-fde-prod:fde_billing_export` exists.
+  The second explicitly authorized origin-token read was used only to
   upload the value as an encrypted Worker secret. Cloudflare Worker
   `fde-platform-prod-edge` now serves custom domain `fde-api.paxtech.net` from
   Worker version `2e0fa223-1f73-498f-b2db-2ad6b02a8c42`; an edge `GET /health`
