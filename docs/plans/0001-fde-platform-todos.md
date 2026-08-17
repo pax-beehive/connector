@@ -240,8 +240,14 @@ after all non-deferred verification for the current TODO passes.
   revision `fde-prod-00003-nm7`, verified edge health, then restored 100 percent
   traffic to `fde-prod-00004-lz5`; a subsequent read-only check confirmed that
   restored traffic state. Evidence file `20260817T042051Z-rollback.json` records
-  both source revisions. Final backup restore and actual-cost evidence remain
-  open.
+  both source revisions. Detailed Billing Export is now enabled for Billing
+  Account `010B0A-372B6F-9675ED` into the existing `US` dataset
+  `pax-fde-prod:fde_billing_export`; the console confirms Standard, FOCUS,
+  Pricing, and CUD exports remain disabled. Evidence file
+  `20260817T051227Z-billing-export.json` records the configuration without
+  secret values. The export table has not appeared yet, so the first actual-cost
+  report remains pending Google's asynchronous initial export. Final backup
+  restore and actual-cost evidence remain open.
 - **Verification:**
   - [x] Remote revision/image identity matches the validated source commit.
   - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
