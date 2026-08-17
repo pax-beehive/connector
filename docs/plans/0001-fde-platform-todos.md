@@ -252,14 +252,38 @@ after all non-deferred verification for the current TODO passes.
   `pax-fde-prod:fde_billing_export`; the console confirms Standard, FOCUS,
   Pricing, and CUD exports remain disabled. Evidence file
   `20260817T051227Z-billing-export.json` records the configuration without
-  secret values. The export table has not appeared yet, so the first actual-cost
-  report remains pending Google's asynchronous initial export. Final backup
-  restore and actual-cost evidence remain open.
+  secret values. The detailed export table has since appeared, but a read-only
+  query at `2026-08-17T16:35Z` found zero rows for `pax-fde-prod`, so the first
+  actual-cost report remains pending Google's asynchronous initial export.
+  Platform commits `e062cf6`, `a9f0900`, `c38668e`, and `c4b6699` make missing,
+  disabled, and cross-tenant connection rejection durable and replayable,
+  restore normal releases to 100 percent latest-revision traffic, and fix the
+  fail-closed release verifier's secret config creation order. The final
+  deployment serves exact commit
+  `c4b669903351410088a6f6b5fbda822ee4197122` on revision
+  `fde-prod-00007-cft` from immutable digest
+  `sha256:1e26ebcf175beaf53ce295b23658165ef386694685eb0664bea499c478f96231`.
+  Build `615f7572-2e46-4320-a887-872b304ad4c1`, migration execution
+  `fde-prod-migrate-czt4d`, and runtime-role configuration execution
+  `fde-prod-configure-runtime-w897f` succeeded. The full Terraform refresh-plan
+  returned no changes. Official evidence
+  `20260817T163357Z-release-verification.json` proves matching Terraform source,
+  Cloud Run image, OCI revision label, and edge revision; exact application
+  direct-origin rejection; invalid-key rejection; and first plus replayed
+  durable rejection for both cross-tenant and disabled connections. A
+  post-verification database query confirmed zero disposable tenants,
+  connections, and action rows remain. Current-image evidence
+  `20260817T163448Z-kms-denial.json` records successful typed KMS denial execution
+  `fde-prod-kms-denial-md2bz`, and
+  `20260817T163450Z-resource-config.json` captures the final resource state
+  without secret values. Final backup restore remains pending irreversible KMS
+  destruction at `2026-08-18T04:11:12.905914Z`; actual-cost evidence remains
+  pending the first project billing-export rows.
 - **Verification:**
   - [x] Remote revision/image identity matches the validated source commit.
   - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
         Instagram smoke action.
-  - [ ] Direct-origin, invalid-key, wrong-tenant, and revoked-connection calls
+  - [x] Direct-origin, invalid-key, wrong-tenant, and disabled-connection calls
         are rejected.
   - [ ] Backup restore, rollback, migration, and key-access failure drills have
         timestamped evidence.
