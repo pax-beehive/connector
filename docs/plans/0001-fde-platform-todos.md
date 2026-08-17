@@ -162,7 +162,14 @@ after all non-deferred verification for the current TODO passes.
   is present. A single request carrying the project owner's short-lived Google
   OIDC identity token returned the identical Google Frontend `404`, so the
   failure is not limited to anonymous invocation. KMS denial, backup/restore,
-  rollback, and observed-cost evidence also remain open.
+  rollback, and observed-cost evidence also remain open. Two additional
+  secret-free probes used the same runtime service account with the public
+  hello image. `fde-prod-saprobe` returned `200`; `fde-prod-sqlprobe` added the
+  production Cloud SQL attachment and also returned `200`. Each probe used
+  zero minimum and one maximum instance, received exactly one anonymous
+  request, and was deleted with deletion verified. The runtime service account
+  and Cloud SQL attachment are therefore ruled out, leaving the production
+  image entrypoint or API-mode environment as the remaining differentiators.
 - **Verification:**
   - [ ] Remote revision/image identity matches the validated source commit.
   - [ ] **Deferred to TODO 16:** A remote platform key invokes the authorized
