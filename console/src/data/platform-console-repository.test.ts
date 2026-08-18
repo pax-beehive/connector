@@ -68,6 +68,7 @@ describe("PlatformConsoleRepository", () => {
     expect(fetcher).toHaveBeenCalledWith(
       "https://admin.example.com/v1/admin/snapshot",
       expect.objectContaining({
+        redirect: "manual",
         headers: expect.objectContaining({
           "CF-Access-Client-Id": "client.access",
           "CF-Access-Client-Secret": "secret-value",
@@ -102,5 +103,24 @@ describe("PlatformConsoleRepository", () => {
     });
 
     await expect(repository.getSnapshot()).rejects.toThrow("Admin snapshot response is invalid");
+  });
+
+  it("rejects redirects without relying on an unsupported edge redirect mode", async () => {
+    const fetcher = vi.fn(async () => new Response(null, {
+      status: 302,
+      headers: { Location: "https://unexpected.example.com" },
+    }));
+    const repository = new PlatformConsoleRepository({
+      edgeUrl: "https://admin.example.com",
+      clientId: "client.access",
+      clientSecret: "secret-value",
+      fetcher,
+    });
+
+    await expect(repository.getSnapshot()).rejects.toThrow("Admin snapshot request failed with status 302");
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://admin.example.com/v1/admin/snapshot",
+      expect.objectContaining({ redirect: "manual" }),
+    );
   });
 });

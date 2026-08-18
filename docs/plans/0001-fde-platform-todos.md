@@ -445,8 +445,16 @@ after all non-deferred verification for the current TODO passes.
   persisted without separate storage authorization; future automation will
   require an authorized secret rotation and storage step. The one-time
   actor-registration job was deleted, and the final Terraform plan reported no
-  changes. The live console UI remains on its sample repository, and
-  user-facing Access roles plus all management actions remain open.
+  changes. A later production UI slice deployed Worker version
+  `092762c2-5180-4d89-b6bc-60c09dece41e` at
+  `https://fde-console.paxtech.net`. Its owner-only Access policy admits the
+  named Console owner, while a dedicated one-year service identity is stored
+  only as encrypted Worker secrets and registered as a scope-all `viewer`.
+  Browser E2E verified live server rendering plus tenant and connector client
+  navigation against one tenant and one connection. The Worker uses manual
+  redirect handling because the edge runtime rejects `redirect: "error"`;
+  redirect responses still fail closed through the non-2xx status check.
+  User-facing role mapping plus all management actions remain open.
 - **Verification:**
   - [ ] JWT/JWKS fixtures cover valid, expired, wrong-audience, unknown-user,
         viewer, operator, admin, and service identities.

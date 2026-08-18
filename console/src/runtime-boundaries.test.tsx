@@ -52,6 +52,16 @@ describe("runtime boundaries", () => {
     await expect(response.text()).resolves.toBe("application");
   });
 
+  it("dispatches local production requests when Worker bindings are absent", async () => {
+    const response = await worker.fetch(
+      new Request("http://localhost/"),
+      undefined as unknown as Parameters<typeof worker.fetch>[1],
+      runtimeContext(),
+    );
+
+    await expect(response.text()).resolves.toBe("application");
+  });
+
   it("rejects Cloudflare requests without an Access assertion", async () => {
     const response = await worker.fetch(
       new Request("https://fde-console.paxtech.net/"),

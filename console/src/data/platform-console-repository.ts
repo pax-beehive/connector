@@ -104,7 +104,7 @@ export class PlatformConsoleRepository implements ConsoleRepository {
         "CF-Access-Client-Secret": this.clientSecret,
       },
       cache: "no-store",
-      redirect: "error",
+      redirect: "manual",
     });
     if (!response.ok) {
       throw new Error(`Admin snapshot request failed with status ${response.status}`);
