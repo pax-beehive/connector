@@ -20,6 +20,10 @@ vi.mock("vinext/server/image-optimization", () => ({
   }),
 }));
 
+vi.mock("next/headers", () => ({
+  headers: vi.fn(async () => new Headers()),
+}));
+
 import RootLayout from "../app/layout";
 import Home from "../app/page";
 import worker from "../worker/index";

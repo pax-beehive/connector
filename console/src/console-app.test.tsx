@@ -121,4 +121,37 @@ describe("ConsoleApp", () => {
     fireEvent.click(screen.getByRole("button", { name: "Close navigation overlay" }));
     expect(container.querySelector(".sidebar")).not.toHaveClass("sidebar-open");
   });
+
+  it("labels live metadata truthfully and keeps unavailable mutations disabled", () => {
+    render(<ConsoleApp snapshot={{
+      ...prototypeSnapshot,
+      mode: "live",
+      generatedAt: "2026-08-18T03:04:31Z",
+      auditId: 9,
+      attention: [],
+      routes: [],
+      events: [],
+      usage: [{ tenantId: "tenant-1", label: "Northstar · actions.calls", value: "3", detail: "$0.12 recorded", tone: "neutral" }],
+    }} />);
+
+    expect(screen.getByText("Live metadata")).toBeVisible();
+    expect(screen.getByText("Production")).toBeVisible();
+    expect(screen.queryByText("Prototype data")).not.toBeInTheDocument();
+    expect(screen.getByText("No action metadata currently needs attention.")).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "Connectors" }));
+    expect(screen.getAllByRole("button", { name: "Connection API pending" })[0]).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Events" }));
+    expect(screen.getByText("Event metadata API pending.")).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "LLM routing" }));
+    expect(screen.getByText("Routing policy API pending.")).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "Usage and cost" }));
+    expect(screen.getByText("Action ledger aggregates")).toBeVisible();
+
+    fireEvent.click(screen.getByRole("button", { name: "Audit log" }));
+    expect(screen.getByText("Recorded activity")).toBeVisible();
+  });
 });

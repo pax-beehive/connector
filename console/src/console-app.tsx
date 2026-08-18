@@ -29,13 +29,13 @@ export function ConsoleApp({ snapshot }: { snapshot: ConsoleSnapshot }) {
 
   return (
     <div className="console-shell" data-theme={theme}>
-      <Sidebar active={view} open={sidebarOpen} onSelect={selectView} onClose={() => setSidebarOpen(false)} />
+      <Sidebar active={view} open={sidebarOpen} mode={snapshot.mode} actor={snapshot.actor} onSelect={selectView} onClose={() => setSidebarOpen(false)} />
       <div className="workspace">
-        <Topbar theme={theme} tenants={snapshot.tenants} tenantId={tenantId} onTenantChange={setTenantId} onThemeChange={() => setTheme(theme === "dark" ? "light" : "dark")} onMenu={() => setSidebarOpen(true)} />
+        <Topbar theme={theme} mode={snapshot.mode} tenants={snapshot.tenants} tenantId={tenantId} onTenantChange={setTenantId} onThemeChange={() => setTheme(theme === "dark" ? "light" : "dark")} onMenu={() => setSidebarOpen(true)} />
         <main className="main-content">{renderView(view, visibleSnapshot, selectedTenant?.name, () => setConnectOpen(true))}</main>
       </div>
       {sidebarOpen ? <button className="sidebar-scrim" type="button" aria-label="Close navigation overlay" onClick={() => setSidebarOpen(false)} /> : null}
-      {connectOpen && selectedTenant ? <ConnectDialog tenantName={selectedTenant.name} onClose={() => setConnectOpen(false)} /> : null}
+      {snapshot.mode === "prototype" && connectOpen && selectedTenant ? <ConnectDialog tenantName={selectedTenant.name} onClose={() => setConnectOpen(false)} /> : null}
     </div>
   );
 }
@@ -43,17 +43,17 @@ export function ConsoleApp({ snapshot }: { snapshot: ConsoleSnapshot }) {
 function renderView(view: ViewId, snapshot: ConsoleSnapshot, tenantName: string | undefined, onConnect: () => void) {
   switch (view) {
     case "tenants":
-      return <TenantsView tenants={snapshot.tenants} />;
+      return <TenantsView mode={snapshot.mode} tenants={snapshot.tenants} />;
     case "connectors":
-      return <ConnectorsView connections={snapshot.connections} canConnect={Boolean(tenantName)} onConnect={onConnect} />;
+      return <ConnectorsView mode={snapshot.mode} connections={snapshot.connections} canConnect={snapshot.mode === "prototype" && Boolean(tenantName)} onConnect={onConnect} />;
     case "routing":
-      return <RoutingView routes={snapshot.routes} />;
+      return <RoutingView mode={snapshot.mode} routes={snapshot.routes} />;
     case "events":
-      return <EventsView events={snapshot.events} />;
+      return <EventsView mode={snapshot.mode} events={snapshot.events} />;
     case "usage":
-      return <UsageView usage={snapshot.usage} />;
+      return <UsageView mode={snapshot.mode} usage={snapshot.usage} />;
     case "audit":
-      return <AuditView entries={snapshot.audit} />;
+      return <AuditView mode={snapshot.mode} entries={snapshot.audit} />;
     default:
       return <OverviewView snapshot={snapshot} />;
   }

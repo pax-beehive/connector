@@ -16,4 +16,28 @@ describe("scopeConsoleSnapshot", () => {
   it("keeps the explicit all-tenant context available", () => {
     expect(scopeConsoleSnapshot(prototypeSnapshot, "")).toBe(prototypeSnapshot);
   });
+
+  it("scopes live usage by stable tenant id", () => {
+    const liveSnapshot = {
+      ...prototypeSnapshot,
+      mode: "live" as const,
+      usage: [
+        { tenantId: "tenant-1", label: "Northstar usage", value: "2", detail: "$0.02", tone: "neutral" as const },
+        { tenantId: "tenant-2", label: "Acme usage", value: "3", detail: "$0.03", tone: "neutral" as const },
+      ],
+    };
+
+    expect(scopeConsoleSnapshot(liveSnapshot, "tenant-2").usage.map((meter) => meter.label)).toEqual(["Acme usage"]);
+  });
+
+  it("relates provider health by stable provider id instead of display name", () => {
+    const liveSnapshot = {
+      ...prototypeSnapshot,
+      mode: "live" as const,
+      providers: [{ id: "instagram", name: "Instagram", status: "healthy" as const, detail: "active", window: "Current metadata" }],
+      connections: [{ ...prototypeSnapshot.connections[0], provider: "instagram" }],
+    };
+
+    expect(scopeConsoleSnapshot(liveSnapshot, "tenant-1").providers.map((provider) => provider.name)).toEqual(["Instagram"]);
+  });
 });

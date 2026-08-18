@@ -1,6 +1,10 @@
 import type { ConsoleRepository, ConsoleSnapshot } from "../domain/console";
 
 export const prototypeSnapshot: ConsoleSnapshot = {
+  mode: "prototype",
+  generatedAt: "",
+  auditId: 0,
+  actor: { kind: "service", role: "viewer" },
   metrics: [
     { label: "Active tenants", value: "18", detail: "+3 this month", tone: "positive" },
     { label: "Action success", value: "99.14%", detail: "+0.42% over 7 days", tone: "positive" },
@@ -13,22 +17,22 @@ export const prototypeSnapshot: ConsoleSnapshot = {
     { id: "att-3", tenantId: "tenant-3", title: "New tenant provisioned", detail: "Kite & Co · prototype", time: "1 hr ago", tone: "positive" },
   ],
   providers: [
-    { name: "Instagram", status: "degraded", uptime: "99.76%", latency: "612 ms" },
-    { name: "OpenAI", status: "healthy", uptime: "99.99%", latency: "341 ms" },
-    { name: "Anthropic", status: "healthy", uptime: "99.98%", latency: "376 ms" },
-    { name: "Cloudflare", status: "healthy", uptime: "100%", latency: "82 ms" },
+    { id: "Instagram", name: "Instagram", status: "degraded", detail: "612 ms p95", window: "99.76% sample uptime" },
+    { id: "OpenAI", name: "OpenAI", status: "healthy", detail: "341 ms p95", window: "99.99% sample uptime" },
+    { id: "Anthropic", name: "Anthropic", status: "healthy", detail: "376 ms p95", window: "99.98% sample uptime" },
+    { id: "Cloudflare", name: "Cloudflare", status: "healthy", detail: "82 ms p95", window: "100% sample uptime" },
   ],
   tenants: [
-    { id: "tenant-1", name: "Northstar Retail", slug: "northstar-retail", plan: "Scale", status: "degraded", connections: 4, calls: "42.8k", spend: "$684" },
-    { id: "tenant-2", name: "Acme Studios", slug: "acme-studios", plan: "Growth", status: "healthy", connections: 3, calls: "31.2k", spend: "$492" },
-    { id: "tenant-3", name: "Kite & Co", slug: "kite-and-co", plan: "Growth", status: "healthy", connections: 2, calls: "18.7k", spend: "$306" },
-    { id: "tenant-4", name: "Monarch Labs", slug: "monarch-labs", plan: "Starter", status: "failed", connections: 1, calls: "2.4k", spend: "$74" },
+    { id: "tenant-1", name: "Northstar Retail", slug: "northstar-retail", status: "degraded", connections: 4, actions: "42.8k", cost: "$684" },
+    { id: "tenant-2", name: "Acme Studios", slug: "acme-studios", status: "healthy", connections: 3, actions: "31.2k", cost: "$492" },
+    { id: "tenant-3", name: "Kite & Co", slug: "kite-and-co", status: "healthy", connections: 2, actions: "18.7k", cost: "$306" },
+    { id: "tenant-4", name: "Monarch Labs", slug: "monarch-labs", status: "failed", connections: 1, actions: "2.4k", cost: "$74" },
   ],
   connections: [
-    { id: "conn-1", tenantId: "tenant-1", provider: "Instagram", account: "@northstar", tenant: "Northstar Retail", status: "degraded", lastSync: "12 min ago", eventCount: "9.8k" },
-    { id: "conn-2", tenantId: "tenant-2", provider: "Instagram", account: "@acmecreates", tenant: "Acme Studios", status: "healthy", lastSync: "2 min ago", eventCount: "7.4k" },
-    { id: "conn-3", tenantId: "tenant-1", provider: "OpenAI", account: "Sample project", tenant: "Northstar Retail", status: "healthy", lastSync: "Sample", eventCount: "42.8k" },
-    { id: "conn-4", tenantId: "tenant-3", provider: "Anthropic", account: "Sample workspace", tenant: "Kite & Co", status: "healthy", lastSync: "Sample", eventCount: "18.7k" },
+    { id: "conn-1", tenantId: "tenant-1", provider: "Instagram", account: "@northstar", tenant: "Northstar Retail", status: "degraded", lastActivity: "12 min ago", actionCount: "9.8k" },
+    { id: "conn-2", tenantId: "tenant-2", provider: "Instagram", account: "@acmecreates", tenant: "Acme Studios", status: "healthy", lastActivity: "2 min ago", actionCount: "7.4k" },
+    { id: "conn-3", tenantId: "tenant-1", provider: "OpenAI", account: "Sample project", tenant: "Northstar Retail", status: "healthy", lastActivity: "Sample", actionCount: "42.8k" },
+    { id: "conn-4", tenantId: "tenant-3", provider: "Anthropic", account: "Sample workspace", tenant: "Kite & Co", status: "healthy", lastActivity: "Sample", actionCount: "18.7k" },
   ],
   routes: [
     { id: "route-1", tenantId: "tenant-1", tenant: "Northstar Retail", useCase: "Customer support", primary: "gpt-5.2", fallback: "claude-sonnet-4", status: "healthy" },
@@ -42,9 +46,9 @@ export const prototypeSnapshot: ConsoleSnapshot = {
     { id: "evt_01JYA8H7", tenantId: "tenant-3", topic: "connector.credential.rotated", tenant: "Kite & Co", status: "healthy", attempts: 1, receivedAt: "00:44:03" },
   ],
   usage: [
-    { label: "Action calls", value: "96.4k", detail: "150k monthly allowance", progress: 64, tone: "positive" },
-    { label: "LLM tokens", value: "28.7M", detail: "40M monthly allowance", progress: 72, tone: "warning" },
-    { label: "Provider spend", value: "$2,840", detail: "$4,500 monthly budget", progress: 62, tone: "neutral" },
+    { tenantId: "", label: "Action calls", value: "96.4k", detail: "150k monthly allowance", progress: 64, tone: "positive" },
+    { tenantId: "", label: "LLM tokens", value: "28.7M", detail: "40M monthly allowance", progress: 72, tone: "warning" },
+    { tenantId: "", label: "Provider spend", value: "$2,840", detail: "$4,500 monthly budget", progress: 62, tone: "neutral" },
   ],
   audit: [
     { id: "aud-1", tenantId: "tenant-1", actor: "example.operator@pax.invalid", action: "connection.rotate", target: "Instagram · Northstar Retail", source: "Access adapter", time: "00:36:14" },

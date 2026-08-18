@@ -9,6 +9,12 @@ export type ViewId =
 
 export type Health = "healthy" | "degraded" | "failed";
 export type Tone = "positive" | "warning" | "critical" | "neutral";
+export type DataMode = "prototype" | "live";
+
+export interface ConsoleActor {
+  kind: "user" | "service";
+  role: "viewer" | "operator" | "admin";
+}
 
 export interface Metric {
   label: string;
@@ -27,21 +33,21 @@ export interface AttentionItem {
 }
 
 export interface ProviderHealth {
+  id: string;
   name: string;
   status: Health;
-  uptime: string;
-  latency: string;
+  detail: string;
+  window: string;
 }
 
 export interface Tenant {
   id: string;
   name: string;
   slug: string;
-  plan: string;
   status: Health;
   connections: number;
-  calls: string;
-  spend: string;
+  actions: string;
+  cost: string;
 }
 
 export interface Connection {
@@ -51,8 +57,8 @@ export interface Connection {
   account: string;
   tenant: string;
   status: Health;
-  lastSync: string;
-  eventCount: string;
+  lastActivity: string;
+  actionCount: string;
 }
 
 export interface ModelRoute {
@@ -76,10 +82,11 @@ export interface EventRecord {
 }
 
 export interface UsageMeter {
+  tenantId: string;
   label: string;
   value: string;
   detail: string;
-  progress: number;
+  progress?: number;
   tone: Tone;
 }
 
@@ -94,6 +101,10 @@ export interface AuditEntry {
 }
 
 export interface ConsoleSnapshot {
+  mode: DataMode;
+  generatedAt: string;
+  auditId: number;
+  actor: ConsoleActor;
   metrics: Metric[];
   attention: AttentionItem[];
   providers: ProviderHealth[];

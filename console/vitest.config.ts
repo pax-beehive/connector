@@ -7,6 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "next/font/google": fileURLToPath(new URL("./tests/next-font-google.ts", import.meta.url)),
+      "next/headers": fileURLToPath(new URL("./tests/next-headers.ts", import.meta.url)),
     },
   },
   test: {
