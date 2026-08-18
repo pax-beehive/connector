@@ -424,6 +424,29 @@ after all non-deferred verification for the current TODO passes.
   actions remain disabled. This proves the hosting and private-access slice
   without claiming Cloudflare Access JWT verification, live admin data, or any
   TODO 13 command behavior.
+  The first production admin-infrastructure slice is now independently
+  verified without enabling any operator mutation. Platform source commit
+  `12c3774f4d376df195b47719c1973e5bfce87bc6` runs the API and dedicated
+  `fde-prod-console` service from immutable digest
+  `sha256:26c14b196b61c5305118a1bc57befa31d815c94f55dcb17a7437afd893621634`.
+  Migration execution `fde-prod-migrate-2jb4f` installed schema version 8;
+  runtime and console role configuration executions succeeded. The console
+  service account has only project-level Cloud SQL client access, can read
+  only its console database secret, and has no origin-token or tenant-KMS
+  binding. Cloudflare Access application `fde-console-api` protects
+  `fde-console-api.paxtech.net` with the `fde-console-service-read` Service
+  Auth policy and a one-year service token. Anonymous metadata access returns
+  `403`; an authenticated request returns `200` as a `service` actor with the
+  `viewer` role and durable audit receipt `9`. The snapshot reported one
+  tenant, one connection, zero actions, and zero forbidden secret-bearing
+  fields. Evidence file `20260818T030431Z-admin-verification.json` records only
+  the source revision, statuses, role, audit id, and aggregate counts. The
+  token secret was used for that verification and then discarded rather than
+  persisted without separate storage authorization; future automation will
+  require an authorized secret rotation and storage step. The one-time
+  actor-registration job was deleted, and the final Terraform plan reported no
+  changes. The live console UI remains on its sample repository, and
+  user-facing Access roles plus all management actions remain open.
 - **Verification:**
   - [ ] JWT/JWKS fixtures cover valid, expired, wrong-audience, unknown-user,
         viewer, operator, admin, and service identities.
