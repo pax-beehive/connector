@@ -12,8 +12,25 @@ const { d1, r2 } = hostingConfig;
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 
 const localBindingConfig = {
+  name: "fde-platform-prod-console-ui",
   main: "./worker/index.ts",
+  account_id: "221784d24eb2a95d148bc96b6f06d6be",
   compatibility_flags: ["nodejs_compat"],
+  workers_dev: false,
+  preview_urls: false,
+  routes: [
+    {
+      pattern: "fde-console.paxtech.net",
+      custom_domain: true,
+    },
+  ],
+  vars: {
+    ADMIN_EDGE_URL: "https://fde-console-api.paxtech.net",
+    CONSOLE_ACCESS_AUDIENCE: "e1018e78903e17cb062ac35148f4a858d484171a7b9b68c78e22e9bce03058cd",
+    CONSOLE_ACCESS_ISSUER: "https://billowing-dream-9314.cloudflareaccess.com",
+    CONSOLE_AUTH_MODE: "cloudflare_access",
+    CONSOLE_DATA_MODE: "live",
+  },
   d1_databases: d1
     ? [
         {

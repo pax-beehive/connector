@@ -12,7 +12,7 @@ export async function loadConsoleSnapshot(options: LiveConsoleOptions): Promise<
   const mode = options.environment.CONSOLE_DATA_MODE ?? "prototype";
   if (mode === "prototype") return prototypeRepository.getSnapshot();
   if (mode !== "live") throw new Error("Console data mode is invalid");
-  requireSitesIdentity(options.requestHeaders);
+  requireConsoleIdentity(options.requestHeaders, options.environment.CONSOLE_AUTH_MODE ?? "sites");
 
   return new PlatformConsoleRepository({
     edgeUrl: requiredSetting(options.environment.ADMIN_EDGE_URL, "admin edge URL"),
@@ -22,7 +22,16 @@ export async function loadConsoleSnapshot(options: LiveConsoleOptions): Promise<
   }).getSnapshot();
 }
 
-function requireSitesIdentity(requestHeaders: Headers) {
+function requireConsoleIdentity(requestHeaders: Headers, mode: string) {
+  if (mode === "cloudflare_access") {
+    const assertion = requestHeaders.get("cf-access-jwt-assertion");
+    if (!assertion || assertion.length > 16_384) {
+      throw new Error("Verified Cloudflare Access identity is required");
+    }
+    return;
+  }
+  if (mode !== "sites") throw new Error("Console auth mode is invalid");
+
   const userID = requestHeaders.get("oai-authenticated-user-id");
   if (!userID || userID.trim() !== userID || userID.length > 256) {
     throw new Error("Authenticated Sites identity is required");

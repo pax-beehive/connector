@@ -39,6 +39,23 @@ describe("loadConsoleSnapshot", () => {
     expect(fetcher).toHaveBeenCalledOnce();
   });
 
+  it("loads live metadata after the Worker verifies Cloudflare Access", async () => {
+    const requestHeaders = new Headers({ "Cf-Access-Jwt-Assertion": "verified-by-worker" });
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify(platformSnapshot()), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    }));
+
+    const snapshot = await loadConsoleSnapshot({
+      requestHeaders,
+      environment: { ...liveEnvironment, CONSOLE_AUTH_MODE: "cloudflare_access" },
+      fetcher,
+    });
+
+    expect(snapshot.mode).toBe("live");
+    expect(fetcher).toHaveBeenCalledOnce();
+  });
+
   it("rejects unknown data modes instead of widening to prototype data", async () => {
     await expect(loadConsoleSnapshot({
       requestHeaders: new Headers(),

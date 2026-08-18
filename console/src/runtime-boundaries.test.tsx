@@ -52,6 +52,38 @@ describe("runtime boundaries", () => {
     await expect(response.text()).resolves.toBe("application");
   });
 
+  it("rejects Cloudflare requests without an Access assertion", async () => {
+    const response = await worker.fetch(
+      new Request("https://fde-console.paxtech.net/"),
+      runtimeEnvironment({
+        CONSOLE_AUTH_MODE: "cloudflare_access",
+        CONSOLE_ACCESS_AUDIENCE: "console-audience",
+        CONSOLE_ACCESS_ISSUER: "https://pax.cloudflareaccess.com",
+      }),
+      runtimeContext(),
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.text()).resolves.toBe("Forbidden");
+  });
+
+  it("rejects an invalid Cloudflare Access assertion", async () => {
+    const response = await worker.fetch(
+      new Request("https://fde-console.paxtech.net/", {
+        headers: { "Cf-Access-Jwt-Assertion": "not-a-jwt" },
+      }),
+      runtimeEnvironment({
+        CONSOLE_AUTH_MODE: "cloudflare_access",
+        CONSOLE_ACCESS_AUDIENCE: "console-audience",
+        CONSOLE_ACCESS_ISSUER: "https://pax.cloudflareaccess.com",
+      }),
+      runtimeContext(),
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.text()).resolves.toBe("Forbidden");
+  });
+
   it("keeps image optimization behind the worker adapter", async () => {
     const response = await worker.fetch(
       new Request("http://localhost/_vinext/image"),
@@ -63,7 +95,7 @@ describe("runtime boundaries", () => {
   });
 });
 
-function runtimeEnvironment() {
+function runtimeEnvironment(overrides: Record<string, string> = {}) {
   return {
     ASSETS: { fetch: vi.fn(async () => new Response("asset")) },
     IMAGES: {
@@ -73,6 +105,7 @@ function runtimeEnvironment() {
         })),
       })),
     },
+    ...overrides,
   } as unknown as Parameters<typeof worker.fetch>[1];
 }
 
