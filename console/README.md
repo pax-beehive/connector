@@ -17,6 +17,14 @@ can be replaced by authenticated platform APIs without changing page modules.
 The current repository is `prototypeRepository`. It is intentionally labeled in
 the interface and makes no live production claims.
 
+## Private preview
+
+The validated prototype is published at
+`https://pax-fde-console.toddbarnes.chatgpt.site`. Hosting access is owner-only:
+the policy has one allowed owner, no groups, and no external visitors, while an
+anonymous request receives `401`. The preview remains sample-only; it does not
+connect to platform data or enable operator actions.
+
 ## Commands
 
 ```bash

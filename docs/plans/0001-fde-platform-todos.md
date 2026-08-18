@@ -415,6 +415,15 @@ after all non-deferred verification for the current TODO passes.
   suspend/reactivate tenant, revoke keys, disable/rotate connection, retry a
   safe job, inspect metadata-only health, and begin offboarding. Service
   automation uses a distinct service identity.
+- **Implementation status:** The Console prototype is privately deployed at
+  `https://pax-fde-console.toddbarnes.chatgpt.site` from exact source commit
+  `d2546f49f8d862a780e59b89811e71e240ab82c2`. Hosting version 1 uses a custom
+  owner-only policy with one allowed owner, no allowed groups, and no external
+  visitors; an anonymous request returned `401`. The deployed repository is
+  still the explicitly labeled sample implementation, and all production
+  actions remain disabled. This proves the hosting and private-access slice
+  without claiming Cloudflare Access JWT verification, live admin data, or any
+  TODO 13 command behavior.
 - **Verification:**
   - [ ] JWT/JWKS fixtures cover valid, expired, wrong-audience, unknown-user,
         viewer, operator, admin, and service identities.
