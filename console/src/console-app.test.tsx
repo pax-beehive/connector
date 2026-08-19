@@ -159,6 +159,79 @@ describe("ConsoleApp", () => {
     expect(screen.getByText("Recorded activity")).toBeVisible();
   });
 
+  it("offers the prototype tenant creation framework without modifying data", () => {
+    renderConsole();
+    fireEvent.click(screen.getByRole("button", { name: "Tenants" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Add tenant" }));
+
+    expect(screen.getByRole("dialog", { name: "Add tenant" })).toBeVisible();
+    expect(screen.getByText("Prototype tenant creation")).toBeVisible();
+    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Close" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("keeps tenant creation disabled for a live viewer", () => {
+    render(<ConsoleApp snapshot={{
+      ...prototypeSnapshot,
+      mode: "live",
+      actor: { kind: "user", role: "viewer" },
+    }} />);
+    fireEvent.click(screen.getByRole("button", { name: "Tenants" }));
+
+    expect(screen.getByRole("button", { name: "Add tenant" })).toBeDisabled();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("lets a live operator create a tenant and shows the registered metadata", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(Response.json({
+      request_id: "req-1",
+      tenant: { id: "tenant-9", slug: "northstar-retail", name: "Northstar Retail", status: "active" },
+    }, { status: 201 }));
+    vi.stubGlobal("fetch", fetcher);
+    render(<ConsoleApp snapshot={{
+      ...prototypeSnapshot,
+      mode: "live",
+      actor: { kind: "user", role: "operator" },
+    }} />);
+    fireEvent.click(screen.getByRole("button", { name: "Tenants" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add tenant" }));
+
+    fireEvent.change(screen.getByLabelText("Tenant name"), { target: { value: "Northstar Retail" } });
+    fireEvent.change(screen.getByLabelText("Slug"), { target: { value: "northstar-retail" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create tenant" }));
+
+    await waitFor(() => expect(screen.getByText("Tenant created")).toBeVisible());
+    const dialog = screen.getByRole("dialog", { name: "Add tenant" });
+    expect(within(dialog).getByText("northstar-retail")).toBeVisible();
+    expect(within(dialog).getByText("active")).toBeVisible();
+    expect(fetcher).toHaveBeenCalledWith("/api/admin/tenants", expect.objectContaining({
+      method: "POST",
+      body: JSON.stringify({ slug: "northstar-retail", name: "Northstar Retail" }),
+    }));
+  });
+
+  it("surfaces a slug conflict when the admin API rejects the tenant", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(Response.json({
+      error: { kind: "tenant_conflict" },
+    }, { status: 409 }));
+    vi.stubGlobal("fetch", fetcher);
+    render(<ConsoleApp snapshot={{
+      ...prototypeSnapshot,
+      mode: "live",
+      actor: { kind: "user", role: "admin" },
+    }} />);
+    fireEvent.click(screen.getByRole("button", { name: "Tenants" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add tenant" }));
+
+    fireEvent.change(screen.getByLabelText("Tenant name"), { target: { value: "Northstar Retail" } });
+    fireEvent.change(screen.getByLabelText("Slug"), { target: { value: "northstar-retail" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create tenant" }));
+
+    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("that slug is already taken"));
+    expect(screen.queryByText("Tenant created")).not.toBeInTheDocument();
+  });
+
   it("lets a live operator save and test an Instagram credential without redisplaying secrets", async () => {
     const connectionID = "10000000-0000-4000-8000-000000000001";
     const fetcher = vi.fn<typeof fetch>()

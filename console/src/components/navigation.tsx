@@ -1,6 +1,7 @@
 import {
   Activity,
   Blocks,
+  Brain,
   Building2,
   Cable,
   ChartNoAxesCombined,
@@ -19,6 +20,7 @@ const items: Array<{ id: ViewId; label: string; icon: typeof Gauge }> = [
   { id: "tenants", label: "Tenants", icon: Building2 },
   { id: "connectors", label: "Connectors", icon: Cable },
   { id: "routing", label: "LLM routing", icon: Route },
+  { id: "llm", label: "LLM gateway", icon: Brain },
   { id: "events", label: "Events", icon: Activity },
   { id: "usage", label: "Usage and cost", icon: ChartNoAxesCombined },
   { id: "audit", label: "Audit log", icon: ClipboardList },
@@ -43,9 +45,9 @@ export function Sidebar({ active, open, mode, actor, onSelect, onClose }: { acti
       </div>
       <nav aria-label="Primary navigation" className="nav-list">
         <p>Workspace</p>
-        {items.slice(0, 4).map((item) => <NavItem key={item.id} item={item} active={active} onSelect={onSelect} />)}
+        {items.slice(0, 5).map((item) => <NavItem key={item.id} item={item} active={active} onSelect={onSelect} />)}
         <p>Monitoring</p>
-        {items.slice(4).map((item) => <NavItem key={item.id} item={item} active={active} onSelect={onSelect} />)}
+        {items.slice(5).map((item) => <NavItem key={item.id} item={item} active={active} onSelect={onSelect} />)}
       </nav>
       <div className="operator-card">
         <div className="avatar">OP</div>

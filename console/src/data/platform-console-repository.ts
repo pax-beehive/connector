@@ -4,6 +4,8 @@ import type {
   ConsoleRepository,
   ConsoleSnapshot,
   Health,
+  LlmModel,
+  LlmRoute,
   Tenant,
   Tone,
 } from "../domain/console";
@@ -26,6 +28,8 @@ interface PlatformSnapshot {
   actions: PlatformAction[];
   usage: PlatformUsage[];
   audit: PlatformAuditEntry[];
+  llm_models: PlatformLlmModel[];
+  llm_routes: PlatformLlmRoute[];
 }
 
 interface PlatformTenant {
@@ -82,6 +86,25 @@ interface PlatformAuditEntry {
   resource?: string;
   outcome: string;
   created_at: string;
+}
+
+interface PlatformLlmModel {
+  id: string;
+  provider: string;
+  endpoint: string;
+  status: string;
+  in_cost_micros_per_mtok: number;
+  out_cost_micros_per_mtok: number;
+  credential_version: number;
+}
+
+interface PlatformLlmRoute {
+  id: string;
+  tenant_id: string | null;
+  task_class: string;
+  targets: string[];
+  version: number;
+  status: string;
 }
 
 export class PlatformConsoleRepository implements ConsoleRepository {
@@ -183,6 +206,8 @@ function mapPlatformSnapshot(source: PlatformSnapshot): ConsoleSnapshot {
       tone: "neutral",
     })),
     audit: source.audit.map((entry) => mapAudit(entry)),
+    llmModels: source.llm_models.map((model) => mapLlmModel(model)),
+    llmRoutes: source.llm_routes.map((route) => mapLlmRoute(route)),
   };
 }
 
@@ -223,6 +248,29 @@ function mapAudit(source: PlatformAuditEntry): AuditEntry {
   };
 }
 
+function mapLlmModel(source: PlatformLlmModel): LlmModel {
+  return {
+    id: source.id,
+    provider: source.provider,
+    endpoint: source.endpoint,
+    status: healthFromStatus(source.status),
+    inCostMicrosPerMtok: source.in_cost_micros_per_mtok,
+    outCostMicrosPerMtok: source.out_cost_micros_per_mtok,
+    credentialVersion: source.credential_version,
+  };
+}
+
+function mapLlmRoute(source: PlatformLlmRoute): LlmRoute {
+  return {
+    id: source.id,
+    tenantId: source.tenant_id,
+    taskClass: source.task_class,
+    targets: [...source.targets],
+    version: source.version,
+    status: healthFromStatus(source.status),
+  };
+}
+
 function parseSnapshot(value: unknown): PlatformSnapshot {
   if (!isPlatformSnapshot(value)) throw new Error("Admin snapshot response is invalid");
   return value as unknown as PlatformSnapshot;
@@ -233,7 +281,8 @@ function isPlatformSnapshot(value: unknown): value is PlatformSnapshot {
   return isString(value.generated_at) && isNumber(value.audit_id) && isActor(value.actor) &&
     isArrayOf(value.tenants, isTenant) && isArrayOf(value.providers, isProvider) &&
     isArrayOf(value.connections, isConnection) && isArrayOf(value.actions, isAction) &&
-    isArrayOf(value.usage, isUsage) && isArrayOf(value.audit, isAuditEntry);
+    isArrayOf(value.usage, isUsage) && isArrayOf(value.audit, isAuditEntry) &&
+    isArrayOf(value.llm_models, isLlmModel) && isArrayOf(value.llm_routes, isLlmRoute);
 }
 
 function isActor(value: unknown) {
@@ -266,6 +315,18 @@ function isUsage(value: unknown) {
 function isAuditEntry(value: unknown) {
   return hasStrings(value, ["actor_type", "actor_id", "action", "outcome", "created_at"]) &&
     isRecord(value) && isNumber(value.id);
+}
+
+function isLlmModel(value: unknown) {
+  return hasStrings(value, ["id", "provider", "endpoint", "status"]) && isRecord(value) &&
+    isNumber(value.in_cost_micros_per_mtok) && isNumber(value.out_cost_micros_per_mtok) &&
+    isNumber(value.credential_version);
+}
+
+function isLlmRoute(value: unknown) {
+  if (!hasStrings(value, ["id", "task_class", "status"]) || !isRecord(value)) return false;
+  return (value.tenant_id === null || isString(value.tenant_id)) &&
+    isArrayOf(value.targets, isString) && isNumber(value.version);
 }
 
 function hasStrings(value: unknown, keys: string[]) {

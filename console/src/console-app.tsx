@@ -8,6 +8,7 @@ import { scopeConsoleSnapshot } from "./domain/scope-console";
 import { AuditView } from "./views/audit";
 import { ConnectorsView } from "./views/connectors";
 import { EventsView } from "./views/events";
+import { LlmView } from "./views/llm";
 import { OverviewView } from "./views/overview";
 import { RoutingView } from "./views/routing";
 import { TenantsView } from "./views/tenants";
@@ -43,11 +44,13 @@ export function ConsoleApp({ snapshot }: { snapshot: ConsoleSnapshot }) {
 function renderView(view: ViewId, snapshot: ConsoleSnapshot, tenantName: string | undefined, onConnect: () => void) {
   switch (view) {
     case "tenants":
-      return <TenantsView mode={snapshot.mode} tenants={snapshot.tenants} />;
+      return <TenantsView mode={snapshot.mode} tenants={snapshot.tenants} canCreate={snapshot.mode === "prototype" || snapshot.actor.role === "operator" || snapshot.actor.role === "admin"} />;
     case "connectors":
       return <ConnectorsView mode={snapshot.mode} connections={snapshot.connections} canConnect={Boolean(tenantName) && (snapshot.mode === "prototype" || snapshot.actor.role === "operator" || snapshot.actor.role === "admin")} hasTenant={Boolean(tenantName)} onConnect={onConnect} />;
     case "routing":
       return <RoutingView mode={snapshot.mode} routes={snapshot.routes} />;
+    case "llm":
+      return <LlmView mode={snapshot.mode} llmModels={snapshot.llmModels} llmRoutes={snapshot.llmRoutes} tenants={snapshot.tenants} canManage={snapshot.mode === "prototype" || snapshot.actor.role === "operator" || snapshot.actor.role === "admin"} />;
     case "events":
       return <EventsView mode={snapshot.mode} events={snapshot.events} />;
     case "usage":

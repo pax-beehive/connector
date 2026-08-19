@@ -56,6 +56,15 @@ export const prototypeSnapshot: ConsoleSnapshot = {
     { id: "aud-3", tenantId: "tenant-3", actor: "example.operator@pax.invalid", action: "route.publish", target: "Long-form analysis · v12", source: "Access adapter", time: "Yesterday" },
     { id: "aud-4", tenantId: "tenant-3", actor: "tenant-admin", action: "api_key.create", target: "Kite & Co · prototype", source: "Tenant console", time: "Yesterday" },
   ],
+  llmModels: [
+    { id: "openai/gpt-5", provider: "openai", endpoint: "https://api.openai.com", status: "healthy", inCostMicrosPerMtok: 1250000, outCostMicrosPerMtok: 10000000, credentialVersion: 2 },
+    { id: "deepseek/deepseek-chat", provider: "deepseek", endpoint: "https://api.deepseek.com", status: "healthy", inCostMicrosPerMtok: 270000, outCostMicrosPerMtok: 1100000, credentialVersion: 1 },
+    { id: "anthropic/claude-sonnet-4-5", provider: "anthropic", endpoint: "https://api.anthropic.com", status: "degraded", inCostMicrosPerMtok: 3000000, outCostMicrosPerMtok: 15000000, credentialVersion: 3 },
+  ],
+  llmRoutes: [
+    { id: "route-llm-1", tenantId: null, taskClass: "default", targets: ["openai/gpt-5", "deepseek/deepseek-chat"], version: 4, status: "healthy" },
+    { id: "route-llm-2", tenantId: "tenant-1", taskClass: "chat", targets: ["anthropic/claude-sonnet-4-5"], version: 2, status: "healthy" },
+  ],
 };
 
 export const prototypeRepository: ConsoleRepository = {

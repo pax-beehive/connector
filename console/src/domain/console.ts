@@ -3,6 +3,7 @@ export type ViewId =
   | "tenants"
   | "connectors"
   | "routing"
+  | "llm"
   | "events"
   | "usage"
   | "audit";
@@ -100,6 +101,25 @@ export interface AuditEntry {
   time: string;
 }
 
+export interface LlmModel {
+  id: string;
+  provider: string;
+  endpoint: string;
+  status: Health;
+  inCostMicrosPerMtok: number;
+  outCostMicrosPerMtok: number;
+  credentialVersion: number;
+}
+
+export interface LlmRoute {
+  id: string;
+  tenantId: string | null;
+  taskClass: string;
+  targets: string[];
+  version: number;
+  status: Health;
+}
+
 export interface ConsoleSnapshot {
   mode: DataMode;
   generatedAt: string;
@@ -114,6 +134,8 @@ export interface ConsoleSnapshot {
   events: EventRecord[];
   usage: UsageMeter[];
   audit: AuditEntry[];
+  llmModels: LlmModel[];
+  llmRoutes: LlmRoute[];
 }
 
 export interface ConsoleRepository {

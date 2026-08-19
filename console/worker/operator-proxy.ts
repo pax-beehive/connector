@@ -1,5 +1,9 @@
 const operatorPrefix = "/api/operator/connections/";
 const createPath = `${operatorPrefix}instagram`;
+const adminPrefix = "/api/admin/";
+const createTenantPath = `${adminPrefix}tenants`;
+const enrollLlmModelPath = `${adminPrefix}llm/models`;
+const setLlmRoutePath = `${adminPrefix}llm/routes`;
 const bodyLimit = 32 * 1024;
 const accessAssertionHeader = "Cf-Access-Jwt-Assertion";
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -8,12 +12,14 @@ export async function handleOperatorRequest(
   request: Request,
   assertion: string,
   platformEdgeUrl: string | undefined,
+  adminEdgeUrl: string | undefined,
   fetcher: typeof fetch = fetch,
 ): Promise<Response | null> {
   const incoming = new URL(request.url);
-  if (!incoming.pathname.startsWith(operatorPrefix)) return null;
+  const admin = incoming.pathname.startsWith(adminPrefix);
+  if (!admin && !incoming.pathname.startsWith(operatorPrefix)) return null;
 
-  const origin = validOrigin(platformEdgeUrl);
+  const origin = validOrigin(admin ? adminEdgeUrl : platformEdgeUrl);
   if (!origin) return operatorError(503, "operator_configuration_unavailable");
   if (incoming.search) return operatorError(404, "not_found");
   if (request.method !== "POST") return operatorError(405, "method_not_allowed");
@@ -25,7 +31,7 @@ export async function handleOperatorRequest(
 
   const body = await readBoundedBody(request);
   if (!body) return operatorError(413, "request_too_large");
-  const target = new URL(operatorPath(incoming.pathname), origin);
+  const target = new URL(admin ? adminPath(incoming.pathname) : operatorPath(incoming.pathname), origin);
   const headers = new Headers({
     "Content-Type": "application/json",
     [accessAssertionHeader]: assertion,
@@ -93,13 +99,17 @@ function validOrigin(value: string | undefined) {
 }
 
 function validPath(path: string) {
-  if (path === createPath) return true;
+  if (path === createPath || path === createTenantPath || path === enrollLlmModelPath || path === setLlmRoutePath) return true;
   const match = path.match(/^\/api\/operator\/connections\/([^/]+)\/checks$/);
   return Boolean(match && uuidPattern.test(match[1]));
 }
 
 function operatorPath(path: string) {
   return path.replace(/^\/api\/operator/, "/v1/operator");
+}
+
+function adminPath(path: string) {
+  return path.replace(/^\/api\/admin/, "/v1/admin");
 }
 
 function sanitizedResponse(response: Response) {

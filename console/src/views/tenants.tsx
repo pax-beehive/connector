@@ -1,15 +1,17 @@
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useState } from "react";
 import type { DataMode, Tenant } from "../domain/console";
+import { CreateTenantDialog } from "../components/create-tenant-dialog";
 import { HealthPill, PageHeader, Panel } from "../components/primitives";
 
-export function TenantsView({ mode, tenants }: { mode: DataMode; tenants: Tenant[] }) {
+export function TenantsView({ mode, tenants, canCreate }: { mode: DataMode; tenants: Tenant[]; canCreate: boolean }) {
   const [query, setQuery] = useState("");
+  const [createOpen, setCreateOpen] = useState(false);
   const filtered = tenants.filter((tenant) => `${tenant.name} ${tenant.slug}`.toLowerCase().includes(query.toLowerCase()));
 
   return (
     <>
-      <PageHeader eyebrow="Administration" title="Tenant operations" detail={mode === "live" ? "Read-only production tenant metadata." : "Prototype tenant administration and governance."} action={<button className="button secondary" type="button" disabled>Tenant API pending</button>} />
+      <PageHeader eyebrow="Administration" title="Tenant operations" detail={mode === "live" ? "Production tenant metadata." : "Prototype tenant administration and governance."} action={<button className={canCreate ? "button primary" : "button secondary"} type="button" disabled={!canCreate} onClick={() => setCreateOpen(true)}><Plus size={16} />Add tenant</button>} />
       <Panel title="Tenant directory" detail={`${filtered.length} of ${tenants.length} tenants`}>
         <label className="search-field"><Search size={16} /><span className="sr-only">Search tenants</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search name or slug" /></label>
         <div className="table-wrap">
@@ -19,6 +21,7 @@ export function TenantsView({ mode, tenants }: { mode: DataMode; tenants: Tenant
         </div>
         {filtered.length === 0 ? <p className="empty-state">No tenants match this search.</p> : null}
       </Panel>
+      {createOpen ? <CreateTenantDialog mode={mode} onClose={() => setCreateOpen(false)} /> : null}
     </>
   );
 }

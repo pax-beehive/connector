@@ -384,6 +384,16 @@ after all non-deferred verification for the current TODO passes.
   - [ ] The ADR names the winner, rejected option, migration seam, and any
         accepted compatibility gaps.
   - [ ] No production implementation begins before the decision is approved.
+- **Implementation status:** Decision made 2026-08-19 by direct owner call,
+  superseding the dual-spike plan: the platform builds the **thin Go
+  proxy** adapter; Cloudflare AI Gateway is rejected to keep the stack
+  uniform and credential custody in-platform. No ADR was written and no
+  Cloudflare spike was run; the black-box contract suite requirement carries
+  over to TODO 12's verification. Scope was also extended by owner decision
+  beyond the RFC's chat-completions-only V1: the gateway exposes
+  `/v1/chat/completions`, `/v1/responses` (OpenAI-format family incl.
+  DeepSeek/OpenRouter) and `/v1/messages` (Anthropic), format-preserving with
+  no cross-format translation.
 
 ## TODO 12 — Route and meter one OpenAI-compatible chat request
 
@@ -404,6 +414,23 @@ after all non-deferred verification for the current TODO passes.
   - [ ] Token/cost facts snapshot model, route, price, upstream request id, and
         terminal status and can be reconciled after an injected crash.
   - [ ] Tenant A cannot select or inspect tenant B's route or usage.
+- **Implementation status:** Code-level implementation landed (uncommitted)
+  in the platform repo: migration `000011_llm_gateway.sql` (`llm_models`,
+  `llm_model_credentials`, `llm_model_prices`, `llm_routes`, `llm_usage`
+  with tenant RLS), platform-owned credential custody via `internal/modelvault`
+  (KMS envelope, `PLATFORM_LLM_KMS_KEY`), the thin gateway in `internal/llm`
+  (tenant-or-global task-class route resolution, format-preserving upstream
+  passthrough, SSE streaming with usage extraction, pre-stream-only failover,
+  terminal `llm_usage` + `usage_facts` ledger with route/price version
+  snapshots; prompt/response content never persisted), tenant endpoints
+  `POST /v1/chat/completions|/v1/responses|/v1/messages` behind the
+  `llm:invoke` API-key scope, admin surface `GET|POST /v1/admin/llm/models`
+  and `GET|POST /v1/admin/llm/routes` (audited, operator+admin), matching
+  `platformctl enroll-llm-model` / `set-llm-route` commands, and the Console
+  "LLM gateway" management UI. Unit + integration suites pass on both repos
+  (real Postgres, RLS isolation verified). The contract-suite verification
+  boxes above remain unchecked: they require a deployed environment and the
+  black-box compatibility run, not yet executed.
 
 ## TODO 13 — Operate tenants through audited admin commands
 

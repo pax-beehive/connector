@@ -82,5 +82,7 @@ function platformSnapshot() {
     actions: [],
     usage: [],
     audit: [],
+    llm_models: [],
+    llm_routes: [],
   };
 }

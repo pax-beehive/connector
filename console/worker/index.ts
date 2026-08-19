@@ -11,6 +11,7 @@ interface Env {
   CONSOLE_ACCESS_AUDIENCE?: string;
   CONSOLE_ACCESS_ISSUER?: string;
   PLATFORM_EDGE_URL?: string;
+  ADMIN_EDGE_URL?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -52,6 +53,7 @@ const worker = {
       request,
       accessAssertion,
       env?.PLATFORM_EDGE_URL,
+      env?.ADMIN_EDGE_URL,
     );
     if (operatorResponse) return operatorResponse;
 
