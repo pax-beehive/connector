@@ -58,7 +58,7 @@ describe("loadConsoleSnapshot", () => {
     expect(fetcher).toHaveBeenCalledWith(
       "https://fde-console-api.paxtech.net/v1/admin/snapshot",
       expect.objectContaining({
-        headers: expect.objectContaining({ "X-FDE-Access-Assertion": "verified-by-worker" }),
+        headers: expect.objectContaining({ Authorization: "Bearer verified-by-worker" }),
       }),
     );
   });

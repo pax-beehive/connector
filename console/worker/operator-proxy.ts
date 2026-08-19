@@ -1,7 +1,7 @@
 const operatorPrefix = "/api/operator/connections/";
 const createPath = `${operatorPrefix}instagram`;
 const bodyLimit = 32 * 1024;
-const delegatedHeader = "X-FDE-Access-Assertion";
+const accessAssertionHeader = "Cf-Access-Jwt-Assertion";
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function handleOperatorRequest(
@@ -28,7 +28,7 @@ export async function handleOperatorRequest(
   const target = new URL(operatorPath(incoming.pathname), origin);
   const headers = new Headers({
     "Content-Type": "application/json",
-    [delegatedHeader]: assertion,
+    [accessAssertionHeader]: assertion,
   });
   const requestID = request.headers.get("X-Request-ID");
   if (requestID && uuidPattern.test(requestID)) headers.set("X-Request-ID", requestID);

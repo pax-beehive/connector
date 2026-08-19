@@ -9,7 +9,8 @@ describe("operator proxy", () => {
     const fetcher = vi.fn<typeof fetch>(async (request) => {
       const forwarded = new Request(request);
       expect(forwarded.url).toBe("https://fde-api.paxtech.net/v1/operator/connections/instagram");
-      expect(forwarded.headers.get("X-FDE-Access-Assertion")).toBe("signed-user-assertion");
+      expect(forwarded.headers.get("Cf-Access-Jwt-Assertion")).toBe("signed-user-assertion");
+      expect(forwarded.headers.get("X-FDE-Access-Assertion")).toBeNull();
       expect(forwarded.headers.get("Cookie")).toBeNull();
       expect(forwarded.headers.get("Authorization")).toBeNull();
       await expect(forwarded.text()).resolves.toContain("provider-token");

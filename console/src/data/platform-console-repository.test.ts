@@ -73,7 +73,7 @@ describe("PlatformConsoleRepository", () => {
         headers: expect.objectContaining({
           "CF-Access-Client-Id": "client.access",
           "CF-Access-Client-Secret": "secret-value",
-          "X-FDE-Access-Assertion": "signed-user-assertion",
+          Authorization: "Bearer signed-user-assertion",
         }),
       }),
     );

@@ -105,7 +105,7 @@ export class PlatformConsoleRepository implements ConsoleRepository {
         Accept: "application/json",
         "CF-Access-Client-Id": this.clientId,
         "CF-Access-Client-Secret": this.clientSecret,
-        ...(this.accessAssertion ? { "X-FDE-Access-Assertion": this.accessAssertion } : {}),
+        ...(this.accessAssertion ? { Authorization: `Bearer ${this.accessAssertion}` } : {}),
       },
       cache: "no-store",
       redirect: "manual",
