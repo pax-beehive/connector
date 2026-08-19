@@ -1,7 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 
+const { applicationHandler } = vi.hoisted(() => ({
+  applicationHandler: vi.fn(async (request: Request) => new Response(
+    request.headers.get("x-fde-verified-access-assertion") ?? "application",
+  )),
+}));
+
 vi.mock("vinext/server/app-router-entry", () => ({
-  default: { fetch: vi.fn(async () => new Response("application")) },
+  default: { fetch: applicationHandler },
 }));
 
 vi.mock("vinext/server/image-optimization", () => ({
@@ -56,6 +62,18 @@ describe("runtime boundaries", () => {
     const response = await worker.fetch(
       new Request("http://localhost/"),
       undefined as unknown as Parameters<typeof worker.fetch>[1],
+      runtimeContext(),
+    );
+
+    await expect(response.text()).resolves.toBe("application");
+  });
+
+  it("removes a client-supplied verified assertion before application dispatch", async () => {
+    const response = await worker.fetch(
+      new Request("http://localhost/", {
+        headers: { "X-FDE-Verified-Access-Assertion": "untrusted" },
+      }),
+      runtimeEnvironment(),
       runtimeContext(),
     );
 

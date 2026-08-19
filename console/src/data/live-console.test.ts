@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { verifiedAccessAssertionHeader } from "../access-boundary";
 import { loadConsoleSnapshot } from "./live-console";
 
 const liveEnvironment = {
@@ -40,7 +41,7 @@ describe("loadConsoleSnapshot", () => {
   });
 
   it("loads live metadata after the Worker verifies Cloudflare Access", async () => {
-    const requestHeaders = new Headers({ "Cf-Access-Jwt-Assertion": "verified-by-worker" });
+    const requestHeaders = new Headers({ [verifiedAccessAssertionHeader]: "verified-by-worker" });
     const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(JSON.stringify(platformSnapshot()), {
       status: 200,
       headers: { "Content-Type": "application/json" },
