@@ -1,5 +1,5 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ConsoleApp } from "./console-app";
 import { prototypeSnapshot } from "./data/mock-console-repository";
 
@@ -8,6 +8,7 @@ function renderConsole() {
 }
 
 describe("ConsoleApp", () => {
+  afterEach(() => vi.unstubAllGlobals());
   it("lets an operator move from the overview to the tenant workspace", () => {
     renderConsole();
 
@@ -139,8 +140,11 @@ describe("ConsoleApp", () => {
     expect(screen.queryByText("Prototype data")).not.toBeInTheDocument();
     expect(screen.getByText("No action metadata currently needs attention.")).toBeVisible();
 
+    fireEvent.change(screen.getByRole("combobox", { name: "Tenant context" }), {
+      target: { value: "tenant-1" },
+    });
     fireEvent.click(screen.getByRole("button", { name: "Connectors" }));
-    expect(screen.getAllByRole("button", { name: "Connection API pending" })[0]).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Operator access required" })).toBeDisabled();
 
     fireEvent.click(screen.getByRole("button", { name: "Events" }));
     expect(screen.getByText("Event metadata API pending.")).toBeVisible();
@@ -153,5 +157,58 @@ describe("ConsoleApp", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Audit log" }));
     expect(screen.getByText("Recorded activity")).toBeVisible();
+  });
+
+  it("lets a live operator save and test an Instagram credential without redisplaying secrets", async () => {
+    const connectionID = "10000000-0000-4000-8000-000000000001";
+    const fetcher = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(Response.json({ connection: {
+        id: connectionID,
+        tenant_id: "tenant-1",
+        provider_id: "instagram",
+        name: "Test Instagram",
+        external_account_id: "ig-user-1",
+        status: "active",
+      } }, { status: 201 }))
+      .mockResolvedValueOnce(Response.json({ check: {
+        id: "check-1",
+        connection_id: connectionID,
+        status: "succeeded",
+        latency_ms: 42,
+        retryable: false,
+        checked_at: "2026-08-18T12:00:00Z",
+      } }));
+    vi.stubGlobal("fetch", fetcher);
+    render(<ConsoleApp snapshot={{
+      ...prototypeSnapshot,
+      mode: "live",
+      actor: { kind: "user", role: "operator" },
+      generatedAt: "2026-08-18T03:04:31Z",
+      auditId: 10,
+    }} />);
+    fireEvent.change(screen.getByRole("combobox", { name: "Tenant context" }), {
+      target: { value: "tenant-1" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Connectors" }));
+    fireEvent.click(screen.getByRole("button", { name: "Connect provider" }));
+
+    fireEvent.change(screen.getByLabelText("Connection name"), { target: { value: "Test Instagram" } });
+    fireEvent.change(screen.getByLabelText("Instagram account ID"), { target: { value: "ig-user-1" } });
+    fireEvent.change(screen.getByLabelText("Access token"), { target: { value: "provider-token" } });
+    fireEvent.change(screen.getByLabelText("App secret"), { target: { value: "provider-secret" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save and test" }));
+
+    await waitFor(() => expect(screen.getByText("Connection succeeded")).toBeVisible());
+    expect(screen.getByText("42 ms")).toBeVisible();
+    expect(screen.queryByDisplayValue("provider-token")).not.toBeInTheDocument();
+    expect(screen.queryByDisplayValue("provider-secret")).not.toBeInTheDocument();
+    expect(fetcher).toHaveBeenNthCalledWith(1, "/api/operator/connections/instagram", expect.objectContaining({
+      method: "POST",
+    }));
+    expect(fetcher).toHaveBeenNthCalledWith(
+      2,
+      `/api/operator/connections/${connectionID}/checks`,
+      expect.objectContaining({ method: "POST" }),
+    );
   });
 });

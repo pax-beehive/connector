@@ -2,12 +2,14 @@
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
 import { verifyAccessAssertion } from "./access-auth";
+import { handleOperatorRequest } from "./operator-proxy";
 
 interface Env {
   ASSETS: Fetcher;
   CONSOLE_AUTH_MODE?: string;
   CONSOLE_ACCESS_AUDIENCE?: string;
   CONSOLE_ACCESS_ISSUER?: string;
+  PLATFORM_EDGE_URL?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -31,10 +33,11 @@ interface ExecutionContext {
 const worker = {
   async fetch(request: Request, env: Env | undefined, ctx: ExecutionContext): Promise<Response> {
     const authMode = env?.CONSOLE_AUTH_MODE;
+    const accessAssertion = request.headers.get("cf-access-jwt-assertion") ?? "";
     if (authMode) {
       const allowed = authMode === "cloudflare_access"
         && await verifyAccessAssertion(
-          request.headers.get("cf-access-jwt-assertion") ?? "",
+          accessAssertion,
           {
             audience: env.CONSOLE_ACCESS_AUDIENCE,
             issuer: env.CONSOLE_ACCESS_ISSUER,
@@ -44,6 +47,12 @@ const worker = {
     }
 
     const url = new URL(request.url);
+    const operatorResponse = await handleOperatorRequest(
+      request,
+      accessAssertion,
+      env?.PLATFORM_EDGE_URL,
+    );
+    if (operatorResponse) return operatorResponse;
 
     if (url.pathname === "/_vinext/image") {
       if (!env) return new Response("Image bindings unavailable", { status: 503 });

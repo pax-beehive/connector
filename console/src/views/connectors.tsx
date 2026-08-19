@@ -2,11 +2,12 @@ import { Plus } from "lucide-react";
 import type { Connection, DataMode } from "../domain/console";
 import { HealthPill, PageHeader, Panel } from "../components/primitives";
 
-export function ConnectorsView({ mode, connections, canConnect, onConnect }: { mode: DataMode; connections: Connection[]; canConnect: boolean; onConnect: () => void }) {
+export function ConnectorsView({ mode, connections, canConnect, hasTenant, onConnect }: { mode: DataMode; connections: Connection[]; canConnect: boolean; hasTenant: boolean; onConnect: () => void }) {
   const live = mode === "live";
+  const connectLabel = canConnect ? "Connect provider" : !hasTenant ? "Select tenant to connect" : live ? "Operator access required" : "Select tenant to connect";
   return (
     <>
-      <PageHeader eyebrow="Credential vault" title="Connector fleet" detail={live ? "Production connection metadata. Credential material is never returned to the console." : "Sample provider connections, credential posture, and event activity."} action={<button className={canConnect ? "button primary" : "button secondary"} type="button" disabled={!canConnect} onClick={onConnect}><Plus size={16} />{canConnect ? "Connect provider" : live ? "Connection API pending" : "Select tenant to connect"}</button>} />
+      <PageHeader eyebrow="Credential vault" title="Connector fleet" detail={live ? "Production connection metadata. Credential material is never returned to the console." : "Sample provider connections, credential posture, and event activity."} action={<button className={canConnect ? "button primary" : "button secondary"} type="button" disabled={!canConnect} onClick={onConnect}><Plus size={16} />{connectLabel}</button>} />
       <section className="connector-grid">
         {connections.map((connection) => (
           <article className="connector-card" key={connection.id}>

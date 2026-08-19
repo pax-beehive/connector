@@ -18,6 +18,7 @@ export async function loadConsoleSnapshot(options: LiveConsoleOptions): Promise<
     edgeUrl: requiredSetting(options.environment.ADMIN_EDGE_URL, "admin edge URL"),
     clientId: requiredSetting(options.environment.CF_ACCESS_CLIENT_ID, "client id"),
     clientSecret: requiredSetting(options.environment.CF_ACCESS_CLIENT_SECRET, "client secret"),
+    accessAssertion: options.requestHeaders.get("cf-access-jwt-assertion") ?? undefined,
     fetcher: options.fetcher,
   }).getSnapshot();
 }

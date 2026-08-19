@@ -1,0 +1,124 @@
+const operatorPrefix = "/api/operator/connections/";
+const createPath = `${operatorPrefix}instagram`;
+const bodyLimit = 32 * 1024;
+const delegatedHeader = "X-FDE-Access-Assertion";
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function handleOperatorRequest(
+  request: Request,
+  assertion: string,
+  platformEdgeUrl: string | undefined,
+  fetcher: typeof fetch = fetch,
+): Promise<Response | null> {
+  const incoming = new URL(request.url);
+  if (!incoming.pathname.startsWith(operatorPrefix)) return null;
+
+  const origin = validOrigin(platformEdgeUrl);
+  if (!origin) return operatorError(503, "operator_configuration_unavailable");
+  if (incoming.search) return operatorError(404, "not_found");
+  if (request.method !== "POST") return operatorError(405, "method_not_allowed");
+  if (!validPath(incoming.pathname)) return operatorError(404, "not_found");
+  if (!assertion || assertion.length > 16_384) return operatorError(401, "access_invalid");
+  if (!request.headers.get("Content-Type")?.toLowerCase().startsWith("application/json")) {
+    return operatorError(415, "content_type_required");
+  }
+
+  const body = await readBoundedBody(request);
+  if (!body) return operatorError(413, "request_too_large");
+  const target = new URL(operatorPath(incoming.pathname), origin);
+  const headers = new Headers({
+    "Content-Type": "application/json",
+    [delegatedHeader]: assertion,
+  });
+  const requestID = request.headers.get("X-Request-ID");
+  if (requestID && uuidPattern.test(requestID)) headers.set("X-Request-ID", requestID);
+
+  try {
+    const response = await fetcher(new Request(target, {
+      method: "POST",
+      headers,
+      body,
+      redirect: "manual",
+    }));
+    if (response.status >= 300 && response.status < 400) {
+      return operatorError(502, "origin_redirect_rejected");
+    }
+    return sanitizedResponse(response);
+  } catch {
+    return operatorError(502, "origin_unavailable");
+  }
+}
+
+async function readBoundedBody(request: Request) {
+  const declaredLength = Number(request.headers.get("Content-Length"));
+  if (Number.isFinite(declaredLength) && declaredLength > bodyLimit) return null;
+  if (!request.body) return new Uint8Array();
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  while (true) {
+    const next = await reader.read();
+    if (next.done) break;
+    size += next.value.byteLength;
+    if (size > bodyLimit) {
+      await reader.cancel();
+      return null;
+    }
+    chunks.push(next.value);
+  }
+  const body = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    body.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return body;
+}
+
+function validOrigin(value: string | undefined) {
+  if (!value) return null;
+  try {
+    const origin = new URL(value);
+    return origin.protocol === "https:"
+      && !origin.username
+      && !origin.password
+      && origin.pathname === "/"
+      && !origin.search
+      && !origin.hash
+      ? origin
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function validPath(path: string) {
+  if (path === createPath) return true;
+  const match = path.match(/^\/api\/operator\/connections\/([^/]+)\/checks$/);
+  return Boolean(match && uuidPattern.test(match[1]));
+}
+
+function operatorPath(path: string) {
+  return path.replace(/^\/api\/operator/, "/v1/operator");
+}
+
+function sanitizedResponse(response: Response) {
+  const headers = new Headers({
+    "Cache-Control": "no-store",
+    "Content-Type": response.headers.get("Content-Type") ?? "application/json",
+    "X-Content-Type-Options": "nosniff",
+  });
+  const requestID = response.headers.get("X-Request-ID");
+  if (requestID && uuidPattern.test(requestID)) headers.set("X-Request-ID", requestID);
+  return new Response(response.body, { status: response.status, headers });
+}
+
+function operatorError(status: number, kind: string) {
+  return Response.json({ error: { kind } }, {
+    status,
+    headers: {
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff",
+    },
+  });
+}

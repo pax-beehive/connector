@@ -35,7 +35,7 @@ export function ConsoleApp({ snapshot }: { snapshot: ConsoleSnapshot }) {
         <main className="main-content">{renderView(view, visibleSnapshot, selectedTenant?.name, () => setConnectOpen(true))}</main>
       </div>
       {sidebarOpen ? <button className="sidebar-scrim" type="button" aria-label="Close navigation overlay" onClick={() => setSidebarOpen(false)} /> : null}
-      {snapshot.mode === "prototype" && connectOpen && selectedTenant ? <ConnectDialog tenantName={selectedTenant.name} onClose={() => setConnectOpen(false)} /> : null}
+      {connectOpen && selectedTenant ? <ConnectDialog mode={snapshot.mode} tenantId={selectedTenant.id} tenantName={selectedTenant.name} onClose={() => setConnectOpen(false)} /> : null}
     </div>
   );
 }
@@ -45,7 +45,7 @@ function renderView(view: ViewId, snapshot: ConsoleSnapshot, tenantName: string 
     case "tenants":
       return <TenantsView mode={snapshot.mode} tenants={snapshot.tenants} />;
     case "connectors":
-      return <ConnectorsView mode={snapshot.mode} connections={snapshot.connections} canConnect={snapshot.mode === "prototype" && Boolean(tenantName)} onConnect={onConnect} />;
+      return <ConnectorsView mode={snapshot.mode} connections={snapshot.connections} canConnect={Boolean(tenantName) && (snapshot.mode === "prototype" || snapshot.actor.role === "operator" || snapshot.actor.role === "admin")} hasTenant={Boolean(tenantName)} onConnect={onConnect} />;
     case "routing":
       return <RoutingView mode={snapshot.mode} routes={snapshot.routes} />;
     case "events":

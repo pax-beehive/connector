@@ -12,6 +12,7 @@ interface PlatformConsoleRepositoryOptions {
   edgeUrl: string;
   clientId: string;
   clientSecret: string;
+  accessAssertion?: string;
   fetcher?: typeof fetch;
 }
 
@@ -87,12 +88,14 @@ export class PlatformConsoleRepository implements ConsoleRepository {
   private readonly edgeUrl: string;
   private readonly clientId: string;
   private readonly clientSecret: string;
+  private readonly accessAssertion?: string;
   private readonly fetcher: typeof fetch;
 
   constructor(options: PlatformConsoleRepositoryOptions) {
     this.edgeUrl = validEdgeUrl(options.edgeUrl);
     this.clientId = requiredCredential(options.clientId, "client id");
     this.clientSecret = requiredCredential(options.clientSecret, "client secret");
+    this.accessAssertion = optionalAssertion(options.accessAssertion);
     this.fetcher = options.fetcher ?? fetch;
   }
 
@@ -102,6 +105,7 @@ export class PlatformConsoleRepository implements ConsoleRepository {
         Accept: "application/json",
         "CF-Access-Client-Id": this.clientId,
         "CF-Access-Client-Secret": this.clientSecret,
+        ...(this.accessAssertion ? { "X-FDE-Access-Assertion": this.accessAssertion } : {}),
       },
       cache: "no-store",
       redirect: "manual",
@@ -111,6 +115,12 @@ export class PlatformConsoleRepository implements ConsoleRepository {
     }
     return mapPlatformSnapshot(parseSnapshot(await response.json()));
   }
+}
+
+function optionalAssertion(value: string | undefined) {
+  if (value === undefined) return undefined;
+  if (!value || value.length > 16_384) throw new Error("Console Access assertion is invalid");
+  return value;
 }
 
 function mapPlatformSnapshot(source: PlatformSnapshot): ConsoleSnapshot {

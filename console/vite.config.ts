@@ -30,6 +30,7 @@ const localBindingConfig = {
     CONSOLE_ACCESS_ISSUER: "https://billowing-dream-9314.cloudflareaccess.com",
     CONSOLE_AUTH_MODE: "cloudflare_access",
     CONSOLE_DATA_MODE: "live",
+    PLATFORM_EDGE_URL: "https://fde-api.paxtech.net",
   },
   d1_databases: d1
     ? [

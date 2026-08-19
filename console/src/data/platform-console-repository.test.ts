@@ -60,6 +60,7 @@ describe("PlatformConsoleRepository", () => {
       edgeUrl: "https://admin.example.com",
       clientId: "client.access",
       clientSecret: "secret-value",
+      accessAssertion: "signed-user-assertion",
       fetcher,
     });
 
@@ -72,6 +73,7 @@ describe("PlatformConsoleRepository", () => {
         headers: expect.objectContaining({
           "CF-Access-Client-Id": "client.access",
           "CF-Access-Client-Secret": "secret-value",
+          "X-FDE-Access-Assertion": "signed-user-assertion",
         }),
       }),
     );

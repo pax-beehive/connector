@@ -454,7 +454,14 @@ after all non-deferred verification for the current TODO passes.
   navigation against one tenant and one connection. The Worker uses manual
   redirect handling because the edge runtime rejects `redirect: "error"`;
   redirect responses still fail closed through the non-2xx status check.
-  User-facing role mapping plus all management actions remain open.
+  A local follow-up implements explicit user registration, delegated Access
+  verification, tenant-scoped operator authorization, KMS-backed Instagram
+  connection creation, and a durable read-only connectivity check. The Console
+  form clears secret fields before awaiting a response and the Worker exposes
+  only the exact create/check paths. This slice is not counted as production
+  evidence until schema version 9, the platform service, the registered user,
+  and the updated Console Worker are remotely verified. All remaining TODO 13
+  management actions stay open.
 - **Verification:**
   - [ ] JWT/JWKS fixtures cover valid, expired, wrong-audience, unknown-user,
         viewer, operator, admin, and service identities.

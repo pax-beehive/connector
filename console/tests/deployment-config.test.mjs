@@ -12,6 +12,7 @@ test("generates a private production Cloudflare deployment", async () => {
   assert.equal(config.vars.CONSOLE_AUTH_MODE, "cloudflare_access");
   assert.equal(config.vars.CONSOLE_DATA_MODE, "live");
   assert.equal(config.vars.ADMIN_EDGE_URL, "https://fde-console-api.paxtech.net");
+  assert.equal(config.vars.PLATFORM_EDGE_URL, "https://fde-api.paxtech.net");
   assert.equal("CF_ACCESS_CLIENT_ID" in config.vars, false);
   assert.equal("CF_ACCESS_CLIENT_SECRET" in config.vars, false);
 });

@@ -54,6 +54,12 @@ describe("loadConsoleSnapshot", () => {
 
     expect(snapshot.mode).toBe("live");
     expect(fetcher).toHaveBeenCalledOnce();
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://fde-console-api.paxtech.net/v1/admin/snapshot",
+      expect.objectContaining({
+        headers: expect.objectContaining({ "X-FDE-Access-Assertion": "verified-by-worker" }),
+      }),
+    );
   });
 
   it("rejects unknown data modes instead of widening to prototype data", async () => {
