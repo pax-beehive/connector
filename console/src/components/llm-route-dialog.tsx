@@ -168,6 +168,11 @@ function friendlyError(kind: string) {
     actor_forbidden: "operator access is required to set routes",
     invalid_request: "the route configuration is invalid",
     admin_unavailable: "the routing service is temporarily unavailable",
+    access_unavailable: "access verification is temporarily unavailable",
+    database_unavailable: "the admin database is temporarily unavailable",
+    operator_configuration_unavailable: "the Console proxy is not fully configured",
+    origin_unavailable: "the admin service could not be reached",
+    origin_redirect_rejected: "the admin service rejected the proxied request",
   };
   return messages[kind] ?? "the request could not be completed";
 }

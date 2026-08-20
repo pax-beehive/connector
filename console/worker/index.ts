@@ -12,6 +12,8 @@ interface Env {
   CONSOLE_ACCESS_ISSUER?: string;
   PLATFORM_EDGE_URL?: string;
   ADMIN_EDGE_URL?: string;
+  CF_ACCESS_CLIENT_ID?: string;
+  CF_ACCESS_CLIENT_SECRET?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -54,6 +56,7 @@ const worker = {
       accessAssertion,
       env?.PLATFORM_EDGE_URL,
       env?.ADMIN_EDGE_URL,
+      { clientId: env?.CF_ACCESS_CLIENT_ID, clientSecret: env?.CF_ACCESS_CLIENT_SECRET },
     );
     if (operatorResponse) return operatorResponse;
 

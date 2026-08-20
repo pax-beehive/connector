@@ -162,6 +162,11 @@ function friendlyError(kind: string) {
     actor_forbidden: "operator access is required for this tenant",
     invalid_request: "the connection details are invalid",
     operator_unavailable: "the connection service is temporarily unavailable",
+    access_unavailable: "access verification is temporarily unavailable",
+    database_unavailable: "the platform database is temporarily unavailable",
+    operator_configuration_unavailable: "the Console proxy is not fully configured",
+    origin_unavailable: "the platform edge could not be reached",
+    origin_redirect_rejected: "the platform edge rejected the proxied request",
   };
   return messages[kind] ?? "the request could not be completed";
 }

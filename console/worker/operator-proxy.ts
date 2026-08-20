@@ -8,11 +8,17 @@ const bodyLimit = 32 * 1024;
 const accessAssertionHeader = "Cf-Access-Jwt-Assertion";
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+export interface AdminServiceAccess {
+  clientId?: string;
+  clientSecret?: string;
+}
+
 export async function handleOperatorRequest(
   request: Request,
   assertion: string,
   platformEdgeUrl: string | undefined,
   adminEdgeUrl: string | undefined,
+  adminAccess: AdminServiceAccess | undefined,
   fetcher: typeof fetch = fetch,
 ): Promise<Response | null> {
   const incoming = new URL(request.url);
@@ -21,6 +27,8 @@ export async function handleOperatorRequest(
 
   const origin = validOrigin(admin ? adminEdgeUrl : platformEdgeUrl);
   if (!origin) return operatorError(503, "operator_configuration_unavailable");
+  const serviceAccess = admin ? validServiceAccess(adminAccess) : null;
+  if (admin && !serviceAccess) return operatorError(503, "operator_configuration_unavailable");
   if (incoming.search) return operatorError(404, "not_found");
   if (request.method !== "POST") return operatorError(405, "method_not_allowed");
   if (!validPath(incoming.pathname)) return operatorError(404, "not_found");
@@ -32,10 +40,18 @@ export async function handleOperatorRequest(
   const body = await readBoundedBody(request);
   if (!body) return operatorError(413, "request_too_large");
   const target = new URL(admin ? adminPath(incoming.pathname) : operatorPath(incoming.pathname), origin);
-  const headers = new Headers({
-    "Content-Type": "application/json",
-    [accessAssertionHeader]: assertion,
-  });
+  const headers = new Headers({ "Content-Type": "application/json" });
+  if (serviceAccess) {
+    // The admin edge sits behind Cloudflare Access: authenticate the Worker
+    // with the Access service token and delegate the operator identity via a
+    // bearer assertion, which the admin edge forwards as the delegated
+    // assertion header. Access injects its own service JWT assertion.
+    headers.set("CF-Access-Client-Id", serviceAccess.clientId);
+    headers.set("CF-Access-Client-Secret", serviceAccess.clientSecret);
+    headers.set("Authorization", `Bearer ${assertion}`);
+  } else {
+    headers.set(accessAssertionHeader, assertion);
+  }
   const requestID = request.headers.get("X-Request-ID");
   if (requestID && uuidPattern.test(requestID)) headers.set("X-Request-ID", requestID);
 
@@ -79,6 +95,13 @@ async function readBoundedBody(request: Request) {
     offset += chunk.byteLength;
   }
   return body;
+}
+
+function validServiceAccess(access: AdminServiceAccess | undefined) {
+  const clientId = access?.clientId ?? "";
+  const clientSecret = access?.clientSecret ?? "";
+  if (!clientId || !clientSecret) return null;
+  return { clientId, clientSecret };
 }
 
 function validOrigin(value: string | undefined) {
